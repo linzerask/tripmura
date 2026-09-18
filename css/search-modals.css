@@ -23,32 +23,35 @@
 }
 
 /* ==========================================================================
-   2. Base Popover Styles (Concentric Radius: 20px outer = 12px inner + 8px padding)
+   2. Desktop Popover Styles (Concentric Radius: 20px outer = 12px inner + 8px padding)
    ========================================================================== */
-.search-popover {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  z-index: 1000;
-  background: #ffffff;
-  border: 1px solid var(--border-card);
-  border-radius: var(--radius-card-sm); /* 20px */
-  padding: var(--space-2); /* 8px */
-  box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(15, 23, 42, 0.08);
-  width: 380px;
-  max-width: 90vw;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-6px) scale(0.98);
-  transition: all var(--transition-normal);
-  pointer-events: none;
-}
+@media (min-width: 641px) {
+  .search-popover {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 1000;
+    background: #ffffff;
+    border: 1px solid var(--border-card);
+    border-radius: var(--radius-card-sm); /* 20px */
+    padding: var(--space-2); /* 8px */
+    box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(15, 23, 42, 0.08);
+    width: 380px;
+    max-width: 90vw;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px) scale(0.98);
+    transition: all var(--transition-normal);
+    pointer-events: none;
+  }
 
-.search-popover.open {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0) scale(1);
-  pointer-events: auto;
+  .search-popover.open,
+  .search-popover.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
 }
 
 /* Header within popover */
@@ -165,16 +168,19 @@
 /* ==========================================================================
    4. Calendar Date Range Modal (Double Month June & July 2026)
    ========================================================================== */
-.calendar-popover {
-  width: 620px;
-  left: 50%;
-  transform: translateX(-50%) translateY(-6px) scale(0.98);
-  padding: var(--space-3); /* 12px padding with 24px outer */
-  border-radius: var(--radius-card-lg); /* 24px outer */
-}
+@media (min-width: 641px) {
+  .calendar-popover {
+    width: 620px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-6px) scale(0.98);
+    padding: var(--space-3); /* 12px padding with 24px outer */
+    border-radius: var(--radius-card-lg); /* 24px outer */
+  }
 
-.calendar-popover.open {
-  transform: translateX(-50%) translateY(0) scale(1);
+  .calendar-popover.open,
+  .calendar-popover.active {
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
 }
 
 /* Presets & Trip Type Top Bar */
@@ -568,8 +574,18 @@
 }
 
 /* ==========================================================================
-   7. Mobile Bottom-Sheet Modal Drawer (<640px)
+   7. Desktop / Mobile Responsive Styles & Full-Screen Modals (<640px)
    ========================================================================== */
+
+/* Hide Mobile-Only Elements on Desktop */
+@media (min-width: 641px) {
+  .modal-top-bar,
+  .modal-search-box,
+  .modal-sticky-footer {
+    display: none !important;
+  }
+}
+
 .search-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -597,42 +613,61 @@ body.search-modal-open .multimodal-search-card,
   z-index: 1000 !important;
 }
 
+@keyframes slideUpMobile {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 @media (max-width: 640px) {
-  .multimodal-search-card.modal-active,
-  body.search-modal-open .multimodal-search-card {
+  body.search-modal-open,
+  body.search-modal-open .multimodal-search-card,
+  body.search-modal-open .hero-section,
+  body.search-modal-open .hero-wrapper,
+  .multimodal-search-card.modal-active {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     transform: none !important;
-    z-index: 1000 !important;
+    filter: none !important;
   }
 
+  /* When inactive on mobile, keep completely hidden */
   .search-popover,
   .search-popover-dropdown,
   #datesPickerModal,
   #travelersModal {
+    display: none !important;
     position: fixed !important;
-    top: auto !important;
-    bottom: 0 !important;
+    top: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    width: 100% !important;
+    bottom: 0 !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
     max-width: 100vw !important;
-    max-height: 80vh !important;
+    max-height: 100vh !important;
+    max-height: 100dvh !important;
     background: #ffffff !important;
-    border-radius: 24px 24px 0 0 !important;
-    border: 1px solid rgba(15, 23, 42, 0.1) !important;
-    border-bottom: none !important;
-    box-shadow: 0 -10px 40px rgba(15, 23, 42, 0.25) !important;
-    z-index: 1050 !important;
-    padding: 20px 20px 32px !important;
-    overflow-y: auto !important;
-    transform: translateY(100%) !important;
+    z-index: 2000 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    transform: none !important;
+    box-shadow: none !important;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease, visibility 200ms ease !important;
   }
 
+  /* When active / open on mobile -> Full-Screen Modal Overlay */
   .search-popover.open,
   .search-popover.active,
   .search-popover-dropdown.open,
@@ -641,33 +676,220 @@ body.search-modal-open .multimodal-search-card,
   #datesPickerModal.active,
   #travelersModal.open,
   #travelersModal.active {
-    transform: translateY(0) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    max-height: 100dvh !important;
+    background: #ffffff !important;
+    z-index: 2000 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
+    animation: slideUpMobile 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
   }
 
-  .popover-header::before {
-    content: '';
-    position: absolute;
-    top: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px;
-    height: 4px;
-    background: #cbd5e1;
-    border-radius: var(--radius-pill);
+  /* Mobile Top Bar (Skyscanner Style) */
+  .modal-top-bar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 12px 16px !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    flex-shrink: 0 !important;
+    height: 56px !important;
   }
 
-  .calendar-popover {
+  .modal-back-btn {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    cursor: pointer !important;
+    color: #0f172a !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    transition: background 0.15s ease !important;
+    flex-shrink: 0 !important;
+  }
+
+  .modal-back-btn:active {
+    background: #e2e8f0 !important;
+    transform: scale(0.95);
+  }
+
+  .modal-bar-title {
+    font-size: 1.02rem !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    text-align: center !important;
+    flex: 1 !important;
+    letter-spacing: -0.2px !important;
+  }
+
+  .modal-close-icon-btn {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    cursor: pointer !important;
+    color: #64748b !important;
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    width: 36px !important;
+    height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    transition: background 0.15s ease !important;
+    flex-shrink: 0 !important;
+  }
+
+  .modal-close-icon-btn:active {
+    background: #e2e8f0 !important;
+  }
+
+  /* Mobile Live Search Box */
+  .modal-search-box {
+    display: block !important;
+    padding: 10px 16px !important;
+    background: #f8fafc !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .modal-input-wrap {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
     width: 100% !important;
-    left: 0 !important;
+    background: #ffffff !important;
+    border: 1.5px solid var(--primary-azure, #0284c7) !important;
+    border-radius: 12px !important;
+    padding: 0 12px !important;
+    height: 46px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  .search-lens-icon {
+    color: var(--primary-azure, #0284c7) !important;
+    margin-right: 8px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .modal-search-field {
+    flex: 1 !important;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: var(--text-primary, #0f172a) !important;
+  }
+
+  .modal-search-field::placeholder {
+    color: #94a3b8 !important;
+    font-weight: 500 !important;
+  }
+
+  .modal-input-clear {
+    background: #f1f5f9 !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 24px !important;
+    height: 24px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.75rem !important;
+    color: #64748b !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Modal Scroll Body */
+  .modal-scroll-body {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 16px !important;
+  }
+
+  .location-list {
+    max-height: none !important;
+    gap: 8px !important;
+  }
+
+  .location-item {
+    padding: 12px 14px !important;
+    border-radius: 14px !important;
+    background: #f8fafc !important;
+    border: 1px solid #f1f5f9 !important;
+    margin-bottom: 2px !important;
+  }
+
+  .location-item:hover,
+  .location-item.focused {
+    background: var(--primary-azure-50, #f0f9ff) !important;
+    border-color: rgba(2, 132, 199, 0.25) !important;
   }
 
   .calendar-dual-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-    max-height: 48vh;
-    overflow-y: auto;
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
+
+  .popover-footer {
+    display: none !important;
+  }
+
+  /* Mobile Sticky Footer */
+  .modal-sticky-footer {
+    display: block !important;
+    flex-shrink: 0 !important;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+    background: #ffffff !important;
+    border-top: 1px solid #f1f5f9 !important;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  .btn-modal-apply {
+    width: 100% !important;
+    height: 48px !important;
+    border-radius: 12px !important;
+    background: var(--gradient-azure, linear-gradient(135deg, #0284c7 0%, #0369a1 100%)) !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    border: none !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35) !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+  }
+
+  .btn-modal-apply:active {
+    transform: scale(0.98) !important;
+    box-shadow: 0 2px 6px rgba(2, 132, 199, 0.2) !important;
   }
 }

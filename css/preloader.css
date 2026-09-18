@@ -204,31 +204,31 @@ body:not(.preloader-done) .social-proof-bar {
 
 body.preloader-done .site-header {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
   transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 body.preloader-done .hero-headline {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
   transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
 }
 
 body.preloader-done .hero-subheadline {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
   transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.18s, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.18s;
 }
 
 body.preloader-done .multimodal-search-card {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
   transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.25s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.25s;
 }
 
 body.preloader-done .hero-route-preview,
 body.preloader-done .social-proof-bar {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
   transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.32s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.32s;
 }

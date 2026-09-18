@@ -84,6 +84,16 @@ function initSearchEngine() {
         backdrop.classList.add('open');
         backdrop.classList.add('active');
       }
+
+      // Sync mobile search input value if present
+      const modalSearch = popover.querySelector('.modal-search-field');
+      if (modalSearch && fieldWrap) {
+        const mainInput = fieldWrap.querySelector('.field-input');
+        if (mainInput) {
+          modalSearch.value = mainInput.value;
+          setTimeout(() => modalSearch.focus(), 100);
+        }
+      }
     }
     if (fieldWrap) {
       fieldWrap.classList.add('active');
@@ -159,6 +169,9 @@ function initSearchEngine() {
     const listEl = container.querySelector('.location-list');
     if (!listEl) return;
 
+    const modalSearchInput = container.querySelector('.modal-search-field');
+    const modalClearBtn = container.querySelector('.modal-input-clear');
+
     let debounceTimer = null;
     const inputKey = inputEl.id;
 
@@ -201,8 +214,9 @@ function initSearchEngine() {
         row.addEventListener('click', (e) => {
           e.stopPropagation();
           inputEl.value = item.name;
+          if (modalSearchInput) modalSearchInput.value = item.name;
           closeAllPopovers();
-          if (nextOpenFn) nextOpenFn();
+          if (nextOpenFn && window.innerWidth > 640) nextOpenFn();
         });
 
         listEl.appendChild(row);
@@ -218,16 +232,12 @@ function initSearchEngine() {
     // Initial render with curated popular hubs
     renderItems(presetHubs);
 
-    // Live typing handler with debounce + API lookup
-    inputEl.addEventListener('input', (e) => {
-      const q = e.target.value.trim();
+    function handleQueryInput(q) {
       clearTimeout(debounceTimer);
 
       if (fetchAbortControllers[inputKey]) {
         fetchAbortControllers[inputKey].abort();
       }
-
-      openPopover(container, inputEl.closest('.search-field'));
 
       if (!q) {
         renderItems(presetHubs);
@@ -254,7 +264,35 @@ function initSearchEngine() {
           renderItems(results, false, q);
         }
       }, 220);
+    }
+
+    // Live typing handler on main input
+    inputEl.addEventListener('input', (e) => {
+      const q = e.target.value.trim();
+      if (modalSearchInput) modalSearchInput.value = e.target.value;
+      openPopover(container, inputEl.closest('.search-field'));
+      handleQueryInput(q);
     });
+
+    // Mobile search input handler
+    if (modalSearchInput) {
+      modalSearchInput.addEventListener('input', (e) => {
+        const q = e.target.value.trim();
+        inputEl.value = e.target.value;
+        handleQueryInput(q);
+      });
+    }
+
+    // Clear button handler
+    if (modalClearBtn) {
+      modalClearBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (modalSearchInput) modalSearchInput.value = '';
+        inputEl.value = '';
+        renderItems(presetHubs);
+        if (modalSearchInput) modalSearchInput.focus();
+      });
+    }
 
     // Input focus / click handler
     inputEl.addEventListener('click', (e) => {
@@ -675,7 +713,41 @@ function initSearchEngine() {
   });
 
   // --------------------------------------------------------------------------
-  // 8. Global Outside-Click & Escape Key Dismissal
+  // 8. Mobile Modal Close, Back & Apply Handlers
+  // --------------------------------------------------------------------------
+  document.querySelectorAll('.modal-back-btn, .modal-close-icon-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeAllPopovers();
+    });
+  });
+
+  const applyOriginBtn = document.getElementById('applyOriginBtn');
+  if (applyOriginBtn) {
+    applyOriginBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeAllPopovers();
+    });
+  }
+
+  const applyDestBtn = document.getElementById('applyDestBtn');
+  if (applyDestBtn) {
+    applyDestBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeAllPopovers();
+    });
+  }
+
+  const applyDatesModalBtn = document.getElementById('applyDatesModalBtn');
+  if (applyDatesModalBtn) {
+    applyDatesModalBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeAllPopovers();
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 9. Global Outside-Click & Escape Key Dismissal
   // --------------------------------------------------------------------------
   document.addEventListener('click', (e) => {
     if (
