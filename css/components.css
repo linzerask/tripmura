@@ -384,7 +384,7 @@
 }
 
 /* ==========================================================================
-   Responsive Breakpoint for Navigation
+   Responsive Breakpoints for Navigation
    ========================================================================== */
 @media (max-width: 980px) {
   .nav-menu {
@@ -395,5 +395,61 @@
   }
   .mobile-nav-toggle {
     display: inline-flex;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    padding: 10px 0;
+  }
+
+  .site-header .nav-actions .btn-primary {
+    display: none !important;
+  }
+
+  .navbar-shell {
+    padding: 6px 12px 6px 16px;
+    gap: 12px;
+  }
+
+  .brand-link {
+    gap: 8px;
+  }
+
+  .brand-symbol-img {
+    height: 32px;
+    width: 32px;
+  }
+
+  .brand-wordmark {
+    font-size: 1.1rem;
+    letter-spacing: 0.3px;
+  }
+
+  .mobile-nav-toggle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(2, 132, 199, 0.08);
+    border: 1px solid rgba(2, 132, 199, 0.15);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-azure-dark);
+    padding: 0;
+    box-shadow: var(--shadow-xs);
+    transition: all var(--transition-fast);
+  }
+
+  .mobile-nav-toggle:hover {
+    background: var(--primary-azure-50);
+    border-color: var(--primary-azure);
+    transform: scale(1.04);
+  }
+
+  .mobile-nav-toggle svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
   }
 }
