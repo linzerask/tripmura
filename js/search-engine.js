@@ -54,19 +54,35 @@ function initSearchEngine() {
   // 2. Helper: Popover & Dropdown Visibility Management
   // --------------------------------------------------------------------------
   function closeAllPopovers() {
-    allPopovers.forEach(p => p.classList.remove('open'));
-    allFields.forEach(f => f.classList.remove('active'));
+    allPopovers.forEach(p => {
+      p.classList.remove('open');
+      p.classList.remove('active');
+    });
+    allFields.forEach(f => {
+      f.classList.remove('active');
+    });
     document.querySelectorAll('.micro-dropdown-menu').forEach(m => m.classList.remove('open'));
     document.querySelectorAll('.micro-option-btn').forEach(b => b.classList.remove('active'));
-    if (backdrop) backdrop.classList.remove('open');
+    document.body.classList.remove('search-modal-open');
+    const searchCard = document.querySelector('.multimodal-search-card');
+    if (searchCard) searchCard.classList.remove('modal-active');
+    if (backdrop) {
+      backdrop.classList.remove('open');
+      backdrop.classList.remove('active');
+    }
   }
 
   function openPopover(popover, fieldWrap) {
     closeAllPopovers();
     if (popover) {
       popover.classList.add('open');
+      popover.classList.add('active');
+      document.body.classList.add('search-modal-open');
+      const searchCard = document.querySelector('.multimodal-search-card');
+      if (searchCard) searchCard.classList.add('modal-active');
       if (backdrop && window.innerWidth <= 640) {
         backdrop.classList.add('open');
+        backdrop.classList.add('active');
       }
     }
     if (fieldWrap) {
