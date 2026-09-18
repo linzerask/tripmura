@@ -62,18 +62,26 @@
   font-weight: 800;
   letter-spacing: var(--tracking-tight);
   line-height: var(--line-height-tight);
-  color: var(--text-primary);
+  color: #0f172a;
   margin-bottom: clamp(16px, 2.5vw, 24px);
   max-width: 900px;
 }
 
+.hero-headline .text-gradient {
+  color: #ffffff !important;
+  background: none !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-shadow: 0 0 20px rgba(0, 242, 254, 0.7), 0 2px 8px rgba(15, 23, 42, 0.5);
+}
+
 .hero-subheadline {
   font-size: var(--font-body-lg);
-  color: var(--text-secondary);
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(15, 23, 42, 0.35);
   line-height: var(--line-height-normal);
   max-width: 680px;
   margin-bottom: clamp(32px, 4vw, 44px);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* ==========================================================================
@@ -368,6 +376,16 @@
   justify-content: center;
   gap: 12px;
   margin-bottom: 40px;
+}
+
+.route-preview-label,
+.hero-route-preview > span {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #ffffff !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 4px rgba(15, 23, 42, 0.35);
 }
 
 .route-pill-item {

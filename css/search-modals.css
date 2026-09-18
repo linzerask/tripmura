@@ -195,6 +195,12 @@
   flex-wrap: wrap;
 }
 
+.calendar-nav-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .calendar-trip-type-toggle {
   display: inline-flex;
   background: rgba(15, 23, 42, 0.06);
@@ -220,11 +226,56 @@
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.12);
 }
 
+.calendar-month-arrows {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(15, 23, 42, 0.04);
+  padding: 2px 4px;
+  border-radius: var(--radius-pill);
+}
+
+.cal-arrow-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: #ffffff;
+  color: var(--text-primary);
+  font-size: 1.15rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 120ms ease;
+  user-select: none;
+  line-height: 1;
+}
+
+.cal-arrow-btn:hover {
+  background: var(--primary-azure-50);
+  border-color: var(--primary-azure);
+  color: var(--primary-azure);
+  transform: scale(1.08);
+}
+
+.cal-arrow-btn:active {
+  transform: scale(0.92);
+}
+
 .calendar-presets-bar {
   display: flex;
   gap: 6px;
   overflow-x: auto;
   scrollbar-width: none;
+  transition: opacity var(--transition-fast);
+}
+
+#datesPickerModal.oneway-mode .calendar-presets-bar,
+.calendar-presets-bar.hidden {
+  display: none !important;
 }
 
 .calendar-presets-bar::-webkit-scrollbar {
@@ -468,23 +519,31 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 0;
+  padding: 6px 0;
+  text-align: left;
 }
 
 .stepper-info {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  flex: 1;
 }
 
 .stepper-label {
   font-size: 0.88rem;
   font-weight: 700;
   color: var(--text-primary);
+  text-align: left;
+  line-height: 1.3;
 }
 
 .stepper-desc {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: var(--text-secondary);
+  text-align: left;
+  line-height: 1.25;
 }
 
 .stepper-controls {

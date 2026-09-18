@@ -409,10 +409,14 @@ function initSearchEngine() {
   function syncTripTypeToCalendar(type) {
     const roundBtn = document.getElementById('calRoundtripBtn');
     const oneBtn = document.getElementById('calOnewayBtn');
+    const datesModal = document.getElementById('datesPickerModal');
+    const presetsBar = document.querySelector('.calendar-presets-bar');
     
     if (type === 'oneway') {
       if (roundBtn) roundBtn.classList.remove('active');
       if (oneBtn) oneBtn.classList.add('active');
+      if (datesModal) datesModal.classList.add('oneway-mode');
+      if (presetsBar) presetsBar.classList.add('hidden');
       selectedEnd = null;
       selectingState = 'idle';
       updateDatesInputText();
@@ -420,6 +424,8 @@ function initSearchEngine() {
     } else {
       if (roundBtn) roundBtn.classList.add('active');
       if (oneBtn) oneBtn.classList.remove('active');
+      if (datesModal) datesModal.classList.remove('oneway-mode');
+      if (presetsBar) presetsBar.classList.remove('hidden');
       if (!selectedEnd && selectedStart) {
         selectedEnd = new Date(selectedStart.getTime() + 7 * 24 * 60 * 60 * 1000);
       }
@@ -430,11 +436,19 @@ function initSearchEngine() {
   }
 
   // --------------------------------------------------------------------------
-  // 6. Interactive Dual-Month Range & One-Way Calendar (June & July 2026)
+  // 6. Interactive Dynamic Dual-Month Range & One-Way Calendar
   // --------------------------------------------------------------------------
+  let currentCalYear = 2026;
+  let currentCalMonth = 5; // June (0-indexed)
+
   let selectedStart = new Date(2026, 5, 12); // Jun 12, 2026
   let selectedEnd = new Date(2026, 5, 19);   // Jun 19, 2026
   let selectingState = 'idle'; // 'idle', 'picking-end'
+
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
 
   function formatDisplayDate(date) {
     if (!date) return '';
@@ -445,7 +459,7 @@ function initSearchEngine() {
   function updateDatesInputText() {
     if (currentTripType === 'oneway') {
       if (selectedStart) {
-        datesInput.value = `${formatDisplayDate(selectedStart)} 2026 (One-way)`;
+        datesInput.value = `${formatDisplayDate(selectedStart)} ${selectedStart.getFullYear()} (One-way)`;
       } else {
         datesInput.value = 'Select Departure Date';
       }
@@ -482,8 +496,8 @@ function initSearchEngine() {
       cell.className = 'day-cell';
       cell.textContent = day;
 
-      const isStart = selectedStart && cellDate.getTime() === selectedStart.getTime();
-      const isEnd = selectedEnd && cellDate.getTime() === selectedEnd.getTime();
+      const isStart = selectedStart && cellDate.toDateString() === selectedStart.toDateString();
+      const isEnd = selectedEnd && cellDate.toDateString() === selectedEnd.toDateString();
       const inRange = currentTripType !== 'oneway' && selectedStart && selectedEnd && cellDate > selectedStart && cellDate < selectedEnd;
 
       if (isStart) cell.classList.add('range-start');
@@ -539,13 +553,57 @@ function initSearchEngine() {
   }
 
   function renderAllCalendars() {
-    const juneGrid = document.getElementById('june2026Grid');
-    const julyGrid = document.getElementById('july2026Grid');
-    renderCalendarMonth(2026, 5, juneGrid); // June 2026
-    renderCalendarMonth(2026, 6, julyGrid); // July 2026
+    const month1Grid = document.getElementById('june2026Grid');
+    const month2Grid = document.getElementById('july2026Grid');
+    const month1Header = document.getElementById('month1Header');
+    const month2Header = document.getElementById('month2Header');
+
+    const year1 = currentCalYear;
+    const month1 = currentCalMonth;
+
+    let year2 = currentCalYear;
+    let month2 = currentCalMonth + 1;
+    if (month2 > 11) {
+      month2 = 0;
+      year2 = currentCalYear + 1;
+    }
+
+    if (month1Header) month1Header.textContent = `${monthNames[month1]} ${year1}`;
+    if (month2Header) month2Header.textContent = `${monthNames[month2]} ${year2}`;
+
+    renderCalendarMonth(year1, month1, month1Grid);
+    renderCalendarMonth(year2, month2, month2Grid);
   }
 
   renderAllCalendars();
+
+  // Dynamic Navigation Arrow Buttons (< and >)
+  const calPrevMonth = document.getElementById('calPrevMonth');
+  const calNextMonth = document.getElementById('calNextMonth');
+
+  if (calPrevMonth) {
+    calPrevMonth.addEventListener('click', (e) => {
+      e.stopPropagation();
+      currentCalMonth--;
+      if (currentCalMonth < 0) {
+        currentCalMonth = 11;
+        currentCalYear--;
+      }
+      renderAllCalendars();
+    });
+  }
+
+  if (calNextMonth) {
+    calNextMonth.addEventListener('click', (e) => {
+      e.stopPropagation();
+      currentCalMonth++;
+      if (currentCalMonth > 11) {
+        currentCalMonth = 0;
+        currentCalYear++;
+      }
+      renderAllCalendars();
+    });
+  }
 
   // Calendar Header Trip Type Buttons
   const calRoundtripBtn = document.getElementById('calRoundtripBtn');
@@ -583,6 +641,9 @@ function initSearchEngine() {
       }
 
       const preset = btn.dataset.preset;
+      currentCalYear = 2026;
+      currentCalMonth = 5; // Reset to June for curated presets
+
       if (preset === '1week') {
         selectedStart = new Date(2026, 5, 12);
         selectedEnd = new Date(2026, 5, 19);

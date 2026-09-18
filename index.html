@@ -179,14 +179,6 @@
       <div class="container">
         <div class="hero-wrapper">
           
-          <!-- Micro-Badge -->
-          <div class="hero-badge-wrap">
-            <div class="micro-badge">
-              <span class="badge-pulse-dot"></span>
-              <span>✨ Door-to-Door Trips, Connected</span>
-            </div>
-          </div>
-
           <!-- Headline -->
           <h1 class="hero-headline">
             From Your Front Door to the Sun. <span class="text-gradient">One Click.</span>
@@ -452,9 +444,16 @@
               <div class="modal-scroll-body">
                 <!-- Trip Type Pill Toggle Inside Modal Header -->
                 <div class="calendar-top-bar">
-                  <div class="calendar-trip-type-toggle">
-                    <button type="button" class="cal-toggle-pill active" id="calRoundtripBtn">Roundtrip</button>
-                    <button type="button" class="cal-toggle-pill" id="calOnewayBtn">One-way</button>
+                  <div class="calendar-nav-wrap">
+                    <div class="calendar-trip-type-toggle">
+                      <button type="button" class="cal-toggle-pill active" id="calRoundtripBtn">Roundtrip</button>
+                      <button type="button" class="cal-toggle-pill" id="calOnewayBtn">One-way</button>
+                    </div>
+                    
+                    <div class="calendar-month-arrows">
+                      <button type="button" class="cal-arrow-btn" id="calPrevMonth" aria-label="Previous Month">‹</button>
+                      <button type="button" class="cal-arrow-btn" id="calNextMonth" aria-label="Next Month">›</button>
+                    </div>
                   </div>
                   
                   <!-- Quick Presets -->
@@ -473,9 +472,9 @@
 
                 <!-- Dual Months Grid -->
                 <div class="calendar-dual-grid">
-                  <!-- June 2026 -->
-                  <div class="month-container">
-                    <div class="month-header">June 2026</div>
+                  <!-- Month 1 -->
+                  <div class="month-container" id="month1Container">
+                    <div class="month-header" id="month1Header">June 2026</div>
                     <div class="weekdays-row">
                       <span class="weekday-col">Mo</span>
                       <span class="weekday-col">Tu</span>
@@ -488,9 +487,9 @@
                     <div class="days-grid" id="june2026Grid"></div>
                   </div>
 
-                  <!-- July 2026 -->
-                  <div class="month-container">
-                    <div class="month-header">July 2026</div>
+                  <!-- Month 2 -->
+                  <div class="month-container" id="month2Container">
+                    <div class="month-header" id="month2Header">July 2026</div>
                     <div class="weekdays-row">
                       <span class="weekday-col">Mo</span>
                       <span class="weekday-col">Tu</span>
@@ -641,11 +640,6 @@
           <div class="footer-region-select">
             <span>USD $</span>
           </div>
-        </div>
-
-        <div class="footer-status-pill">
-          <span class="status-dot"></span>
-          <span>14,000+ Multimodal Routes Live</span>
         </div>
       </div>
 
