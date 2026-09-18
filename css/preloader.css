@@ -1,0 +1,231 @@
+/**
+ * TripMura Design System — 60FPS Luxury Vector Flight Preloader
+ * 1.4s Pure Eased 2D Jet Trajectory + Concentric Scale Reveal
+ */
+
+/* ==========================================================================
+   1. Preloader Viewport Stage
+   ========================================================================== */
+.site-preloader {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  background: #fafbfc;
+  background: radial-gradient(circle at 50% 46%, #ffffff 0%, #f8fafc 55%, #f1f5f9 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+  overflow: hidden;
+}
+
+body:not(.preloader-done) {
+  overflow: hidden !important;
+}
+
+.site-preloader.loaded {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(1.04);
+  pointer-events: none;
+}
+
+/* Container inside preloader */
+.preloader-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 420px;
+  width: 90%;
+  padding: var(--space-4, 16px);
+  position: relative;
+  z-index: 2;
+}
+
+/* ==========================================================================
+   2. Centered M-Symbol with Breathing Aura
+   ========================================================================== */
+.preloader-brand-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-4, 16px);
+}
+
+.preloader-symbol-aura {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(2, 132, 199, 0.22) 0%, rgba(2, 132, 199, 0) 70%);
+  animation: preloader-aura-pulse 2.4s ease-in-out infinite alternate;
+}
+
+.preloader-symbol {
+  width: 52px;
+  height: 52px;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 6px 16px rgba(2, 132, 199, 0.28));
+  animation: preloader-symbol-float 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes preloader-aura-pulse {
+  0% { transform: scale(0.85); opacity: 0.5; }
+  100% { transform: scale(1.3); opacity: 0.9; }
+}
+
+@keyframes preloader-symbol-float {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-4px) scale(1.03); }
+}
+
+/* ==========================================================================
+   3. Vector Flight Arc & 2D Animated Airplane
+   ========================================================================== */
+.preloader-flight-stage {
+  position: relative;
+  width: 280px;
+  height: 70px;
+  margin-bottom: var(--space-2, 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preloader-flight-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Faint background flight track */
+.flight-path-bg {
+  stroke: rgba(2, 132, 199, 0.15);
+  stroke-width: 2.5;
+  stroke-dasharray: 4 4;
+  fill: none;
+  stroke-linecap: round;
+}
+
+/* Active solid glowing azure flight progress trail */
+.flight-path-active {
+  stroke: url(#preloaderSkyGrad);
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 280;
+  stroke-dashoffset: 280;
+  filter: drop-shadow(0 2px 6px rgba(2, 132, 199, 0.35));
+  will-change: stroke-dashoffset;
+}
+
+/* 2D Minimalist Vector Jet */
+.flight-jet-group {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  transform-origin: center center;
+  pointer-events: none;
+  will-change: transform;
+  filter: drop-shadow(0 3px 6px rgba(15, 23, 42, 0.22));
+}
+
+.flight-jet-icon {
+  width: 24px;
+  height: 24px;
+  fill: var(--primary-azure, #0284c7);
+  transform: rotate(0deg);
+}
+
+/* ==========================================================================
+   4. Elegant Percentage Counter & Subtext
+   ========================================================================== */
+.preloader-counter-wrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  margin-bottom: var(--space-1, 4px);
+}
+
+.preloader-counter {
+  font-family: 'Plus Jakarta Sans', var(--font-sans, system-ui);
+  font-size: clamp(2.4rem, 6vw, 3.2rem);
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0284c7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.preloader-subtext {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 0.02em;
+  margin-top: 6px;
+  animation: preloader-shimmer 2s ease-in-out infinite alternate;
+}
+
+@keyframes preloader-shimmer {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; color: #0284c7; }
+}
+
+/* ==========================================================================
+   5. Smooth Hero Staggered Entrance Reveal
+   ========================================================================== */
+body:not(.preloader-done) .site-header,
+body:not(.preloader-done) .hero-headline,
+body:not(.preloader-done) .hero-subheadline,
+body:not(.preloader-done) .multimodal-search-card,
+body:not(.preloader-done) .hero-route-preview,
+body:not(.preloader-done) .social-proof-bar {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+body.preloader-done .site-header {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.preloader-done .hero-headline {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
+}
+
+body.preloader-done .hero-subheadline {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.18s, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.18s;
+}
+
+body.preloader-done .multimodal-search-card {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.25s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.25s;
+}
+
+body.preloader-done .hero-route-preview,
+body.preloader-done .social-proof-bar {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.32s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.32s;
+}
