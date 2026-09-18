@@ -317,6 +317,226 @@ function initSearchEngine() {
   // --------------------------------------------------------------------------
   // 4. Skyscanner Category Switcher Tabs
   // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // 4. Skyscanner-Style Category Mode Tabs & Dynamic Context-Aware Controls
+  // --------------------------------------------------------------------------
+  const tripTypeBtn = document.getElementById('tripTypeBtn');
+  const tripTypeMenu = document.getElementById('tripTypeMenu');
+  const tripTypeLabel = document.getElementById('tripTypeLabel');
+
+  const cabinClassBtn = document.getElementById('cabinClassBtn');
+  const cabinClassMenu = document.getElementById('cabinClassMenu');
+  const cabinClassLabel = document.getElementById('cabinClassLabel');
+
+  const subOptionsConfig = {
+    holiday: {
+      opt1: {
+        label: 'Roundtrip',
+        defaultVal: 'roundtrip',
+        items: [
+          { val: 'roundtrip', label: 'Roundtrip' },
+          { val: 'oneway', label: 'One-way' },
+          { val: 'multicity', label: 'Multi-city' }
+        ],
+        isTripType: true
+      },
+      opt2: {
+        label: 'Economy',
+        defaultVal: 'economy',
+        items: [
+          { val: 'economy', label: 'Economy' },
+          { val: 'premium', label: 'Premium Economy' },
+          { val: 'business', label: 'Business Class' },
+          { val: 'first', label: 'First Class' }
+        ]
+      }
+    },
+    flights: {
+      opt1: {
+        label: 'Roundtrip',
+        defaultVal: 'roundtrip',
+        items: [
+          { val: 'roundtrip', label: 'Roundtrip' },
+          { val: 'oneway', label: 'One-way' },
+          { val: 'multicity', label: 'Multi-city' }
+        ],
+        isTripType: true
+      },
+      opt2: {
+        label: 'Economy',
+        defaultVal: 'economy',
+        items: [
+          { val: 'economy', label: 'Economy' },
+          { val: 'premium', label: 'Premium Economy' },
+          { val: 'business', label: 'Business Class' },
+          { val: 'first', label: 'First Class' }
+        ]
+      }
+    },
+    stays: {
+      opt1: {
+        label: 'All Stays',
+        defaultVal: 'all_stays',
+        items: [
+          { val: 'all_stays', label: 'All Stays' },
+          { val: 'boutique', label: 'Boutique Hotels' },
+          { val: 'villas', label: 'Luxury Villas' },
+          { val: 'apartments', label: 'Apartments & Chalets' }
+        ],
+        isTripType: false
+      },
+      opt2: {
+        label: 'Top Rated (8.5+)',
+        defaultVal: '8.5',
+        items: [
+          { val: 'any', label: 'Any Rating' },
+          { val: '8.5', label: 'Top Rated (8.5+)' },
+          { val: '9.0', label: 'Exceptional (9.0+)' },
+          { val: '5star', label: '5-Star Luxury' }
+        ]
+      }
+    },
+    rail: {
+      opt1: {
+        label: 'Roundtrip',
+        defaultVal: 'roundtrip',
+        items: [
+          { val: 'roundtrip', label: 'Roundtrip' },
+          { val: 'oneway', label: 'One-way' }
+        ],
+        isTripType: true
+      },
+      opt2: {
+        label: 'Standard Class',
+        defaultVal: 'standard',
+        items: [
+          { val: 'standard', label: 'Standard Class' },
+          { val: 'executive', label: '1st Class / Executive' },
+          { val: 'sleeper', label: 'Couchette / Sleeper' }
+        ]
+      }
+    },
+    cars: {
+      opt1: {
+        label: 'Return to same location',
+        defaultVal: 'same',
+        items: [
+          { val: 'same', label: 'Return to same location' },
+          { val: 'diff', label: 'Different Drop-off' }
+        ],
+        isTripType: false
+      },
+      opt2: {
+        label: 'Any Car Type',
+        defaultVal: 'any',
+        items: [
+          { val: 'any', label: 'Any Car Type' },
+          { val: 'compact', label: 'Compact' },
+          { val: 'suv', label: 'SUV / 4x4' },
+          { val: 'luxury', label: 'Luxury' },
+          { val: 'electric', label: 'Electric' }
+        ]
+      }
+    },
+    packages: {
+      opt1: {
+        label: 'Roundtrip',
+        defaultVal: 'roundtrip',
+        items: [
+          { val: 'roundtrip', label: 'Roundtrip' },
+          { val: 'oneway', label: 'One-way' },
+          { val: 'multicity', label: 'Multi-city' }
+        ],
+        isTripType: true
+      },
+      opt2: {
+        label: 'Economy',
+        defaultVal: 'economy',
+        items: [
+          { val: 'economy', label: 'Economy' },
+          { val: 'premium', label: 'Premium Economy' },
+          { val: 'business', label: 'Business Class' },
+          { val: 'first', label: 'First Class' }
+        ]
+      }
+    }
+  };
+
+  let activeMode = 'holiday';
+
+  function renderSubOptions(mode) {
+    const cfg = subOptionsConfig[mode] || subOptionsConfig.holiday;
+    
+    // Update Option 1
+    if (tripTypeLabel) tripTypeLabel.textContent = cfg.opt1.label;
+    if (tripTypeMenu) {
+      tripTypeMenu.innerHTML = cfg.opt1.items.map((item, idx) => `
+        <div class="micro-option-item ${item.val === cfg.opt1.defaultVal ? 'active' : ''}" data-val="${item.val}" role="option">
+          ${item.label}
+        </div>
+      `).join('');
+      
+      tripTypeMenu.querySelectorAll('.micro-option-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          tripTypeMenu.querySelectorAll('.micro-option-item').forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          const val = item.dataset.val;
+          const text = item.textContent.trim();
+          if (tripTypeLabel) tripTypeLabel.textContent = text;
+          tripTypeMenu.classList.remove('open');
+          if (tripTypeBtn) tripTypeBtn.classList.remove('active');
+
+          if (cfg.opt1.isTripType) {
+            currentTripType = val;
+            syncTripTypeToCalendar(val);
+          }
+        });
+      });
+    }
+
+    // Update Option 2
+    if (cabinClassLabel) cabinClassLabel.textContent = cfg.opt2.label;
+    if (cabinClassMenu) {
+      cabinClassMenu.innerHTML = cfg.opt2.items.map((item, idx) => `
+        <div class="micro-option-item ${item.val === cfg.opt2.defaultVal ? 'active' : ''}" data-val="${item.val}" role="option">
+          ${item.label}
+        </div>
+      `).join('');
+
+      cabinClassMenu.querySelectorAll('.micro-option-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          cabinClassMenu.querySelectorAll('.micro-option-item').forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          const val = item.dataset.val;
+          const text = item.textContent.trim();
+          if (cabinClassLabel) cabinClassLabel.textContent = text;
+          currentCabinClass = val;
+          cabinClassMenu.classList.remove('open');
+          if (cabinClassBtn) cabinClassBtn.classList.remove('active');
+        });
+      });
+    }
+  }
+
+  function setupMicroDropdownToggle(btn, menu) {
+    if (!btn || !menu) return;
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = menu.classList.contains('open');
+      closeAllPopovers();
+      if (!isOpen) {
+        menu.classList.add('open');
+        btn.classList.add('active');
+      }
+    });
+  }
+
+  setupMicroDropdownToggle(tripTypeBtn, tripTypeMenu);
+  setupMicroDropdownToggle(cabinClassBtn, cabinClassMenu);
+  renderSubOptions('holiday');
+
   const categoryTabs = document.querySelectorAll('.search-mode-tab');
   categoryTabs.forEach(tab => {
     tab.addEventListener('click', (e) => {
@@ -329,6 +549,9 @@ function initSearchEngine() {
       tab.setAttribute('aria-selected', 'true');
 
       const mode = tab.dataset.mode;
+      activeMode = mode;
+      renderSubOptions(mode);
+
       const originLabel = document.querySelector('#originField .field-label');
       const destLabel = document.querySelector('#destField .field-label');
 
@@ -347,6 +570,11 @@ function initSearchEngine() {
         if (destLabel) destLabel.textContent = 'Arrival Station';
         originInput.placeholder = 'Eurostar / Rail Station';
         destInput.placeholder = 'Connecting Station';
+      } else if (mode === 'cars') {
+        if (originLabel) originLabel.textContent = 'Pick-up Location';
+        if (destLabel) destLabel.textContent = 'Drop-off Location';
+        originInput.placeholder = 'Airport, City or Rental Hub';
+        destInput.placeholder = 'Drop-off Airport or City';
       } else {
         if (originLabel) originLabel.textContent = 'From (Your Door)';
         if (destLabel) destLabel.textContent = 'To (Sun Destination)';
@@ -354,56 +582,6 @@ function initSearchEngine() {
         destInput.placeholder = 'Where to?';
       }
     });
-  });
-
-  // --------------------------------------------------------------------------
-  // 5. Trip Type & Cabin Class Micro-Selectors
-  // --------------------------------------------------------------------------
-  const tripTypeBtn = document.getElementById('tripTypeBtn');
-  const tripTypeMenu = document.getElementById('tripTypeMenu');
-  const tripTypeLabel = document.getElementById('tripTypeLabel');
-
-  const cabinClassBtn = document.getElementById('cabinClassBtn');
-  const cabinClassMenu = document.getElementById('cabinClassMenu');
-  const cabinClassLabel = document.getElementById('cabinClassLabel');
-
-  function setupMicroDropdown(btn, menu, onSelect) {
-    if (!btn || !menu) return;
-
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = menu.classList.contains('open');
-      closeAllPopovers();
-      if (!isOpen) {
-        menu.classList.add('open');
-        btn.classList.add('active');
-      }
-    });
-
-    const items = menu.querySelectorAll('.micro-option-item');
-    items.forEach(item => {
-      item.addEventListener('click', (e) => {
-        e.stopPropagation();
-        items.forEach(i => i.classList.remove('active'));
-        item.classList.add('active');
-        const val = item.dataset.val;
-        const text = item.textContent.trim();
-        menu.classList.remove('open');
-        btn.classList.remove('active');
-        if (onSelect) onSelect(val, text);
-      });
-    });
-  }
-
-  setupMicroDropdown(tripTypeBtn, tripTypeMenu, (val, text) => {
-    currentTripType = val;
-    if (tripTypeLabel) tripTypeLabel.textContent = text;
-    syncTripTypeToCalendar(val);
-  });
-
-  setupMicroDropdown(cabinClassBtn, cabinClassMenu, (val, text) => {
-    currentCabinClass = val;
-    if (cabinClassLabel) cabinClassLabel.textContent = text;
   });
 
   function syncTripTypeToCalendar(type) {
@@ -436,13 +614,16 @@ function initSearchEngine() {
   }
 
   // --------------------------------------------------------------------------
-  // 6. Interactive Dynamic Dual-Month Range & One-Way Calendar
+  // 6. Interactive Dynamic Real Live-Date Dual-Month Range Calendar
   // --------------------------------------------------------------------------
-  let currentCalYear = 2026;
-  let currentCalMonth = 5; // June (0-indexed)
+  const today = new Date();
+  const todayNormalized = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-  let selectedStart = new Date(2026, 5, 12); // Jun 12, 2026
-  let selectedEnd = new Date(2026, 5, 19);   // Jun 19, 2026
+  let currentCalYear = today.getFullYear();
+  let currentCalMonth = today.getMonth();
+
+  let selectedStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  let selectedEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
   let selectingState = 'idle'; // 'idle', 'picking-end'
 
   const monthNames = [
@@ -496,6 +677,11 @@ function initSearchEngine() {
       cell.className = 'day-cell';
       cell.textContent = day;
 
+      const isPast = cellDate < todayNormalized;
+      if (isPast) {
+        cell.classList.add('disabled');
+      }
+
       const isStart = selectedStart && cellDate.toDateString() === selectedStart.toDateString();
       const isEnd = selectedEnd && cellDate.toDateString() === selectedEnd.toDateString();
       const inRange = currentTripType !== 'oneway' && selectedStart && selectedEnd && cellDate > selectedStart && cellDate < selectedEnd;
@@ -504,41 +690,43 @@ function initSearchEngine() {
       if (isEnd) cell.classList.add('range-end');
       if (inRange) cell.classList.add('in-range');
 
-      cell.addEventListener('click', (e) => {
-        e.stopPropagation();
+      if (!isPast) {
+        cell.addEventListener('click', (e) => {
+          e.stopPropagation();
 
-        if (currentTripType === 'oneway') {
-          selectedStart = cellDate;
-          selectedEnd = null;
-          selectingState = 'idle';
-          updateDatesInputText();
-          renderAllCalendars();
-          return;
-        }
-
-        // Roundtrip logic
-        if (selectingState === 'idle' || (selectedStart && selectedEnd)) {
-          selectedStart = cellDate;
-          selectedEnd = null;
-          selectingState = 'picking-end';
-        } else if (selectingState === 'picking-end') {
-          if (cellDate < selectedStart) {
+          if (currentTripType === 'oneway') {
             selectedStart = cellDate;
             selectedEnd = null;
-          } else {
-            selectedEnd = cellDate;
             selectingState = 'idle';
+            updateDatesInputText();
+            renderAllCalendars();
+            return;
           }
-        }
-        updateDatesInputText();
-        renderAllCalendars();
-      });
 
-      cell.addEventListener('mouseenter', () => {
-        if (currentTripType !== 'oneway' && selectingState === 'picking-end' && selectedStart && !selectedEnd) {
-          highlightHoverRange(cellDate);
-        }
-      });
+          // Roundtrip logic
+          if (selectingState === 'idle' || (selectedStart && selectedEnd)) {
+            selectedStart = cellDate;
+            selectedEnd = null;
+            selectingState = 'picking-end';
+          } else if (selectingState === 'picking-end') {
+            if (cellDate < selectedStart) {
+              selectedStart = cellDate;
+              selectedEnd = null;
+            } else {
+              selectedEnd = cellDate;
+              selectingState = 'idle';
+            }
+          }
+          updateDatesInputText();
+          renderAllCalendars();
+        });
+
+        cell.addEventListener('mouseenter', () => {
+          if (currentTripType !== 'oneway' && selectingState === 'picking-end' && selectedStart && !selectedEnd) {
+            highlightHoverRange(cellDate);
+          }
+        });
+      }
 
       gridEl.appendChild(cell);
     }
@@ -575,9 +763,10 @@ function initSearchEngine() {
     renderCalendarMonth(year2, month2, month2Grid);
   }
 
+  updateDatesInputText();
   renderAllCalendars();
 
-  // Dynamic Navigation Arrow Buttons (< and >)
+  // Dynamic Navigation Arrow Buttons (< and >) placed at bottom of calendar
   const calPrevMonth = document.getElementById('calPrevMonth');
   const calNextMonth = document.getElementById('calNextMonth');
 
@@ -641,18 +830,18 @@ function initSearchEngine() {
       }
 
       const preset = btn.dataset.preset;
-      currentCalYear = 2026;
-      currentCalMonth = 5; // Reset to June for curated presets
+      currentCalYear = today.getFullYear();
+      currentCalMonth = today.getMonth();
 
       if (preset === '1week') {
-        selectedStart = new Date(2026, 5, 12);
-        selectedEnd = new Date(2026, 5, 19);
+        selectedStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        selectedEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
       } else if (preset === 'weekend') {
-        selectedStart = new Date(2026, 5, 18);
-        selectedEnd = new Date(2026, 5, 21);
+        selectedStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        selectedEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 3);
       } else if (preset === '2weeks') {
-        selectedStart = new Date(2026, 5, 12);
-        selectedEnd = new Date(2026, 5, 26);
+        selectedStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        selectedEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 14);
       }
       selectingState = 'idle';
       updateDatesInputText();

@@ -342,7 +342,7 @@
               <div class="search-field-wrap">
                 <div class="search-field" id="datesField">
                   <label class="field-label" for="datesInput">Trip Dates</label>
-                  <input type="text" id="datesInput" class="field-input" value="12 Jun – 19 Jun" placeholder="Select dates" readonly>
+                  <input type="text" id="datesInput" class="field-input" placeholder="Select dates" readonly>
                 </div>
               </div>
 
@@ -442,24 +442,17 @@
 
               <!-- Scrollable Body for Mobile / Desktop -->
               <div class="modal-scroll-body">
-                <!-- Trip Type Pill Toggle Inside Modal Header -->
+                <!-- Trip Type Pill Toggle & Quick Presets -->
                 <div class="calendar-top-bar">
-                  <div class="calendar-nav-wrap">
-                    <div class="calendar-trip-type-toggle">
-                      <button type="button" class="cal-toggle-pill active" id="calRoundtripBtn">Roundtrip</button>
-                      <button type="button" class="cal-toggle-pill" id="calOnewayBtn">One-way</button>
-                    </div>
-                    
-                    <div class="calendar-month-arrows">
-                      <button type="button" class="cal-arrow-btn" id="calPrevMonth" aria-label="Previous Month">‹</button>
-                      <button type="button" class="cal-arrow-btn" id="calNextMonth" aria-label="Next Month">›</button>
-                    </div>
+                  <div class="calendar-trip-type-toggle">
+                    <button type="button" class="cal-toggle-pill active" id="calRoundtripBtn">Roundtrip</button>
+                    <button type="button" class="cal-toggle-pill" id="calOnewayBtn">One-way</button>
                   </div>
                   
                   <!-- Quick Presets -->
                   <div class="calendar-presets-bar">
                     <button type="button" class="preset-pill-btn active" data-preset="1week">
-                      <span>☀️ 1 Week in June</span>
+                      <span>☀️ 1 Week</span>
                     </button>
                     <button type="button" class="preset-pill-btn" data-preset="weekend">
                       <span>🏖️ Long Weekend</span>
@@ -474,7 +467,7 @@
                 <div class="calendar-dual-grid">
                   <!-- Month 1 -->
                   <div class="month-container" id="month1Container">
-                    <div class="month-header" id="month1Header">June 2026</div>
+                    <div class="month-header" id="month1Header">September 2026</div>
                     <div class="weekdays-row">
                       <span class="weekday-col">Mo</span>
                       <span class="weekday-col">Tu</span>
@@ -489,7 +482,7 @@
 
                   <!-- Month 2 -->
                   <div class="month-container" id="month2Container">
-                    <div class="month-header" id="month2Header">July 2026</div>
+                    <div class="month-header" id="month2Header">October 2026</div>
                     <div class="weekdays-row">
                       <span class="weekday-col">Mo</span>
                       <span class="weekday-col">Tu</span>
@@ -501,6 +494,18 @@
                     </div>
                     <div class="days-grid" id="july2026Grid"></div>
                   </div>
+                </div>
+
+                <!-- Month Navigation Controls Underneath Grid -->
+                <div class="calendar-month-nav-bottom">
+                  <button type="button" class="cal-nav-pill-btn" id="calPrevMonth" aria-label="Previous Month">
+                    <span class="cal-nav-arrow">‹</span>
+                    <span>Previous Month</span>
+                  </button>
+                  <button type="button" class="cal-nav-pill-btn" id="calNextMonth" aria-label="Next Month">
+                    <span>Next Month</span>
+                    <span class="cal-nav-arrow">›</span>
+                  </button>
                 </div>
 
                 <!-- Calendar Footer Desktop -->
@@ -590,8 +595,14 @@
           <p class="footer-desc">
             Synchronizing flights, scenic trains, and boutique stays into one seamless door-to-door trip.
           </p>
-          <div class="footer-copyright">
-            &copy; 2026 TripMura Inc. All rights reserved.
+          <div class="footer-meta-desktop">
+            <div class="footer-copyright">
+              &copy; 2026 TripMura Inc. All rights reserved.
+            </div>
+            <div class="footer-credit">
+              <span>Designed & Engineered by </span>
+              <a href="https://anonymcreator.online" target="_blank" rel="noopener noreferrer" class="credit-link">AnonymCreator</a>
+            </div>
           </div>
         </div>
 
@@ -639,6 +650,16 @@
           </div>
           <div class="footer-region-select">
             <span>USD $</span>
+          </div>
+        </div>
+
+        <div class="footer-meta-mobile">
+          <div class="footer-copyright">
+            &copy; 2026 TripMura Inc. All rights reserved.
+          </div>
+          <div class="footer-credit">
+            <span>Designed & Engineered by </span>
+            <a href="https://anonymcreator.online" target="_blank" rel="noopener noreferrer" class="credit-link">AnonymCreator</a>
           </div>
         </div>
       </div>
