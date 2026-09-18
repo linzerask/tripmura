@@ -1,0 +1,320 @@
+/**
+ * TripMura Design System — Hero Stage Styles
+ * Atmospheric Mediterranean Cloud Canvas & Multimodal Holiday Engine
+ */
+
+.hero-section {
+  position: relative;
+  padding: clamp(32px, 5vw, 64px) 0 clamp(48px, 6vw, 80px);
+  overflow: hidden;
+}
+
+/* Background Atmosphere */
+.hero-atmosphere-container {
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  max-width: 1920px;
+  height: 820px;
+  pointer-events: none;
+  z-index: var(--z-negative);
+  opacity: 0.85;
+  mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+}
+
+.hero-cloud-drift {
+  width: 100%;
+  height: 100%;
+  background-image: url('../assets/brand/backgrounds/bg_sky_clouds.png');
+  background-size: cover;
+  background-position: center top;
+  animation: cloud-drift-ambient 30s ease-in-out infinite alternate;
+}
+
+@keyframes cloud-drift-ambient {
+  0% { transform: scale(1.0) translateY(0); }
+  100% { transform: scale(1.04) translateY(-15px); }
+}
+
+/* Hero Content Grid */
+.hero-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 1020px;
+  margin: 0 auto;
+}
+
+/* Top Meta Pill */
+.hero-badge-wrap {
+  margin-bottom: clamp(16px, 2.5vw, 24px);
+}
+
+/* Main Headline */
+.hero-headline {
+  font-size: var(--font-hero);
+  font-weight: 800;
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--line-height-tight);
+  color: var(--text-primary);
+  margin-bottom: clamp(16px, 2.5vw, 24px);
+  max-width: 900px;
+}
+
+.hero-subheadline {
+  font-size: var(--font-body-lg);
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
+  max-width: 680px;
+  margin-bottom: clamp(32px, 4vw, 44px);
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   Multimodal Trip Planner Search Bar (Interactive Glass Component)
+   ========================================================================== */
+.multimodal-search-card {
+  position: relative;
+  z-index: 50;
+  width: 100%;
+  max-width: 920px;
+  background: var(--bg-glass-heavy);
+  backdrop-filter: var(--backdrop-blur-md);
+  -webkit-backdrop-filter: var(--backdrop-blur-md);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-card-lg);
+  padding: var(--space-3);
+  box-shadow: var(--shadow-glass);
+  margin-bottom: var(--space-8);
+  transition: all var(--transition-normal);
+}
+
+.multimodal-search-card:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(2, 132, 199, 0.25);
+}
+
+.search-mode-tabs {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-light);
+  margin-bottom: var(--space-3);
+  overflow-x: auto;
+}
+
+.search-mode-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: transparent;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.search-mode-tab:hover {
+  color: var(--primary-azure);
+  background: var(--primary-azure-50);
+}
+
+.search-mode-tab.active {
+  color: #ffffff;
+  background: var(--primary-azure);
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+}
+
+.search-mode-tab:focus-visible {
+  outline: 3px solid rgba(2, 132, 199, 0.35);
+  outline-offset: 2px;
+}
+
+.search-input-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1.2fr 1fr 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.search-field {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-inner-md);
+  padding: 10px 14px;
+  min-height: 54px;
+  text-align: left;
+  transition: all var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.search-field:focus-within {
+  border-color: var(--primary-azure);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+.field-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-1);
+}
+
+.field-input {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.field-input::placeholder {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.search-cta-btn {
+  height: 100%;
+  min-height: 54px;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 800;
+  border-radius: var(--radius-inner-md);
+  background: var(--gradient-azure);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(2, 132, 199, 0.35);
+  transition: all var(--transition-normal);
+  cursor: pointer;
+}
+
+.search-cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+  background: var(--gradient-azure-hover);
+}
+
+.search-cta-btn:focus-visible {
+  outline: 3px solid rgba(2, 132, 199, 0.35);
+  outline-offset: 2px;
+}
+
+.search-cta-btn:active {
+  transform: scale(0.98);
+}
+
+/* ==========================================================================
+   Live Route Sync Cards & Social Proof
+   ========================================================================== */
+.hero-route-preview {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.route-pill-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-xs);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.route-pill-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--border-focus);
+}
+
+.route-pill-tag {
+  background: var(--primary-azure-50);
+  color: var(--primary-azure-dark);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+/* Social Proof Bar */
+.social-proof-bar {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: var(--backdrop-blur-sm);
+  -webkit-backdrop-filter: var(--backdrop-blur-sm);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-xs);
+}
+
+.proof-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.proof-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--primary-azure);
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Responsive Adaptations
+   ========================================================================== */
+@media (max-width: 860px) {
+  .search-input-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .search-cta-btn {
+    grid-column: 1 / -1;
+    height: 48px;
+  }
+}
+
+@media (max-width: 580px) {
+  .search-input-grid {
+    grid-template-columns: 1fr;
+  }
+  .social-proof-bar {
+    border-radius: var(--radius-lg);
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+}

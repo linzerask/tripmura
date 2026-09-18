@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TripMura — Holidays Made Simple</title>
+  <meta name="description" content="Flights, trains, and boutique stays synchronized into one seamless holiday. Book your whole trip from your front door to the sun in one click with 100% transfer protection.">
+  
+  <!-- OpenGraph Metadata -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tripmura.com/">
+  <meta property="og:title" content="TripMura — Holidays Made Simple">
+  <meta property="og:description" content="Your whole holiday, synchronized in one click. Zero transfer stress with 100% self-transfer protection.">
+  <meta property="og:image" content="assets/brand/og_preview_sky.png">
+  
+  <!-- Favicons -->
+  <link rel="icon" type="image/svg+xml" href="assets/brand/favicon.svg">
+  <link rel="alternate icon" type="image/png" sizes="32x32" href="assets/brand/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/brand/apple-touch-icon.png">
+
+  <!-- Typography: Google Fonts Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Design System Stylesheets -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/hero.css">
+  <link rel="stylesheet" href="css/footer.css">
+</head>
+<body>
+
+  <!-- ==========================================================================
+       Global Glassmorphism Navigation
+       ========================================================================== -->
+  <header class="site-header">
+    <div class="container">
+      <nav class="navbar-shell" aria-label="Main Navigation">
+        
+        <!-- Brand Logo -->
+        <a href="index.html" class="brand-link" aria-label="TripMura Homepage">
+          <img src="assets/brand/symbol/tripmura_symbol.svg" alt="TripMura" class="brand-symbol-img" width="38" height="38">
+          <span class="brand-wordmark">TRIPMURA</span>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <div class="nav-menu">
+          <a href="#explore" class="nav-link">Explore Trips</a>
+          <a href="#routes" class="nav-link">Multimodal Routes</a>
+          <a href="#group-sync" class="nav-link">Group Sync</a>
+          <a href="#guarantee" class="nav-link">Protection Guarantee</a>
+        </div>
+
+        <!-- Right Utility Actions -->
+        <div class="nav-actions">
+          <button class="utility-pill-btn" id="currencyBtn" aria-label="Change currency">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
+            <span>EUR €</span>
+          </button>
+
+          <button class="utility-pill-btn" aria-label="Language selection">
+            <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .68-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/></svg>
+            <span>EN</span>
+          </button>
+
+          <a href="#planner" class="btn-primary">
+            <span>Start a Trip</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-7.85-1.42 1.42L16.86 11H5v2z"/></svg>
+          </a>
+
+          <!-- Mobile Hamburger Toggle -->
+          <button class="mobile-nav-toggle" aria-label="Open mobile menu" aria-expanded="false" aria-controls="mobileDrawer">
+            <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+          </button>
+        </div>
+
+      </nav>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Drawer -->
+  <div class="mobile-drawer-backdrop" aria-hidden="true"></div>
+  <aside class="mobile-drawer" id="mobileDrawer" aria-label="Mobile Navigation Menu">
+    <div class="drawer-header">
+      <a href="index.html" class="brand-link" aria-label="TripMura Homepage">
+        <img src="assets/brand/symbol/tripmura_symbol.svg" alt="TripMura" class="brand-symbol-img" width="34" height="34">
+        <span class="brand-wordmark">TRIPMURA</span>
+      </a>
+      <button class="drawer-close-btn" aria-label="Close mobile menu">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+    </div>
+    <nav class="drawer-nav">
+      <a href="#explore" class="drawer-link">
+        <span>Explore Trips</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+      </a>
+      <a href="#routes" class="drawer-link">
+        <span>Multimodal Routes</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+      </a>
+      <a href="#group-sync" class="drawer-link">
+        <span>Group Sync</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+      </a>
+      <a href="#guarantee" class="drawer-link">
+        <span>Protection Guarantee</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+      </a>
+    </nav>
+    <div class="drawer-actions">
+      <a href="#planner" class="btn-primary" style="width: 100%;">
+        <span>Start a Trip</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ==========================================================================
+       Atmospheric Mediterranean Hero Stage
+       ========================================================================== -->
+  <main>
+    <section class="hero-section" id="planner">
+      
+      <!-- Sky Drift Ambient Atmosphere -->
+      <div class="hero-atmosphere-container">
+        <div class="hero-cloud-drift"></div>
+      </div>
+
+      <div class="container">
+        <div class="hero-wrapper">
+          
+          <!-- Micro-Badge -->
+          <div class="hero-badge-wrap">
+            <div class="micro-badge">
+              <span class="badge-pulse-dot"></span>
+              <span>✨ Door-to-Door Trips, Connected</span>
+            </div>
+          </div>
+
+          <!-- Headline -->
+          <h1 class="hero-headline">
+            From Your Front Door to the Sun. <span class="text-gradient">One Click.</span>
+          </h1>
+
+          <!-- Subheadline -->
+          <p class="hero-subheadline">
+            Flights, high-speed trains, and boutique stays synchronized into one single holiday booking. Zero self-transfer stress with 100% missed-connection protection.
+          </p>
+
+          <!-- Multimodal Planner Search Card -->
+          <div class="multimodal-search-card">
+            
+            <!-- Mode Tabs -->
+            <div class="search-mode-tabs" role="tablist">
+              <button class="search-mode-tab active" role="tab" aria-selected="true">
+                <span>Whole Holiday</span>
+              </button>
+              <button class="search-mode-tab" role="tab" aria-selected="false">
+                <span>Flight + Boutique Stay</span>
+              </button>
+              <button class="search-mode-tab" role="tab" aria-selected="false">
+                <span>Scenic Rail + Resort</span>
+              </button>
+              <button class="search-mode-tab" role="tab" aria-selected="false">
+                <span>Island Hopping</span>
+              </button>
+            </div>
+
+            <!-- Search Inputs -->
+            <form class="search-input-grid" onsubmit="event.preventDefault();">
+              
+              <!-- Origin -->
+              <div class="search-field">
+                <label class="field-label" for="originInput">From (Your Door)</label>
+                <input type="text" id="originInput" class="field-input" value="London, St Pancras" placeholder="City or Station">
+              </div>
+
+              <!-- Destination -->
+              <div class="search-field">
+                <label class="field-label" for="destInput">To (Sun Destination)</label>
+                <input type="text" id="destInput" class="field-input" value="Amalfi Coast, Italy" placeholder="Where to?">
+              </div>
+
+              <!-- Dates -->
+              <div class="search-field">
+                <label class="field-label" for="datesInput">Trip Dates</label>
+                <input type="text" id="datesInput" class="field-input" value="12 Jun – 19 Jun" placeholder="Select dates">
+              </div>
+
+              <!-- Travelers -->
+              <div class="search-field">
+                <label class="field-label" for="guestsInput">Travelers</label>
+                <input type="text" id="guestsInput" class="field-input" value="2 Adults, 1 Room" placeholder="Guests">
+              </div>
+
+              <!-- Submit CTA Button -->
+              <button type="submit" class="search-cta-btn" aria-label="Find seamless holiday trips">
+                <span>Find Trips</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              </button>
+
+            </form>
+          </div>
+
+          <!-- Route Preview Quick Tags -->
+          <div class="hero-route-preview">
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Trending Routes:</span>
+            
+            <a href="#planner" class="route-pill-item">
+              <span class="route-pill-tag">Scenic Rail</span>
+              <span>London ➔ Eurostar ➔ Zurich ➔ Como Villa</span>
+            </a>
+            
+            <a href="#planner" class="route-pill-item">
+              <span class="route-pill-tag">Flight + Boat</span>
+              <span>Munich ➔ Naples Flight ➔ Capri Hydrofoil</span>
+            </a>
+
+            <a href="#planner" class="route-pill-item">
+              <span class="route-pill-tag">Direct Sun</span>
+              <span>Paris ➔ TGV ➔ Nice Yacht ➔ St. Tropez</span>
+            </a>
+          </div>
+
+          <!-- Social Proof & Trust Bar -->
+          <div class="social-proof-bar">
+            
+            <div class="proof-item">
+              <svg class="proof-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+              <span>100% Self-Transfer Protection</span>
+            </div>
+
+            <div class="proof-item">
+              <svg class="proof-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+              <span>Over 14,000+ Multimodal Routes</span>
+            </div>
+
+            <div class="proof-item">
+              <svg class="proof-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+              <span>Single Checkout &bull; Zero Booking Fees</span>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       Luxury Practical UI Footer
+       ========================================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+      
+      <div class="footer-grid">
+        
+        <!-- Column 1: Brand & Mission -->
+        <div class="footer-brand-col">
+          <a href="index.html" class="footer-logo-link" aria-label="TripMura Home">
+            <div class="footer-brand-lockup">
+              <img src="assets/brand/symbol/tripmura_symbol.svg" alt="TripMura" class="footer-symbol-img" width="32" height="32">
+              <span class="footer-wordmark">TRIPMURA</span>
+            </div>
+          </a>
+          <div class="footer-tagline">Holidays Made Simple.</div>
+          <p class="footer-desc">
+            Synchronizing flights, scenic trains, and boutique stays into one seamless door-to-door trip.
+          </p>
+          <div class="footer-copyright">
+            &copy; 2026 TripMura Inc. All rights reserved.
+          </div>
+        </div>
+
+        <!-- Column 2: Explore -->
+        <div class="footer-nav-col">
+          <h4 class="footer-col-title">Explore</h4>
+          <ul class="footer-links">
+            <li><a href="#explore" class="footer-link">Mediterranean Escapes</a></li>
+            <li><a href="#explore" class="footer-link">Alpine Stays</a></li>
+            <li><a href="#routes" class="footer-link">Scenic Rail Routes</a></li>
+            <li><a href="#routes" class="footer-link">Island Hopping</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Platform & Safety -->
+        <div class="footer-nav-col">
+          <h4 class="footer-col-title">Platform & Safety</h4>
+          <ul class="footer-links">
+            <li><a href="#guarantee" class="footer-link">100% Transfer Guarantee</a></li>
+            <li><a href="#planner" class="footer-link">Door-to-Door TCO</a></li>
+            <li><a href="#group-sync" class="footer-link">Group Trip Sync</a></li>
+            <li><a href="#guarantee" class="footer-link">Disruption Shield</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 4: Trust & Legal -->
+        <div class="footer-nav-col">
+          <h4 class="footer-col-title">Trust & Legal</h4>
+          <ul class="footer-links">
+            <li><a href="#rights" class="footer-link">EU261 Passenger Rights</a></li>
+            <li><a href="#privacy" class="footer-link">Privacy Policy</a></li>
+            <li><a href="#terms" class="footer-link">Terms of Service</a></li>
+            <li><a href="#support" class="footer-link">Support Concierge</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Bottom Sub-Bar -->
+      <div class="footer-sub-bar">
+        <div class="footer-sub-left">
+          <div class="footer-region-select">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            <span>EUR €</span>
+          </div>
+          <div class="footer-region-select">
+            <span>USD $</span>
+          </div>
+        </div>
+
+        <div class="footer-status-pill">
+          <span class="status-dot"></span>
+          <span>14,000+ Multimodal Routes Live</span>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/nav.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TripMura — Holidays Made Simple</title>
+  <link rel="icon" type="image/svg+xml" href="assets/brand/favicon.svg">
+  <link rel="alternate icon" type="image/png" sizes="32x32" href="assets/brand/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/brand/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-porcelain: #fafbfc;
+      --bg-white: #ffffff;
+      --bg-obsidian: #07080b;
+      --bg-sand: #f8fafc;
+      --text-slate-900: #0f172a;
+      --text-slate-600: #475569;
+      --text-slate-500: #64748b;
+      --cyan-electric: #00f2fe;
+      --azure-600: #0284c7;
+      --azure-700: #0369a1;
+      --azure-50: #f0f9ff;
+      --border-light: rgba(15, 23, 42, 0.08);
+      --shadow-soft: 0 10px 30px -5px rgba(15, 23, 42, 0.05), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+      --shadow-card: 0 20px 40px -10px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04);
+      --font-brand: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-porcelain);
+      background-image: 
+        radial-gradient(at 10% 10%, rgba(0, 242, 254, 0.08) 0px, transparent 50%),
+        radial-gradient(at 90% 20%, rgba(2, 132, 199, 0.07) 0px, transparent 50%),
+        radial-gradient(at 50% 90%, rgba(248, 250, 252, 1) 0px, transparent 50%);
+      color: var(--text-slate-900);
+      font-family: var(--font-brand);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+      padding: 40px 24px 100px;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border-light);
+      margin-bottom: 40px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-logo {
+      width: 44px;
+      height: 44px;
+    }
+
+    .header-title-group h1 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      color: var(--text-slate-900);
+    }
+
+    .header-title-group p {
+      font-size: 13px;
+      color: var(--text-slate-500);
+      font-weight: 500;
+    }
+
+    .header-badges {
+      display: flex;
+      gap: 10px;
+    }
+
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--azure-50);
+      color: var(--azure-600);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      border: 1px solid rgba(2, 132, 199, 0.15);
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--azure-600);
+      border-radius: 50%;
+    }
+
+    /* Section Styling */
+    .section-title-wrap {
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-slate-900);
+      letter-spacing: -0.3px;
+    }
+
+    .section-subtitle {
+      font-size: 14px;
+      color: var(--text-slate-500);
+      font-weight: 500;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      background: var(--bg-white);
+      border-radius: 24px;
+      padding: 48px;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-card);
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+      align-items: center;
+      margin-bottom: 56px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 242, 254, 0.1);
+      color: #0284c7;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      border: 1px solid rgba(2, 132, 199, 0.15);
+    }
+
+    .hero-title {
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+      color: var(--text-slate-900);
+      margin-bottom: 12px;
+    }
+
+    .hero-tagline {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--azure-600);
+      margin-bottom: 16px;
+    }
+
+    .hero-desc {
+      font-size: 15px;
+      color: var(--text-slate-600);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .spec-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .spec-card {
+      background: var(--bg-porcelain);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 12px 16px;
+    }
+
+    .spec-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-slate-500);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .spec-val {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-slate-900);
+    }
+
+    .hero-sky-stage {
+      background-image: url('assets/brand/backgrounds/bg_sky_clouds.png');
+      background-size: cover;
+      background-position: center;
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      height: 380px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+      overflow: hidden;
+    }
+
+    .hero-glass-box {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      border-radius: 24px;
+      padding: 32px 48px;
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .hero-glass-box img {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 14px;
+    }
+
+    .hero-glass-title {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text-slate-900);
+      letter-spacing: 1px;
+      line-height: 1;
+    }
+
+    .hero-glass-sub {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--azure-600);
+      margin-top: 6px;
+    }
+
+    .hero-glass-badge {
+      display: inline-block;
+      margin-top: 14px;
+      padding: 5px 18px;
+      background: var(--text-slate-900);
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    }
+
+    /* Section 1: Interactive 3x4 Matrix Simulator */
+    .simulator-card {
+      background: var(--bg-white);
+      border: 1px solid var(--border-light);
+      border-radius: 24px;
+      padding: 36px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 56px;
+    }
+
+    .sim-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 28px;
+      align-items: center;
+    }
+
+    .sim-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .sim-group-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-slate-500);
+      margin-right: 4px;
+    }
+
+    .sim-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--border-light);
+      background: var(--bg-porcelain);
+      color: var(--text-slate-600);
+      transition: all 0.2s;
+    }
+
+    .sim-btn.active {
+      background: var(--azure-600);
+      color: #ffffff;
+      border-color: var(--azure-600);
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+    }
+
+    .sim-stage-main {
+      height: 420px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.4s ease;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+      padding: 32px;
+    }
+
+    .sim-stage-main.mode-white {
+      background-color: #fafbfc;
+      background-image: radial-gradient(at 10% 10%, rgba(0, 242, 254, 0.08) 0px, transparent 50%),
+                        radial-gradient(at 90% 20%, rgba(2, 132, 199, 0.07) 0px, transparent 50%);
+    }
+
+    .sim-stage-main.mode-dark {
+      background-color: #07080b;
+      background-image: radial-gradient(circle at center, #0f172a 0%, #07080b 100%);
+    }
+
+    .sim-stage-main.mode-sky {
+      background-image: url('assets/brand/backgrounds/bg_sky_clouds.png');
+    }
+
+    .sim-stage-main.mode-azure {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    }
+
+    .sim-img-viewer {
+      max-width: 90%;
+      max-height: 85%;
+      object-fit: contain;
+      transition: opacity 0.2s ease;
+    }
+
+    /* Section 2: 12-Card Permutation Matrix */
+    .matrix-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .matrix-tab-btn {
+      padding: 8px 18px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--border-light);
+      background: var(--bg-white);
+      color: var(--text-slate-600);
+      transition: all 0.2s;
+    }
+
+    .matrix-tab-btn.active {
+      background: var(--text-slate-900);
+      color: #ffffff;
+      border-color: var(--text-slate-900);
+    }
+
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 56px;
+    }
+
+    .matrix-card {
+      background: var(--bg-white);
+      border: 1px solid var(--border-light);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .matrix-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card);
+    }
+
+    .matrix-img-box {
+      width: 100%;
+      height: 180px;
+      background: #fafbfc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid var(--border-light);
+      overflow: hidden;
+    }
+
+    .matrix-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .matrix-meta {
+      padding: 14px 16px;
+    }
+
+    .matrix-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-slate-900);
+      margin-bottom: 2px;
+    }
+
+    .matrix-env {
+      font-size: 11px;
+      color: var(--text-slate-500);
+      font-weight: 500;
+    }
+
+    /* Section 3: App Icons & Avatars */
+    .app-icon-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 56px;
+    }
+
+    .app-icon-card {
+      background: var(--bg-white);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 32px 24px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .app-icon-img-box {
+      width: 160px;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .app-icon-img-box img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    /* Section 4: Standalone Multi-Resolution Scale Matrix */
+    .resolution-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 56px;
+    }
+
+    .res-card {
+      background: var(--bg-white);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 24px 16px;
+      text-align: center;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 190px;
+    }
+
+    .res-stage {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .res-meta {
+      margin-top: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-slate-900);
+    }
+
+    .res-sub {
+      font-size: 11px;
+      color: var(--text-slate-500);
+    }
+
+    /* Section 5: Optical Alignment Verification */
+    .alignment-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 24px;
+      margin-bottom: 56px;
+    }
+
+    .align-card {
+      background: var(--bg-white);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+    }
+
+    .align-card-stage {
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 36px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 16px;
+      min-height: 220px;
+      background-image: linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    .guide-line-h {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+      background: rgba(2, 132, 199, 0.35);
+      pointer-events: none;
+      border-top: 1px dashed #0284c7;
+      display: none;
+    }
+
+    .guide-line-v {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 1px;
+      background: rgba(2, 132, 199, 0.35);
+      pointer-events: none;
+      border-left: 1px dashed #0284c7;
+      display: none;
+    }
+
+    .guides-active .guide-line-h,
+    .guides-active .guide-line-v {
+      display: block;
+    }
+
+    .align-toggle-btn {
+      padding: 6px 14px;
+      background: var(--bg-porcelain);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-slate-600);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .align-toggle-btn.active {
+      background: var(--azure-600);
+      color: #ffffff;
+      border-color: var(--azure-600);
+    }
+
+    /* Section 6: Production 4K Asset Catalog */
+    .asset-catalog-card {
+      background: var(--bg-white);
+      border: 1px solid var(--border-light);
+      border-radius: 24px;
+      padding: 36px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .catalog-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .catalog-table th {
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 2px solid var(--border-light);
+      color: var(--text-slate-500);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .catalog-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--text-slate-900);
+    }
+
+    .catalog-table tr:hover td {
+      background: #fafbfc;
+    }
+
+    .badge-fmt {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--azure-50);
+      color: var(--azure-600);
+    }
+
+    .download-link {
+      color: var(--azure-600);
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .download-link:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 900px) {
+      .hero-banner, .sim-stage-dual, .alignment-grid, .app-icon-grid {
+        grid-template-columns: 1fr;
+      }
+      .matrix-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .resolution-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <img src="assets/brand/symbol/tripmura_symbol.svg" alt="TripMura" class="header-logo">
+        <div class="header-title-group">
+          <h1>TRIPMURA</h1>
+          <p>Holidays Made Simple</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <div class="brand-badge">
+          <span class="badge-dot"></span>
+          tripmura.com
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="hero-banner">
+      <div class="hero-text">
+        <div class="hero-meta">Door-to-Door Trips, Connected</div>
+        <h2 class="hero-title">TRIPMURA</h2>
+        <div class="hero-tagline">"Holidays Made Simple."</div>
+        <p class="hero-desc">
+          Single M-Symbol, Stacked, and Horizontal lockups calibrated across Mediterranean light and dark environments. Lossless vector architecture with 4K resolution master exports.
+        </p>
+        <div class="spec-grid">
+          <div class="spec-card">
+            <div class="spec-label">Platform Identity</div>
+            <div class="spec-val">Holidays Made Simple</div>
+          </div>
+          <div class="spec-card">
+            <div class="spec-label">Master Palette</div>
+            <div class="spec-val">#00f2fe &rarr; #0284c7</div>
+          </div>
+          <div class="spec-card">
+            <div class="spec-label">Wordmark Font</div>
+            <div class="spec-val">Swiss Grotesque Bold</div>
+          </div>
+          <div class="spec-card">
+            <div class="spec-label">Asset Suite</div>
+            <div class="spec-val">12 Permutations &bull; 4K Masters</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-sky-stage">
+        <div class="hero-glass-box">
+          <img src="assets/brand/symbol/tripmura_symbol.svg" alt="TripMura Symbol">
+          <div class="hero-glass-title">TRIPMURA</div>
+          <div class="hero-glass-sub">Holidays Made Simple.</div>
+          <div class="hero-glass-badge">tripmura.com</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 1: Interactive 3x4 Matrix Simulator -->
+    <div class="section-title-wrap">
+      <div>
+        <h3 class="section-title">1. Interactive Permutation Simulator</h3>
+        <p class="section-subtitle">Real-time permutation switcher across 4 Environments & 3 Form Factors</p>
+      </div>
+    </div>
+
+    <div class="simulator-card">
+      <div class="sim-bar">
+        <div class="sim-group">
+          <span class="sim-group-label">Environment:</span>
+          <button class="sim-btn active" id="envWhite" onclick="setSimEnv('white')">Porcelain White</button>
+          <button class="sim-btn" id="envDark" onclick="setSimEnv('dark')">Dark Obsidian</button>
+          <button class="sim-btn" id="envSky" onclick="setSimEnv('sky')">Sunlit Clouds</button>
+          <button class="sim-btn" id="envAzure" onclick="setSimEnv('azure')">Deep Azure</button>
+        </div>
+
+        <div class="sim-group">
+          <span class="sim-group-label">Form Factor:</span>
+          <button class="sim-btn active" id="formSymbol" onclick="setSimForm('symbol')">Single M-Symbol</button>
+          <button class="sim-btn" id="formStacked" onclick="setSimForm('stacked')">Stacked Lockup</button>
+          <button class="sim-btn" id="formHorizontal" onclick="setSimForm('horizontal')">Horizontal Lockup</button>
+        </div>
+      </div>
+
+      <div class="sim-stage-main mode-white" id="simStageMain">
+        <img id="simViewerImg" class="sim-img-viewer" src="assets/brand/showcase/symbol_on_white.png" alt="Simulator Output">
+      </div>
+    </div>
+
+    <!-- Section 2: 12-Card Permutation Matrix -->
+    <div class="section-title-wrap">
+      <div>
+        <h3 class="section-title">2. Complete Permutation Matrix (12 Variations)</h3>
+        <p class="section-subtitle">Filter by Form Factor or explore the complete suite</p>
+      </div>
+    </div>
+
+    <div class="matrix-tabs">
+      <button class="matrix-tab-btn active" onclick="filterMatrix('all', this)">All 12 Permutations</button>
+      <button class="matrix-tab-btn" onclick="filterMatrix('symbol', this)">Single M-Symbols (4)</button>
+      <button class="matrix-tab-btn" onclick="filterMatrix('stacked', this)">Stacked Lockups (4)</button>
+      <button class="matrix-tab-btn" onclick="filterMatrix('horizontal', this)">Horizontal Lockups (4)</button>
+    </div>
+
+    <div class="matrix-grid" id="matrixGrid">
+      <!-- Row 1: Symbols -->
+      <div class="matrix-card" data-form="symbol">
+        <div class="matrix-img-box">
+          <img src="assets/brand/showcase/symbol_on_white.png" alt="Symbol on White">
+        </div>
+        <div class="matrix-meta">
+          <div class="matrix-title">Single M-Symbol</div>
+          <div class="matrix-env">Porcelain White Canvas</div>
+        </div>
+      </div>
+
+      <div class="matrix-card" data-form="symbol">
+        <div class="matrix-img-box">
+          <img src="assets/brand/showcase/symbol_on_dark.png" alt="Symbol on Dark">
+        </div>
+        <div class="matrix-meta">
+          <div class="matrix-title">Single M-Symbol (White)</div>
+          <div class="matrix-env">Dark Obsidian Studio</div>
+        </div>
+      </div>
+
+      <div class="matrix-card" data-form="symbol">
+        <div class="matrix-img-box">
+          <img src="assets/brand/showcase/symbol_on_clouds.png" alt="Symbol on Clouds">
+        </div>
+        <div class="matrix-meta">
+          <div class="matrix-title">Single M-Symbol (Glass)</div>
+          <div class="matrix-env">Mediterranean Clouds</div>
+        </div>
+      </div>
+
+      <div class="matrix-card" data-form="symbol">
+        <div class="matrix-img-box">
+          <img src="assets/brand/showcase/symbol_on_azure.png" alt="Symbol on Azure">
+        </div>
+        <div class="matrix-meta">
+          <div class="matrix-title">Single M-Symbol (White)</div>
+          <div class="matrix-env">Deep Azure Gradient</div>
+        </div>
+      </div>
+
+      <!-- Row 2: Stacked -->
+      <div class="matrix-card" data-form="stacked">
+        <div class="matrix-img-box">
+          <img src="assets/brand/showcase/stacked_on_white.png" alt="Stacked on White">
+        </div>
+        <div class="matrix-meta">
+          <div class="matrix-title">Stacked Lockup</div>
+          <div class="matrix-env">Porcelain White Canvas</div>
+        </div>
+      </div>
+
+      <div class="matrix-card" data-form="stacked">
+        <div class="matrix-img-box">
+          <img src="assets/brand/showcase/stacked_on_dark.png" alt="Stacked on Dark">
+        </div>
+        <div class="matrix-meta">
+          <div class="matrix-title">Stacked Lockup (White)</div>
+          <div class="matrix-env">Dark Obsidian Studio</div>
+        </div>
+      </div>
+
+      <div class="matrix-card" data-form="stacked">
+        <div class="matrix-img-box">
+          <img src="assets/brand/showcase/stacked_on_clouds.png" alt="Stacked on Clouds">
+        </div>
+        <div class="matrix-meta">
+          <div class="matrix-title">Stacked Lockup (Glass)</div>
+          <div class="matrix-env">Mediterranean Clouds</div>
+        </div>
+      </div>
+
+      <div class="matrix-card" data-form="stacked">
+        <div class="matrix-img-box">
+          <img src="assets/brand/showcase/stacked_on_azure.png" alt="Stacked on Azure">
+        </div>
+        <div class="matrix-meta">
+          <div class="matrix-title">Stacked Lockup (White)</div>
+          <div class="matrix-env">Deep Azure Gradient</div>
+        </div>
+      </div>
+
+      <!-- Row 3: Horizontal -->
+      <div class="matrix-card" data-form="horizontal">
+        <div class="matrix-img-box">
+          <img src="assets/brand/showcase/horizontal_on_white.png" alt="Horizontal on White">
+        </div>
+        <div class="matrix-meta">
+          <div class="matrix-title">Horizontal Lockup</div>
+          <div class="matrix-env">Porcelain White Canvas</div>
+        </div>
+      </div>
+
+      <div class="matrix-card" data-form="horizontal">
+        <div class="matrix-img-box">
+          <img src="assets/brand/showcase/horizontal_on_dark.png" alt="Horizontal on Dark">
+        </div>
+        <div class="matrix-meta">
+          <div class="matrix-title">Horizontal Lockup (White)</div>
+          <div class="matrix-env">Dark Obsidian Studio</div>
+        </div>
+      </div>
+
+      <div class="matrix-card" data-form="horizontal">
+        <div class="matrix-img-box">
+          <img src="assets/brand/showcase/horizontal_on_clouds.png" alt="Horizontal on Clouds">
+        </div>
+        <div class="matrix-meta">
+          <div class="matrix-title">Horizontal Lockup (Glass)</div>
+          <div class="matrix-env">Mediterranean Clouds</div>
+        </div>
+      </div>
+
+      <div class="matrix-card" data-form="horizontal">
+        <div class="matrix-img-box">
+          <img src="assets/brand/showcase/horizontal_on_azure.png" alt="Horizontal on Azure">
+        </div>
+        <div class="matrix-meta">
+          <div class="matrix-title">Horizontal Lockup (White)</div>
+          <div class="matrix-env">Deep Azure Gradient</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: App Icons & Social Avatars -->
+    <div class="section-title-wrap">
+      <div>
+        <h3 class="section-title">3. App Icon & Social Avatar Suite</h3>
+        <p class="section-subtitle">Porcelain white squircle & circular adaptive icons with Cyan-to-Azure Gradient M</p>
+      </div>
+    </div>
+
+    <div class="app-icon-grid">
+      <div class="app-icon-card">
+        <div class="app-icon-img-box">
+          <img src="assets/brand/icons/app_icon_ios_1024.png" alt="iOS App Icon" style="border-radius: 36px; box-shadow: 0 16px 36px rgba(2, 132, 199, 0.15); border: 1px solid rgba(2, 132, 199, 0.1);">
+        </div>
+        <div style="font-weight: 700; font-size: 15px; margin-bottom: 4px;">iOS Master App Icon</div>
+        <div style="font-size: 12px; color: var(--text-slate-500); margin-bottom: 12px;">1024 &times; 1024 Porcelain White Squircle &bull; Gradient M</div>
+        <span class="badge-fmt">1024x1024 PNG</span>
+      </div>
+
+      <div class="app-icon-card">
+        <div class="app-icon-img-box">
+          <img src="assets/brand/icons/app_icon_android_adaptive.png" alt="Android Icon" style="border-radius: 50%; box-shadow: 0 16px 36px rgba(2, 132, 199, 0.15);">
+        </div>
+        <div style="font-weight: 700; font-size: 15px; margin-bottom: 4px;">Android Adaptive Icon</div>
+        <div style="font-size: 12px; color: var(--text-slate-500); margin-bottom: 12px;">Circular Porcelain White Canvas &bull; Gradient M</div>
+        <span class="badge-fmt">1024x1024 PNG</span>
+      </div>
+
+      <div class="app-icon-card">
+        <div class="app-icon-img-box">
+          <img src="assets/brand/icons/social_avatar_500x500.png" alt="Social Avatar" style="border-radius: 50%; box-shadow: 0 16px 36px rgba(2, 132, 199, 0.15);">
+        </div>
+        <div style="font-weight: 700; font-size: 15px; margin-bottom: 4px;">Social Profile Avatar</div>
+        <div style="font-size: 12px; color: var(--text-slate-500); margin-bottom: 12px;">500 &times; 500 Porcelain White Canvas &bull; Gradient M</div>
+        <span class="badge-fmt">500x500 PNG</span>
+      </div>
+    </div>
+
+    <!-- Section 4: Standalone Multi-Resolution Scale Matrix -->
+    <div class="section-title-wrap">
+      <div>
+        <h3 class="section-title">4. Standalone Symbol Resolution Matrix</h3>
+        <p class="section-subtitle">Optical legibility across micro-favicons and 4096px Ultra-HD masters</p>
+      </div>
+    </div>
+
+    <div class="resolution-grid">
+      <div class="res-card">
+        <div class="res-stage">
+          <img src="assets/brand/symbol/tripmura_symbol.svg" style="width: 16px; height: 16px;" alt="16px">
+        </div>
+        <div>
+          <div class="res-meta">16 &times; 16 px</div>
+          <div class="res-sub">Micro Tab Icon</div>
+        </div>
+      </div>
+
+      <div class="res-card">
+        <div class="res-stage">
+          <img src="assets/brand/symbol/tripmura_symbol.svg" style="width: 32px; height: 32px;" alt="32px">
+        </div>
+        <div>
+          <div class="res-meta">32 &times; 32 px</div>
+          <div class="res-sub">Retina Favicon</div>
+        </div>
+      </div>
+
+      <div class="res-card">
+        <div class="res-stage">
+          <img src="assets/brand/symbol/tripmura_symbol.svg" style="width: 64px; height: 64px;" alt="64px">
+        </div>
+        <div>
+          <div class="res-meta">64 &times; 64 px</div>
+          <div class="res-sub">Mobile Header</div>
+        </div>
+      </div>
+
+      <div class="res-card">
+        <div class="res-stage">
+          <img src="assets/brand/symbol/tripmura_symbol_512.png" style="width: 128px; height: 128px;" alt="512px">
+        </div>
+        <div>
+          <div class="res-meta">512 &times; 512 px</div>
+          <div class="res-sub">App Icon Master</div>
+        </div>
+      </div>
+
+      <div class="res-card">
+        <div class="res-stage">
+          <img src="assets/brand/symbol/tripmura_symbol_4k.png" style="width: 150px; height: 150px;" alt="4K">
+        </div>
+        <div>
+          <div class="res-meta">4096 &times; 4096 px</div>
+          <div class="res-sub">4K Billboard Master</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 5: Optical Alignment Verification -->
+    <div class="section-title-wrap">
+      <div>
+        <h3 class="section-title">5. Optical Alignment Verification</h3>
+        <p class="section-subtitle">Median axis, cap-height, and center baseline balance</p>
+      </div>
+      <button class="align-toggle-btn" id="toggleGuidesBtn" onclick="toggleGuides()">Toggle Alignment Guides</button>
+    </div>
+
+    <div class="alignment-grid" id="alignmentContainer">
+      <div class="align-card">
+        <div class="align-card-stage">
+          <div class="guide-line-h"></div>
+          <div class="guide-line-v"></div>
+          <img src="assets/brand/tripmura_logo_horizontal.png" alt="Horizontal Lockup" style="max-width: 90%; height: auto;">
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: 700; font-size: 15px;">Master Horizontal Lockup</div>
+            <div style="font-size: 12px; color: var(--text-slate-500);">Optically centered median axis across symbol and wordmark</div>
+          </div>
+          <span class="badge-fmt">1300x360 &bull; 4K</span>
+        </div>
+      </div>
+
+      <div class="align-card">
+        <div class="align-card-stage">
+          <div class="guide-line-h"></div>
+          <div class="guide-line-v"></div>
+          <img src="assets/brand/tripmura_logo_stacked.png" alt="Stacked Lockup" style="max-width: 65%; height: auto;">
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: 700; font-size: 15px;">Master Stacked Lockup</div>
+            <div style="font-size: 12px; color: var(--text-slate-500);">Vertical symmetrical axis alignment</div>
+          </div>
+          <span class="badge-fmt">900x900 &bull; 4K</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 6: Production 4K Asset Catalog -->
+    <div class="section-title-wrap">
+      <div>
+        <h3 class="section-title">6. Production Asset Catalog</h3>
+        <p class="section-subtitle">Lossless vectors, 4K masters, and high-performance assets</p>
+      </div>
+    </div>
+
+    <div class="asset-catalog-card">
+      <table class="catalog-table">
+        <thead>
+          <tr>
+            <th>Asset Name</th>
+            <th>Type</th>
+            <th>Dimensions</th>
+            <th>Format</th>
+            <th>Direct Link</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>tripmura_symbol.svg</strong></td>
+            <td>Vector Master Symbol</td>
+            <td>Scalable (512x512)</td>
+            <td><span class="badge-fmt">SVG</span></td>
+            <td><a href="assets/brand/symbol/tripmura_symbol.svg" class="download-link" target="_blank">Open Vector</a></td>
+          </tr>
+          <tr>
+            <td><strong>tripmura_symbol_4k.png</strong></td>
+            <td>4K Master Symbol (Gradient)</td>
+            <td>4096 &times; 4096</td>
+            <td><span class="badge-fmt">PNG</span></td>
+            <td><a href="assets/brand/symbol/tripmura_symbol_4k.png" class="download-link" target="_blank">Download 4K</a></td>
+          </tr>
+          <tr>
+            <td><strong>symbol_on_porcelain_white_4k.png</strong></td>
+            <td>4K Symbol on Porcelain White</td>
+            <td>4096 &times; 4096</td>
+            <td><span class="badge-fmt">PNG</span></td>
+            <td><a href="assets/brand/symbol/backgrounds/symbol_on_porcelain_white_4k.png" class="download-link" target="_blank">Download 4K</a></td>
+          </tr>
+          <tr>
+            <td><strong>symbol_on_dark_obsidian_4k.png</strong></td>
+            <td>4K Symbol on Dark Obsidian</td>
+            <td>4096 &times; 4096</td>
+            <td><span class="badge-fmt">PNG</span></td>
+            <td><a href="assets/brand/symbol/backgrounds/symbol_on_dark_obsidian_4k.png" class="download-link" target="_blank">Download 4K</a></td>
+          </tr>
+          <tr>
+            <td><strong>symbol_on_sunlit_clouds_4k.png</strong></td>
+            <td>4K Symbol on Sunlit Clouds</td>
+            <td>4096 &times; 4096</td>
+            <td><span class="badge-fmt">PNG</span></td>
+            <td><a href="assets/brand/symbol/backgrounds/symbol_on_sunlit_clouds_4k.png" class="download-link" target="_blank">Download 4K</a></td>
+          </tr>
+          <tr>
+            <td><strong>symbol_on_azure_gradient_4k.png</strong></td>
+            <td>4K Symbol on Azure Gradient</td>
+            <td>4096 &times; 4096</td>
+            <td><span class="badge-fmt">PNG</span></td>
+            <td><a href="assets/brand/symbol/backgrounds/symbol_on_azure_gradient_4k.png" class="download-link" target="_blank">Download 4K</a></td>
+          </tr>
+          <tr>
+            <td><strong>app_icon_ios_1024.png</strong></td>
+            <td>iOS Master App Icon</td>
+            <td>1024 &times; 1024</td>
+            <td><span class="badge-fmt">PNG</span></td>
+            <td><a href="assets/brand/icons/app_icon_ios_1024.png" class="download-link" target="_blank">Download Icon</a></td>
+          </tr>
+          <tr>
+            <td><strong>tripmura_logo_horizontal_4k.png</strong></td>
+            <td>4K Horizontal Lockup (Gradient)</td>
+            <td>3840 &times; 1063</td>
+            <td><span class="badge-fmt">PNG</span></td>
+            <td><a href="assets/brand/tripmura_logo_horizontal_4k.png" class="download-link" target="_blank">Download 4K</a></td>
+          </tr>
+          <tr>
+            <td><strong>tripmura_logo_stacked_4k.png</strong></td>
+            <td>4K Stacked Lockup (Gradient)</td>
+            <td>3840 &times; 3840</td>
+            <td><span class="badge-fmt">PNG</span></td>
+            <td><a href="assets/brand/tripmura_logo_stacked_4k.png" class="download-link" target="_blank">Download 4K</a></td>
+          </tr>
+          <tr>
+            <td><strong>bg_sky_clouds.png</strong></td>
+            <td>Mediterranean Sky Texture</td>
+            <td>3840 &times; 2160</td>
+            <td><span class="badge-fmt">PNG</span></td>
+            <td><a href="assets/brand/backgrounds/bg_sky_clouds.png" class="download-link" target="_blank">Download 4K</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script>
+    let currentEnv = 'white';
+    let currentForm = 'symbol';
+
+    const assetMap = {
+      'symbol': {
+        'white': 'assets/brand/showcase/symbol_on_white.png',
+        'dark': 'assets/brand/showcase/symbol_on_dark.png',
+        'sky': 'assets/brand/showcase/symbol_on_clouds.png',
+        'azure': 'assets/brand/showcase/symbol_on_azure.png'
+      },
+      'stacked': {
+        'white': 'assets/brand/showcase/stacked_on_white.png',
+        'dark': 'assets/brand/showcase/stacked_on_dark.png',
+        'sky': 'assets/brand/showcase/stacked_on_clouds.png',
+        'azure': 'assets/brand/showcase/stacked_on_azure.png'
+      },
+      'horizontal': {
+        'white': 'assets/brand/showcase/horizontal_on_white.png',
+        'dark': 'assets/brand/showcase/horizontal_on_dark.png',
+        'sky': 'assets/brand/showcase/horizontal_on_clouds.png',
+        'azure': 'assets/brand/showcase/horizontal_on_azure.png'
+      }
+    };
+
+    function updateSimulator() {
+      const stage = document.getElementById('simStageMain');
+      const img = document.getElementById('simViewerImg');
+
+      stage.className = 'sim-stage-main mode-' + currentEnv;
+      img.src = assetMap[currentForm][currentEnv];
+    }
+
+    function setSimEnv(env) {
+      currentEnv = env;
+      ['envWhite', 'envDark', 'envSky', 'envAzure'].forEach(id => {
+        document.getElementById(id).classList.remove('active');
+      });
+      const btnId = 'env' + env.charAt(0).toUpperCase() + env.slice(1);
+      document.getElementById(btnId).classList.add('active');
+      updateSimulator();
+    }
+
+    function setSimForm(form) {
+      currentForm = form;
+      ['formSymbol', 'formStacked', 'formHorizontal'].forEach(id => {
+        document.getElementById(id).classList.remove('active');
+      });
+      const btnId = 'form' + form.charAt(0).toUpperCase() + form.slice(1);
+      document.getElementById(btnId).classList.add('active');
+      updateSimulator();
+    }
+
+    function filterMatrix(form, btn) {
+      document.querySelectorAll('.matrix-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const cards = document.querySelectorAll('.matrix-card');
+      cards.forEach(card => {
+        if (form === 'all' || card.getAttribute('data-form') === form) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function toggleGuides() {
+      const container = document.getElementById('alignmentContainer');
+      const btn = document.getElementById('toggleGuidesBtn');
+      container.classList.toggle('guides-active');
+      btn.classList.toggle('active');
+    }
+  </script>
+</body>
+</html>

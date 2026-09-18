@@ -1,0 +1,205 @@
+/**
+ * TripMura Design System — Luxury Footer Styles (Practical UI Compliance)
+ */
+
+.site-footer {
+  margin-top: clamp(60px, 8vw, 100px);
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-light);
+  padding: clamp(48px, 6vw, 80px) 0 32px;
+  position: relative;
+  z-index: var(--z-elevate);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: clamp(32px, 4vw, 56px);
+  margin-bottom: clamp(40px, 5vw, 64px);
+}
+
+/* Column 1: Brand & Mission */
+.footer-brand-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.footer-logo-link {
+  display: inline-block;
+  margin-bottom: 14px;
+  text-decoration: none;
+}
+
+.footer-brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-symbol-img {
+  height: 32px;
+  width: 32px;
+  object-fit: contain;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.footer-logo-link:hover .footer-symbol-img {
+  transform: scale(1.05);
+}
+
+.footer-wordmark {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.footer-tagline {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary-azure);
+  margin-bottom: 10px;
+}
+
+.footer-desc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
+  max-width: 320px;
+  margin-bottom: 20px;
+}
+
+.footer-copyright {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Columns 2, 3, 4: Navigation Columns */
+.footer-nav-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-col-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--text-primary);
+  margin-bottom: 18px;
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-link {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.footer-link:hover {
+  color: var(--primary-azure);
+  transform: translateX(2px);
+}
+
+/* Bottom Sub-Bar */
+.footer-sub-bar {
+  padding-top: 24px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-sub-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.footer-region-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-pill);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.footer-region-select:hover {
+  background: var(--primary-azure-50);
+  border-color: var(--border-focus);
+  color: var(--primary-azure);
+}
+
+.footer-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: var(--radius-pill);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #065f46;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--accent-emerald);
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulse-emerald 2s infinite;
+}
+
+@keyframes pulse-emerald {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* ==========================================================================
+   Responsive Footer Layout
+   ========================================================================== */
+@media (max-width: 900px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+  }
+  .footer-brand-col {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 580px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .footer-sub-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
