@@ -1022,17 +1022,11 @@ function initSearchEngine() {
   });
 
   // --------------------------------------------------------------------------
-  // 9. Search CTA Loading Micro-Animation
+  // 10. Search CTA Submit & Popover Close Coordinator
   // --------------------------------------------------------------------------
-  if (searchForm && searchCta) {
+  if (searchForm) {
     searchForm.addEventListener('submit', (e) => {
-      e.preventDefault();
       closeAllPopovers();
-
-      searchCta.classList.add('loading');
-      setTimeout(() => {
-        searchCta.classList.remove('loading');
-      }, 1800);
     });
   }
 }

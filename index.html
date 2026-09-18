@@ -31,6 +31,7 @@
   <link rel="stylesheet" href="css/search-modals.css">
   <link rel="stylesheet" href="css/footer.css">
   <link rel="stylesheet" href="css/preloader.css">
+  <link rel="stylesheet" href="css/results.css">
 </head>
 <body>
 
@@ -186,7 +187,7 @@
 
           <!-- Subheadline -->
           <p class="hero-subheadline">
-            Flights, high-speed trains, and boutique stays synchronized into one single holiday booking. Zero self-transfer stress with 100% missed-connection protection.
+            Compare flights, scenic trains, and boutique stays across 100+ platforms in one click. Book directly with trusted providers at zero extra cost.
           </p>
 
           <!-- Multimodal Planner Search Card -->
@@ -567,13 +568,39 @@
             </div>
 
             <div class="proof-item">
-              <svg class="proof-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
-              <span>Single Checkout &bull; Zero Booking Fees</span>
+              <svg class="proof-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <span>100% Free to Use &bull; Direct Provider Booking &bull; No Hidden Fees</span>
             </div>
 
           </div>
 
         </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Metasearch Results & Multimodal Itineraries Section
+         ========================================================================== -->
+    <section id="searchResultsSection" class="results-section">
+      <div class="container">
+        
+        <!-- Section Header -->
+        <div class="results-header">
+          <div class="results-badge-wrap">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            <span>Live Metasearch Comparison</span>
+          </div>
+          <h2 class="results-title">Synchronized Multimodal Packages</h2>
+          <p class="results-subtitle" id="resultsMetaSummary">
+            Comparing live routes across Skyscanner, Trainline, Omio, Booking.com, and Airbnb. Book each leg directly with zero markup.
+          </p>
+        </div>
+
+        <!-- Dynamic Results Cards Grid -->
+        <div class="results-grid" id="resultsCardsGrid">
+          <!-- Populated dynamically via js/results-engine.js -->
+        </div>
+
       </div>
     </section>
   </main>
@@ -649,6 +676,56 @@
     </div>
   </footer>
 
+  <!-- ==========================================================================
+       Trip Summary & Direct Provider Booking Drawer / Modal
+       ========================================================================== -->
+  <div class="trip-summary-modal-backdrop" id="tripSummaryBackdrop" aria-hidden="true"></div>
+  
+  <div class="trip-summary-drawer" id="tripSummaryModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="drawerHeadline">
+    
+    <!-- Drawer Header -->
+    <div class="drawer-header">
+      <div class="drawer-title-wrap">
+        <div class="drawer-tag-pill">
+          <span>✨ 100% Free Metasearch Engine</span>
+        </div>
+        <h3 class="drawer-headline" id="drawerHeadline">London → Amalfi Coast</h3>
+        <span class="drawer-meta-sub" id="drawerMetaSub">18 Sep – 25 Sep • 2 Travelers • Smart Synchronized Route</span>
+      </div>
+      <button type="button" class="drawer-close-btn" id="closeSummaryDrawerBtn" aria-label="Close trip breakdown">✕</button>
+    </div>
+
+    <!-- Drawer Scrollable Body -->
+    <div class="drawer-scroll-body">
+      
+      <!-- Metasearch Transparency Notice -->
+      <div class="drawer-intro-notice">
+        <span class="drawer-intro-icon">🛡️</span>
+        <div>
+          <strong>Zero Booking Fees:</strong> TripMura is 100% free to use. Compare and book each leg directly with trusted official providers below:
+        </div>
+      </div>
+
+      <!-- Provider Booking Legs List -->
+      <div class="drawer-legs-list" id="drawerLegsList">
+        <!-- Rendered dynamically by js/results-engine.js -->
+      </div>
+
+    </div>
+
+    <!-- Drawer Pinned Footer -->
+    <div class="drawer-footer">
+      <div class="drawer-tco-summary-box">
+        <div class="tco-summary-info">
+          <span class="tco-summary-title">Total Estimated Door-to-Door TCO</span>
+          <span class="tco-summary-sub">✓ Direct Provider Rates • Zero Hidden Markups</span>
+        </div>
+        <div class="tco-summary-amount" id="drawerTcoAmount">€604</div>
+      </div>
+    </div>
+
+  </div>
+
   <!-- Search Engine Mobile Backdrop -->
   <div class="search-modal-backdrop" aria-hidden="true"></div>
 
@@ -657,5 +734,6 @@
   <script src="js/nav.js"></script>
   <script src="js/app.js"></script>
   <script src="js/search-engine.js"></script>
+  <script src="js/results-engine.js"></script>
 </body>
 </html>
