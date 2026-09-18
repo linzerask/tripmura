@@ -7,26 +7,31 @@
    1. Glassmorphism Navbar
    ========================================================================== */
 .site-header {
-  position: sticky;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   z-index: var(--z-navbar);
-  padding: 16px 0;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 24px 0 0;
   transition: all var(--transition-normal);
 }
 
 .site-header.scrolled {
-  padding: 10px 0;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .navbar-shell {
-  background: var(--bg-glass);
-  backdrop-filter: var(--backdrop-blur-md);
-  -webkit-backdrop-filter: var(--backdrop-blur-md);
-  border: 1px solid var(--border-glass);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
   padding: 8px 16px 8px 24px;
   display: flex;
   align-items: center;
@@ -36,8 +41,8 @@
 }
 
 .site-header.scrolled .navbar-shell {
-  background: var(--bg-glass-heavy);
-  box-shadow: var(--shadow-elevation);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 12px 35px rgba(15, 23, 42, 0.12);
   border-color: rgba(255, 255, 255, 0.95);
 }
 
@@ -400,7 +405,7 @@
 
 @media (max-width: 640px) {
   .site-header {
-    padding: 10px 0;
+    padding: 16px 0 0;
   }
 
   .site-header .nav-actions .btn-primary {
