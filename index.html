@@ -153,20 +153,63 @@
           <!-- Multimodal Planner Search Card -->
           <div class="multimodal-search-card">
             
-            <!-- Mode Tabs -->
-            <div class="search-mode-tabs" role="tablist">
-              <button class="search-mode-tab active" role="tab" aria-selected="true">
-                <span>Whole Holiday</span>
+            <!-- Skyscanner-Style Category Mode Tabs -->
+            <div class="search-mode-tabs" role="tablist" aria-label="Search Categories">
+              <button class="search-mode-tab active" role="tab" aria-selected="true" data-mode="holiday">
+                <span>🏖️ Whole Holiday</span>
               </button>
-              <button class="search-mode-tab" role="tab" aria-selected="false">
-                <span>Flight + Boutique Stay</span>
+              <button class="search-mode-tab" role="tab" aria-selected="false" data-mode="flights">
+                <span>✈️ Flights</span>
               </button>
-              <button class="search-mode-tab" role="tab" aria-selected="false">
-                <span>Scenic Rail + Resort</span>
+              <button class="search-mode-tab" role="tab" aria-selected="false" data-mode="stays">
+                <span>🏨 Stays</span>
               </button>
-              <button class="search-mode-tab" role="tab" aria-selected="false">
-                <span>Island Hopping</span>
+              <button class="search-mode-tab" role="tab" aria-selected="false" data-mode="rail">
+                <span>🚆 Rail & Ferry</span>
               </button>
+              <button class="search-mode-tab" role="tab" aria-selected="false" data-mode="cars">
+                <span>🚗 Cars</span>
+              </button>
+              <button class="search-mode-tab" role="tab" aria-selected="false" data-mode="packages">
+                <span>🎒 Packages</span>
+              </button>
+            </div>
+
+            <!-- Skyscanner-Style Trip Type & Cabin Class Micro-Selectors -->
+            <div class="search-sub-options">
+              <!-- Trip Type Selector -->
+              <div class="micro-dropdown-wrap">
+                <button type="button" class="micro-option-btn" id="tripTypeBtn" aria-haspopup="listbox" aria-expanded="false">
+                  <span id="tripTypeLabel">Roundtrip</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+                </button>
+                <div class="micro-dropdown-menu" id="tripTypeMenu" role="listbox">
+                  <div class="micro-option-item active" data-val="roundtrip" role="option">Roundtrip</div>
+                  <div class="micro-option-item" data-val="oneway" role="option">One-way</div>
+                  <div class="micro-option-item" data-val="multicity" role="option">Multi-city</div>
+                </div>
+              </div>
+
+              <!-- Cabin Class Selector -->
+              <div class="micro-dropdown-wrap">
+                <button type="button" class="micro-option-btn" id="cabinClassBtn" aria-haspopup="listbox" aria-expanded="false">
+                  <span id="cabinClassLabel">Economy</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+                </button>
+                <div class="micro-dropdown-menu" id="cabinClassMenu" role="listbox">
+                  <div class="micro-option-item active" data-val="economy" role="option">Economy</div>
+                  <div class="micro-option-item" data-val="premium" role="option">Premium Economy</div>
+                  <div class="micro-option-item" data-val="business" role="option">Business Class</div>
+                  <div class="micro-option-item" data-val="first" role="option">First Class</div>
+                </div>
+              </div>
+
+              <!-- Direct Routes Only Checkbox Pill -->
+              <label class="micro-checkbox-pill">
+                <input type="checkbox" id="directRoutesOnly" class="micro-checkbox-input">
+                <span class="micro-checkbox-custom"></span>
+                <span class="micro-checkbox-text">Direct routes only</span>
+              </label>
             </div>
 
             <!-- Search Inputs -->
@@ -176,13 +219,13 @@
               <div class="search-field-wrap">
                 <div class="search-field" id="originField">
                   <label class="field-label" for="originInput">From (Your Door)</label>
-                  <input type="text" id="originInput" class="field-input" value="London, St Pancras" placeholder="City or Station" autocomplete="off">
+                  <input type="text" id="originInput" class="field-input" value="London, St Pancras" placeholder="City, Airport or Station" autocomplete="off">
                 </div>
                 <!-- Origin Popover -->
-                <div class="search-popover" id="originPopover" role="dialog" aria-label="Select Origin Hub">
+                <div class="search-popover search-popover-dropdown" id="originPopover" role="dialog" aria-label="Select Origin Hub">
                   <div class="popover-header">
                     <span class="popover-title">Departure Hubs</span>
-                    <span class="popover-badge">Eurostar & Air</span>
+                    <span class="popover-badge">Global & Multimodal</span>
                   </div>
                   <div class="location-list"></div>
                 </div>
@@ -195,7 +238,7 @@
                   <input type="text" id="destInput" class="field-input" value="Amalfi Coast, Italy" placeholder="Where to?" autocomplete="off">
                 </div>
                 <!-- Destination Popover -->
-                <div class="search-popover" id="destPopover" role="dialog" aria-label="Select Destination">
+                <div class="search-popover search-popover-dropdown" id="destPopover" role="dialog" aria-label="Select Destination">
                   <div class="popover-header">
                     <span class="popover-title">Popular Destinations</span>
                     <span class="popover-badge">Boutique & Coastal</span>
@@ -284,17 +327,26 @@
 
             <!-- Calendar Range Modal (June & July 2026) Centered on Search Card -->
             <div class="search-popover calendar-popover" id="datesPickerModal" role="dialog" aria-label="Select Dates">
-              <!-- Quick Presets -->
-              <div class="calendar-presets-bar">
-                <button type="button" class="preset-pill-btn active" data-preset="1week">
-                  <span>☀️ 1 Week in June</span>
-                </button>
-                <button type="button" class="preset-pill-btn" data-preset="weekend">
-                  <span>🏖️ Long Weekend</span>
-                </button>
-                <button type="button" class="preset-pill-btn" data-preset="2weeks">
-                  <span>🌿 2 Weeks Escape</span>
-                </button>
+              
+              <!-- Trip Type Pill Toggle Inside Modal Header -->
+              <div class="calendar-top-bar">
+                <div class="calendar-trip-type-toggle">
+                  <button type="button" class="cal-toggle-pill active" id="calRoundtripBtn">Roundtrip</button>
+                  <button type="button" class="cal-toggle-pill" id="calOnewayBtn">One-way</button>
+                </div>
+                
+                <!-- Quick Presets -->
+                <div class="calendar-presets-bar">
+                  <button type="button" class="preset-pill-btn active" data-preset="1week">
+                    <span>☀️ 1 Week in June</span>
+                  </button>
+                  <button type="button" class="preset-pill-btn" data-preset="weekend">
+                    <span>🏖️ Long Weekend</span>
+                  </button>
+                  <button type="button" class="preset-pill-btn" data-preset="2weeks">
+                    <span>🌿 2 Weeks Escape</span>
+                  </button>
+                </div>
               </div>
 
               <!-- Dual Months Grid -->
@@ -332,8 +384,15 @@
 
               <!-- Calendar Footer -->
               <div class="popover-footer">
-                <button type="button" class="btn-ghost-sm" id="clearDatesBtn">Clear</button>
-                <button type="button" class="btn-apply-sm" id="applyDatesBtn">Apply Dates</button>
+                <label class="flexible-dates-wrap">
+                  <input type="checkbox" id="flexibleDatesCheck" class="flexible-dates-input">
+                  <span class="flexible-dates-custom"></span>
+                  <span class="flexible-dates-text">Flexible dates (±3 days)</span>
+                </label>
+                <div class="footer-action-btns">
+                  <button type="button" class="btn-ghost-sm" id="clearDatesBtn">Clear</button>
+                  <button type="button" class="btn-apply-sm" id="applyDatesBtn">Apply Dates</button>
+                </div>
               </div>
             </div>
 

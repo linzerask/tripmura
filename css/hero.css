@@ -80,8 +80,9 @@
 .multimodal-search-card {
   position: relative;
   z-index: 50;
+  overflow: visible;
   width: 100%;
-  max-width: 920px;
+  max-width: 960px;
   background: var(--bg-glass-heavy);
   backdrop-filter: var(--backdrop-blur-md);
   -webkit-backdrop-filter: var(--backdrop-blur-md);
@@ -101,10 +102,15 @@
 .search-mode-tabs {
   display: flex;
   gap: var(--space-2);
-  padding: var(--space-1) var(--space-2) var(--space-3);
+  padding: var(--space-1) var(--space-2) var(--space-2);
   border-bottom: 1px solid var(--border-light);
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-2);
   overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.search-mode-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .search-mode-tab {
@@ -119,6 +125,7 @@
   background: transparent;
   transition: all var(--transition-fast);
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .search-mode-tab:hover {
@@ -137,11 +144,137 @@
   outline-offset: 2px;
 }
 
+/* Skyscanner-Style Sub-Options Bar (Trip Type, Cabin Class, Direct Filter) */
+.search-sub-options {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-2) var(--space-2);
+  flex-wrap: wrap;
+}
+
+.micro-dropdown-wrap {
+  position: relative;
+}
+
+.micro-option-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.micro-option-btn:hover, .micro-option-btn.active {
+  color: var(--primary-azure-dark);
+  border-color: var(--primary-azure);
+  background: #ffffff;
+  box-shadow: var(--shadow-xs);
+}
+
+.micro-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 1050;
+  background: #ffffff;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-inner-md);
+  padding: 4px;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15), 0 0 0 1px rgba(15, 23, 42, 0.05);
+  min-width: 155px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px) scale(0.98);
+  transition: all var(--transition-fast);
+  pointer-events: none;
+}
+
+.micro-dropdown-menu.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.micro-option-item {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-radius: var(--radius-inner-sm);
+  cursor: pointer;
+  transition: all 100ms ease;
+}
+
+.micro-option-item:hover {
+  background: var(--primary-azure-50);
+  color: var(--primary-azure);
+}
+
+.micro-option-item.active {
+  font-weight: 700;
+  color: var(--primary-azure);
+  background: rgba(2, 132, 199, 0.08);
+}
+
+.micro-checkbox-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  margin-left: auto;
+  user-select: none;
+}
+
+.micro-checkbox-input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--border-subtle);
+  border-radius: 4px;
+  background: #ffffff;
+  cursor: pointer;
+  outline: none;
+  transition: all 120ms ease;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.micro-checkbox-input:checked {
+  background: var(--primary-azure);
+  border-color: var(--primary-azure);
+}
+
+.micro-checkbox-input:checked::after {
+  content: '';
+  width: 4px;
+  height: 8px;
+  border: solid #ffffff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
 .search-input-grid {
   display: grid;
   grid-template-columns: 1.2fr 1.2fr 1fr 1fr auto;
   gap: 10px;
   align-items: center;
+  position: relative;
+  z-index: 10;
 }
 
 .search-field {
@@ -221,7 +354,7 @@
    ========================================================================== */
 .hero-route-preview {
   position: relative;
-  z-index: 10;
+  z-index: 1;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -263,7 +396,7 @@
 /* Social Proof Bar */
 .social-proof-bar {
   position: relative;
-  z-index: 10;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;

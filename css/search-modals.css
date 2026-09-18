@@ -29,13 +29,13 @@
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
-  z-index: var(--z-dropdown);
+  z-index: 1000;
   background: #ffffff;
   border: 1px solid var(--border-card);
   border-radius: var(--radius-card-sm); /* 20px */
   padding: var(--space-2); /* 8px */
-  box-shadow: var(--shadow-glass);
-  width: 360px;
+  box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(15, 23, 42, 0.08);
+  width: 380px;
   max-width: 90vw;
   opacity: 0;
   visibility: hidden;
@@ -177,25 +177,63 @@
   transform: translateX(-50%) translateY(0) scale(1);
 }
 
-/* Presets Bar */
-.calendar-presets-bar {
+/* Presets & Trip Type Top Bar */
+.calendar-top-bar {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   padding: 4px 6px 12px;
   border-bottom: 1px solid var(--border-light);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.calendar-trip-type-toggle {
+  display: inline-flex;
+  background: rgba(15, 23, 42, 0.06);
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  gap: 2px;
+}
+
+.cal-toggle-pill {
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: transparent;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.cal-toggle-pill.active {
+  background: #ffffff;
+  color: var(--primary-azure-dark);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.12);
+}
+
+.calendar-presets-bar {
+  display: flex;
+  gap: 6px;
   overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.calendar-presets-bar::-webkit-scrollbar {
+  display: none;
 }
 
 .preset-pill-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 5px 10px;
   background: var(--bg-card-subtle);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-pill);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-secondary);
   cursor: pointer;
@@ -318,6 +356,56 @@
   justify-content: space-between;
   padding-top: 12px;
   border-top: 1px solid var(--border-light);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.flexible-dates-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  user-select: none;
+}
+
+.flexible-dates-input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 15px;
+  height: 15px;
+  border: 1.5px solid var(--border-subtle);
+  border-radius: 4px;
+  background: #ffffff;
+  cursor: pointer;
+  outline: none;
+  transition: all 120ms ease;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flexible-dates-input:checked {
+  background: var(--primary-azure);
+  border-color: var(--primary-azure);
+}
+
+.flexible-dates-input:checked::after {
+  content: '';
+  width: 3.5px;
+  height: 7px;
+  border: solid #ffffff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
+.footer-action-btns {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .btn-ghost-sm {
