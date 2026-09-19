@@ -724,10 +724,10 @@ function initResultsPage() {
 
     items.forEach((item, index) => {
       const card = document.createElement('div');
-      card.className = `feed-card ${item.highlight ? 'highlight-pick' : ''}`;
+      card.className = `feed-card results-card ${item.highlight ? 'highlight-pick' : ''}`;
       
       const legsHtml = item.legs.map(leg => `
-        <div class="leg-box">
+        <div class="leg-box itinerary-leg">
           <div class="leg-box-top">
             <div class="leg-carrier-lockup">
               <span class="leg-carrier-logo">${leg.icon}</span>
@@ -748,29 +748,29 @@ function initResultsPage() {
 
       card.innerHTML = `
         <div>
-          <div class="feed-card-top-row">
-            <div class="feed-badges-wrap">
+          <div class="feed-card-top-row card-top-row">
+            <div class="feed-badges-wrap card-badges-left">
               <span class="feed-badge ${item.badgeClass}">${item.badge}</span>
               <span class="feed-badge duration">${item.durationStr}</span>
               <span class="feed-badge eco">🌿 ${item.co2kg}kg CO2</span>
             </div>
-            <div style="font-size: 0.8rem; font-weight: 700; color: #0284c7;">
+            <div class="feed-stay-score-badge card-rating-right">
               ★ ${item.stayScore} Verified Stay
             </div>
           </div>
 
           <div class="feed-card-header-info" style="margin-top: 10px; margin-bottom: 16px;">
-            <h3 class="feed-card-title">${item.title}</h3>
-            <p class="feed-card-desc">${item.desc}</p>
+            <h3 class="feed-card-title card-title">${item.title}</h3>
+            <p class="feed-card-desc card-desc">${item.desc}</p>
           </div>
 
-          <div class="feed-journey-legs-grid">
+          <div class="feed-journey-legs-grid itinerary-legs-grid">
             ${legsHtml}
           </div>
         </div>
 
         <!-- 1-Click Multi-Engine Comparison Bar -->
-        <div class="multi-engine-bar">
+        <div class="multi-engine-bar compare-engines-bar">
           <div class="engine-bar-header">
             <span class="engine-bar-label">⚡ Compare Real-Time Fares Across Engines:</span>
             <span class="engine-bar-guarantee">Pre-filled • No 404s</span>
@@ -799,7 +799,7 @@ function initResultsPage() {
           </div>
         </div>
 
-        <div class="feed-card-bottom-row">
+        <div class="feed-card-bottom-row card-footer-row">
           <div class="feed-tco-block">
             <div class="feed-tco-labels">
               <span class="feed-tco-title">Door-to-Door TCO</span>
@@ -810,12 +810,12 @@ function initResultsPage() {
             </div>
           </div>
 
-          <div class="feed-card-actions-group">
-            <a href="${item.primaryCtaUrl}" target="_blank" rel="noopener noreferrer" class="btn-primary-carrier-book" title="Direct Booking on Official Portal">
+          <div class="feed-card-actions-group card-footer-actions">
+            <a href="${item.primaryCtaUrl}" target="_blank" rel="noopener noreferrer" class="btn-primary-carrier-book btn-book-primary" title="Direct Booking on Official Portal">
               <span>${item.primaryCtaLabel}</span>
             </a>
 
-            <button type="button" class="btn-feed-breakdown" data-card-idx="${index}">
+            <button type="button" class="btn-feed-breakdown btn-details-secondary" data-card-idx="${index}">
               <span>Itinerary Details</span>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
             </button>

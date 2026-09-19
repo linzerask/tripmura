@@ -4,7 +4,15 @@
 
 /* Box sizing rules & smooth scrolling */
 *, *::before, *::after {
-  box-sizing: border-box;
+  box-sizing: border-box !important;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100% !important;
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
   margin: 0;
   padding: 0;
 }
@@ -14,7 +22,6 @@ html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  overflow-x: clip;
 }
 
 body {
@@ -28,7 +35,6 @@ body {
   line-height: var(--line-height-normal);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: clip;
   position: relative;
 }
 
@@ -74,13 +80,15 @@ ul, ol {
 }
 
 /* Container */
-.container {
-  width: 100%;
-  max-width: var(--container-max);
-  margin-left: auto;
-  margin-right: auto;
+.container,
+.results-page-main {
+  width: 100% !important;
+  max-width: 1360px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
   padding-left: var(--container-padding);
   padding-right: var(--container-padding);
+  box-sizing: border-box !important;
 }
 
 /* Accessibility: Focus visible */
