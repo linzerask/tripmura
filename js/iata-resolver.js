@@ -1,7 +1,9 @@
 /**
- * TripMura — IATA Resolver & Metasearch Deep-Link Engine
- * Resolves cities/airports into valid 3-letter IATA codes and constructs
- * 100% accurate, pre-populated deep-links with zero 404s.
+ * TripMura — IATA Resolver, Smart Hub Routing & Deep-Link Engine
+ * Resolves cities/airports into valid 3-letter IATA codes, calculates smart hub connections,
+ * and constructs 100% accurate, pre-populated deep-links with zero 404s.
+ *
+ * Travelpayouts Partner Marker: 575598
  */
 
 (function (root, factory) {
@@ -14,15 +16,33 @@
   }
 }(typeof self !== 'undefined' ? self : this, function () {
 
+  // Centralized Configuration Fallback (if config.js not yet loaded)
+  const CONFIG = (typeof window !== 'undefined' && window.TRIPMURA_CONFIG) ? window.TRIPMURA_CONFIG : {
+    travelpayouts: {
+      marker: '575598',
+      scriptId: 'NTc1NTk4'
+    },
+    affiliate: {
+      enabled: true,
+      bookingAid: '575598',
+      discoverCarsId: '575598',
+      travelpayoutsMarker: '575598',
+      airlineCampaignTag: 'tripmura_575598'
+    },
+    useLiveApi: false
+  };
+
   // Comprehensive European and Global IATA Database
   const IATA_DATABASE = {
     // Austria
     'linz': 'LNZ',
     'linz airport': 'LNZ',
+    'linz hbf': 'LNZ',
     'hoersching': 'LNZ',
     'vienna': 'VIE',
     'wien': 'VIE',
     'vienna schwechat': 'VIE',
+    'vienna airport': 'VIE',
     'salzburg': 'SZG',
     'graz': 'GRZ',
     'innsbruck': 'INN',
@@ -31,7 +51,9 @@
     // Germany
     'munich': 'MUC',
     'muenchen': 'MUC',
+    'munich airport': 'MUC',
     'frankfurt': 'FRA',
+    'frankfurt am main': 'FRA',
     'berlin': 'BER',
     'berlin brandenburg': 'BER',
     'hamburg': 'HAM',
@@ -249,7 +271,7 @@
     const clean = locationString
       .replace(/\(.*?\)/g, '') // remove (LNZ) etc
       .split(',')[0]           // take primary city before comma
-      .replace(/Airport|Station|Hauptbahnhof|Terminal|Central|Pier/gi, '')
+      .replace(/Airport|Station|Hauptbahnhof|Terminal|Central|Pier|Hbf/gi, '')
       .trim();
 
     return clean || fallback;
@@ -291,46 +313,109 @@
     return `${yyyy}-${mm}-${dd}`;
   }
 
-  // Centralized Affiliate Monetization Architecture
-  const AFFILIATE_CONFIG = {
-    enabled: false, // Set to true when partner IDs are active
-    bookingComAid: 'YOUR_BOOKING_AID',
-    travelpayoutsMarker: 'YOUR_MARKER',
-    discoverCarsId: 'YOUR_DC_ID',
-    airlineCampaignTag: 'tripmura_direct'
-  };
-
   /**
-   * Builds direct official carrier booking URLs with pre-populated routes, dates, and passengers.
+   * Smart Hub Router: Resolves regional airports/cities into their optimal international hub
+   * with seamless ground transit (ÖBB / DB / SBB).
    */
+  function resolveSmartHubRoute(originIATA, originCity) {
+    const code = (originIATA || '').toUpperCase();
+    
+    // Austria Regional -> Vienna International Hub (VIE)
+    if (code === 'LNZ' || code === 'SZG' || code === 'GRZ' || code === 'KLU') {
+      return {
+        needsHubTransfer: true,
+        originIATA: code,
+        originCity: originCity || 'Linz',
+        hubIATA: 'VIE',
+        hubCity: 'Vienna',
+        hubAirportName: 'Vienna International Airport (VIE)',
+        transitType: 'ÖBB Railjet Airport Direct',
+        transitDurationStr: code === 'LNZ' ? '1h 40m' : (code === 'SZG' ? '2h 45m' : '2h 30m'),
+        transitOperator: 'ÖBB Ticket Shop',
+        transitLinkDestination: 'Flughafen Wien'
+      };
+    }
+
+    // Western Austria -> Munich Hub (MUC) or Vienna (VIE)
+    if (code === 'INN') {
+      return {
+        needsHubTransfer: true,
+        originIATA: code,
+        originCity: originCity || 'Innsbruck',
+        hubIATA: 'MUC',
+        hubCity: 'Munich',
+        hubAirportName: 'Munich Airport (MUC)',
+        transitType: 'ÖBB / DB EuroCity Direct',
+        transitDurationStr: '1h 50m',
+        transitOperator: 'ÖBB / DB Ticket Shop',
+        transitLinkDestination: 'München Flughafen'
+      };
+    }
+
+    // Germany Regional -> Munich (MUC) or Frankfurt (FRA)
+    if (code === 'NUE' || code === 'STR' || code === 'LEJ') {
+      const targetHub = code === 'NUE' ? 'MUC' : 'FRA';
+      const targetCity = code === 'NUE' ? 'Munich' : 'Frankfurt';
+      return {
+        needsHubTransfer: true,
+        originIATA: code,
+        originCity: originCity || 'Nuremberg',
+        hubIATA: targetHub,
+        hubCity: targetCity,
+        hubAirportName: `${targetCity} Airport (${targetHub})`,
+        transitType: 'Deutsche Bahn ICE Airport Express',
+        transitDurationStr: '1h 15m',
+        transitOperator: 'Deutsche Bahn (DB)',
+        transitLinkDestination: `${targetCity} Flughafen`
+      };
+    }
+
+    // Direct International Hub Origins (VIE, MUC, FRA, BER, LON, CDG, ZRH, MXP, etc.)
+    return {
+      needsHubTransfer: false,
+      originIATA: code,
+      originCity: originCity,
+      hubIATA: code,
+      hubCity: originCity,
+      hubAirportName: `${originCity} (${code})`,
+      transitType: 'Direct Departure',
+      transitDurationStr: '0m',
+      transitOperator: 'Direct',
+      transitLinkDestination: ''
+    };
+  }
+
+  // --------------------------------------------------------------------------
+  // Direct Carrier Booking URLs
+  // --------------------------------------------------------------------------
   function buildAustrianAirlinesUrl(originIATA, destIATA, departDate, returnDate, adults = 2) {
     let url = `https://www.austrian.com/at/de/book-and-manage/flights?origin=${originIATA}&destination=${destIATA}&departDate=${departDate}&returnDate=${returnDate || ''}&adults=${adults}`;
-    if (AFFILIATE_CONFIG.enabled && AFFILIATE_CONFIG.airlineCampaignTag) {
-      url += `&utm_source=tripmura&utm_campaign=${AFFILIATE_CONFIG.airlineCampaignTag}`;
+    if (CONFIG.affiliate.enabled && CONFIG.affiliate.airlineCampaignTag) {
+      url += `&utm_source=tripmura&utm_campaign=${CONFIG.affiliate.airlineCampaignTag}`;
     }
     return url;
   }
 
   function buildRyanairUrl(originIATA, destIATA, departDate, returnDate, adults = 2) {
     let url = `https://www.ryanair.com/at/de/trip/flights/select?originIata=${originIATA}&destinationIata=${destIATA}&tpStartDate=${departDate}&tpEndDate=${returnDate || ''}&tpAdults=${adults}`;
-    if (AFFILIATE_CONFIG.enabled && AFFILIATE_CONFIG.airlineCampaignTag) {
-      url += `&utm_source=tripmura&utm_campaign=${AFFILIATE_CONFIG.airlineCampaignTag}`;
+    if (CONFIG.affiliate.enabled && CONFIG.affiliate.airlineCampaignTag) {
+      url += `&utm_source=tripmura&utm_campaign=${CONFIG.affiliate.airlineCampaignTag}`;
     }
     return url;
   }
 
   function buildLufthansaUrl(originIATA, destIATA, departDate, returnDate, adults = 2) {
     let url = `https://www.lufthansa.com/at/de/flugsuche?origin=${originIATA}&destination=${destIATA}&outboundDate=${departDate}&inboundDate=${returnDate || ''}&adults=${adults}`;
-    if (AFFILIATE_CONFIG.enabled && AFFILIATE_CONFIG.airlineCampaignTag) {
-      url += `&utm_source=tripmura&utm_campaign=${AFFILIATE_CONFIG.airlineCampaignTag}`;
+    if (CONFIG.affiliate.enabled && CONFIG.affiliate.airlineCampaignTag) {
+      url += `&utm_source=tripmura&utm_campaign=${CONFIG.affiliate.airlineCampaignTag}`;
     }
     return url;
   }
 
   function buildSwissUrl(originIATA, destIATA, departDate, returnDate, adults = 2) {
     let url = `https://www.swiss.com/at/de/book-and-manage/flights?origin=${originIATA}&destination=${destIATA}&departDate=${departDate}&returnDate=${returnDate || ''}&adults=${adults}`;
-    if (AFFILIATE_CONFIG.enabled && AFFILIATE_CONFIG.airlineCampaignTag) {
-      url += `&utm_source=tripmura&utm_campaign=${AFFILIATE_CONFIG.airlineCampaignTag}`;
+    if (CONFIG.affiliate.enabled && CONFIG.affiliate.airlineCampaignTag) {
+      url += `&utm_source=tripmura&utm_campaign=${CONFIG.affiliate.airlineCampaignTag}`;
     }
     return url;
   }
@@ -351,8 +436,9 @@
     return `https://www.airfrance.com/search?departureLocation=${originIATA}&arrivalLocation=${destIATA}&departureDate=${departDate}&returnDate=${returnDate || ''}&pax=${adults}A`;
   }
 
-  function buildOebbUrl(originCity, destCity, departDate) {
-    return `https://shop.oebbtickets.at/de/ticket?station=${encodeURIComponent(originCity)}&destination=${encodeURIComponent(destCity)}&date=${departDate}`;
+  function buildOebbUrl(originCity, destDestination, departDate) {
+    const destParam = destDestination || 'Flughafen Wien';
+    return `https://shop.oebbtickets.at/de/ticket?station=${encodeURIComponent(originCity)}&destination=${encodeURIComponent(destParam)}&date=${departDate}`;
   }
 
   function buildDbUrl(originCity, destCity, departDate) {
@@ -368,11 +454,8 @@
   }
 
   function buildBookingUrl(destCity, checkin, checkout, adults = 2, rooms = 1) {
-    let url = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(destCity)}&checkin=${checkin}&checkout=${checkout}&group_adults=${adults}&no_rooms=${rooms}&order=price`;
-    if (AFFILIATE_CONFIG.enabled && AFFILIATE_CONFIG.bookingComAid) {
-      url += `&aid=${encodeURIComponent(AFFILIATE_CONFIG.bookingComAid)}`;
-    }
-    return url;
+    const aid = (CONFIG.affiliate && CONFIG.affiliate.bookingAid) ? CONFIG.affiliate.bookingAid : '575598';
+    return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(destCity)}&checkin=${checkin}&checkout=${checkout}&group_adults=${adults}&no_rooms=${rooms}&order=price&aid=${encodeURIComponent(aid)}`;
   }
 
   function buildAirbnbUrl(destCity, checkin, checkout, adults = 2) {
@@ -380,20 +463,32 @@
   }
 
   function buildDiscoverCarsUrl(destCity, checkin, checkout) {
-    let url = `https://www.discovercars.com/?pickup_location=${encodeURIComponent(destCity)}&pickup_date=${checkin}&dropoff_date=${checkout}`;
-    if (AFFILIATE_CONFIG.enabled) {
-      if (AFFILIATE_CONFIG.discoverCarsId) {
-        url += `&partner=${encodeURIComponent(AFFILIATE_CONFIG.discoverCarsId)}`;
-      }
-      if (AFFILIATE_CONFIG.travelpayoutsMarker) {
-        url += `&marker=${encodeURIComponent(AFFILIATE_CONFIG.travelpayoutsMarker)}`;
-      }
-    }
-    return url;
+    const partner = (CONFIG.affiliate && CONFIG.affiliate.discoverCarsId) ? CONFIG.affiliate.discoverCarsId : '575598';
+    const marker = (CONFIG.travelpayouts && CONFIG.travelpayouts.marker) ? CONFIG.travelpayouts.marker : '575598';
+    return `https://www.discovercars.com/?pickup_location=${encodeURIComponent(destCity)}&pickup_date=${checkin}&dropoff_date=${checkout}&partner=${encodeURIComponent(partner)}&marker=${encodeURIComponent(marker)}`;
+  }
+
+  // --------------------------------------------------------------------------
+  // Multi-Aggregator 1-Click Comparison Deep-Link Builders
+  // --------------------------------------------------------------------------
+  function buildGoogleFlightsUrl(originIATA, destIATA, departDate, returnDate, adults = 2) {
+    return `https://www.google.com/travel/flights?q=Flights%20from%20${originIATA}%20to%20${destIATA}%20on%20${departDate}%20through%20${returnDate}&curr=EUR`;
+  }
+
+  function buildSkyscannerUrl(originIATA, destIATA, departDate, returnDate, adults = 2, cabin = 'economy') {
+    const depYY = formatDateYYMMDD(departDate, 0);
+    const retYY = formatDateYYMMDD(returnDate, 7);
+    const origLow = (originIATA || 'vie').toLowerCase();
+    const destLow = (destIATA || 'skg').toLowerCase();
+    return `https://www.skyscanner.net/transport/flights/${origLow}/${destLow}/${depYY}/${retYY}/?adultsv2=${adults}&cabinclass=${encodeURIComponent(cabin)}&ref=home`;
+  }
+
+  function buildKayakUrl(originIATA, destIATA, departDate, returnDate, adults = 2) {
+    return `https://www.kayak.com/flights/${originIATA}-${destIATA}/${departDate}/${returnDate}?sort=price_a`;
   }
 
   /**
-   * Builds 100% accurate, direct carrier & operator outbound URLs with pre-populated parameters.
+   * Master Provider & Comparison URL Generator
    */
   function buildDirectProviderUrls(params) {
     const originRaw = params.origin || 'Linz (LNZ)';
@@ -412,6 +507,11 @@
     const rooms = parseInt(params.rooms, 10) || 1;
     const cabin = (params.cabinClass || params.cabin || 'economy').toLowerCase();
 
+    // Smart Hub Routing Calculation
+    const hubRoute = resolveSmartHubRoute(originIATA, originCity);
+    const flightOriginIATA = hubRoute.needsHubTransfer ? hubRoute.hubIATA : originIATA;
+    const flightOriginCity = hubRoute.needsHubTransfer ? hubRoute.hubCity : originCity;
+
     return {
       originCity,
       destCity,
@@ -422,19 +522,22 @@
       adults,
       rooms,
       cabin,
+      hubRoute,
+      flightOriginIATA,
+      flightOriginCity,
 
-      // ✈️ Direct Airline Portals
-      austrian: buildAustrianAirlinesUrl(originIATA, destIATA, departDate, returnDate, adults),
-      ryanair: buildRyanairUrl(originIATA, destIATA, departDate, returnDate, adults),
-      lufthansa: buildLufthansaUrl(originIATA, destIATA, departDate, returnDate, adults),
-      swiss: buildSwissUrl(originIATA, destIATA, departDate, returnDate, adults),
-      wizzair: buildWizzAirUrl(originIATA, destIATA, departDate, returnDate, adults),
-      easyjet: buildEasyJetUrl(originIATA, destIATA, departDate, returnDate, adults),
-      britishAirways: buildBritishAirwaysUrl(originIATA, destIATA, departDate, returnDate, adults),
-      airFrance: buildAirFranceUrl(originIATA, destIATA, departDate, returnDate, adults),
+      // ✈️ Direct Airline Portals (Calculated from optimal departure airport)
+      austrian: buildAustrianAirlinesUrl(flightOriginIATA, destIATA, departDate, returnDate, adults),
+      ryanair: buildRyanairUrl(flightOriginIATA, destIATA, departDate, returnDate, adults),
+      lufthansa: buildLufthansaUrl(flightOriginIATA, destIATA, departDate, returnDate, adults),
+      swiss: buildSwissUrl(flightOriginIATA, destIATA, departDate, returnDate, adults),
+      wizzair: buildWizzAirUrl(flightOriginIATA, destIATA, departDate, returnDate, adults),
+      easyjet: buildEasyJetUrl(flightOriginIATA, destIATA, departDate, returnDate, adults),
+      britishAirways: buildBritishAirwaysUrl(flightOriginIATA, destIATA, departDate, returnDate, adults),
+      airFrance: buildAirFranceUrl(flightOriginIATA, destIATA, departDate, returnDate, adults),
 
       // 🚆 Direct Rail Ticket Shops
-      oebb: buildOebbUrl(originCity, destCity, departDate),
+      oebb: buildOebbUrl(originCity, hubRoute.needsHubTransfer ? hubRoute.transitLinkDestination : destCity, departDate),
       db: buildDbUrl(originCity, destCity, departDate),
       trenitalia: buildTrenitaliaUrl(originCity, destCity, departDate),
       eurostar: buildEurostarUrl(originIATA, destIATA, departDate, returnDate, adults),
@@ -444,17 +547,23 @@
       airbnb: buildAirbnbUrl(destCity, departDate, returnDate, adults),
 
       // 🚗 Direct Car Rental
-      discoverCars: buildDiscoverCarsUrl(destCity, departDate, returnDate)
+      discoverCars: buildDiscoverCarsUrl(destCity, departDate, returnDate),
+
+      // ⚡ 1-Click Multi-Engine Comparison Bar URLs
+      googleFlights: buildGoogleFlightsUrl(flightOriginIATA, destIATA, departDate, returnDate, adults),
+      skyscanner: buildSkyscannerUrl(flightOriginIATA, destIATA, departDate, returnDate, adults, cabin),
+      kayak: buildKayakUrl(flightOriginIATA, destIATA, departDate, returnDate, adults)
     };
   }
 
   return {
+    CONFIG,
     IATA_DATABASE,
-    AFFILIATE_CONFIG,
     resolveIATA,
     getCleanCityName,
     formatDateYYMMDD,
     formatDateISO,
+    resolveSmartHubRoute,
     buildAustrianAirlinesUrl,
     buildRyanairUrl,
     buildLufthansaUrl,
@@ -470,6 +579,9 @@
     buildBookingUrl,
     buildAirbnbUrl,
     buildDiscoverCarsUrl,
+    buildGoogleFlightsUrl,
+    buildSkyscannerUrl,
+    buildKayakUrl,
     buildDirectProviderUrls
   };
 }));
