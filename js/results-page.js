@@ -127,7 +127,7 @@ function initResultsPage() {
     const isGermanyOrigin = originIATA === 'MUC' || originIATA === 'FRA' || originIATA === 'BER';
 
     return [
-      // 1. Top Pick: Austrian / Premium Direct + Boutique Stay
+      // 1. Top Pick: Austrian / Lufthansa Direct + Boutique Stay
       {
         id: 'pkg-1',
         title: `${isAustriaOrigin ? 'Austrian Airlines Direct Express' : 'Lufthansa Direct Hub Express'} & Boutique Hotel`,
@@ -139,7 +139,7 @@ function initResultsPage() {
         durationMinutes: 225,
         co2kg: 52,
         stops: 0,
-        provider: 'skyscanner',
+        provider: 'austrian',
         stayScore: 9.1,
         totalPrice: 495,
         highlight: true,
@@ -149,13 +149,15 @@ function initResultsPage() {
             carrierCode: isAustriaOrigin ? 'OS' : 'LH',
             icon: '✈️',
             type: 'Direct Scheduled Flight',
-            providerTag: 'Skyscanner & Google Flights',
+            providerTag: isAustriaOrigin ? 'Austrian Airlines Direct' : 'Lufthansa Direct',
             times: `08:35 → 11:20 • ${isAustriaOrigin ? 'OS 817' : 'LH 1754'} Non-Stop`,
             routeSub: `${originCity} (${originIATA}) → ${destCity} (${destIATA}) • 1h 45m`,
             estCost: '€140 / traveler',
             actions: [
-              { label: 'Book Flight on Skyscanner ↗', url: directUrls.skyscanner, featured: true },
-              { label: 'Compare on Google Flights ↗', url: directUrls.googleFlights }
+              isAustriaOrigin 
+                ? { label: 'Book Direct on Austrian Airlines ↗', url: directUrls.austrian, featured: true }
+                : { label: 'Book Direct on Lufthansa ↗', url: directUrls.lufthansa, featured: true },
+              { label: 'Alternative on Lufthansa ↗', url: directUrls.lufthansa }
             ]
           },
           {
@@ -163,12 +165,12 @@ function initResultsPage() {
             carrierCode: 'BUS',
             icon: '🚐',
             type: 'Direct Airport Harbor Shuttle',
-            providerTag: 'Omio Transfer',
+            providerTag: 'Official Airport Link',
             times: '12:00 → 12:35 • Dedicated Express',
             routeSub: `${destIATA} Airport Pier → Central Promenade • 35m`,
             estCost: '€15 / traveler',
             actions: [
-              { label: 'Book Transfer on Omio ↗', url: directUrls.omio, featured: true }
+              { label: 'Book on ÖBB Ticket Shop ↗', url: directUrls.oebb, featured: true }
             ]
           },
           {
@@ -176,13 +178,13 @@ function initResultsPage() {
             carrierCode: 'STAY',
             icon: '🏨',
             type: `7 Nights in ${destCity}`,
-            providerTag: 'Booking.com & Airbnb',
+            providerTag: 'Booking.com Direct',
             times: `Check-in ${formatDisplayDate(rawDepart)} • Verified 9.1/10 Rating`,
             routeSub: 'Sea View Balcony, Breakfast Included, Free Cancellation',
             estCost: '€340 total',
             actions: [
-              { label: 'View Stays on Booking.com ↗', url: directUrls.booking, featured: true },
-              { label: 'View Rentals on Airbnb ↗', url: directUrls.airbnb }
+              { label: 'Reserve Room on Booking.com ↗', url: directUrls.booking, featured: true },
+              { label: 'Reserve Villa on Airbnb ↗', url: directUrls.airbnb }
             ]
           }
         ]
@@ -200,7 +202,7 @@ function initResultsPage() {
         durationMinutes: 510,
         co2kg: 18,
         stops: 1,
-        provider: 'trainline',
+        provider: 'oebb',
         stayScore: 9.4,
         totalPrice: 420,
         highlight: false,
@@ -210,13 +212,13 @@ function initResultsPage() {
             carrierCode: 'ÖBB',
             icon: '🚆',
             type: 'High-Speed Railjet & Sleeper Couchette',
-            providerTag: 'Trainline',
+            providerTag: 'ÖBB Ticket Shop',
             times: '07:15 → 13:40 • EuroCity Scenic Route',
             routeSub: `${originCity} Main Station → Coastal Junction • Panoramic Car`,
             estCost: '€95 / traveler',
             actions: [
-              { label: 'Book Train on Trainline ↗', url: directUrls.trainline, featured: true },
-              { label: 'Compare on Omio ↗', url: directUrls.omio }
+              { label: 'Book on ÖBB Ticket Shop ↗', url: directUrls.oebb, featured: true },
+              { label: 'Book on Deutsche Bahn (DB) ↗', url: directUrls.db }
             ]
           },
           {
@@ -224,12 +226,12 @@ function initResultsPage() {
             carrierCode: 'SEA',
             icon: '⛵',
             type: 'High-Speed Hydrofoil Ferry',
-            providerTag: 'Omio Ferry',
+            providerTag: 'Official Port Link',
             times: '14:15 → 15:00 • Fast Sea Link',
             routeSub: `Main Pier → ${destCity} Waterfront • 45m`,
             estCost: '€25 / traveler',
             actions: [
-              { label: 'Book Ferry on Omio ↗', url: directUrls.omio, featured: true }
+              { label: 'Book on Trenitalia ↗', url: directUrls.trenitalia, featured: true }
             ]
           },
           {
@@ -237,12 +239,12 @@ function initResultsPage() {
             carrierCode: 'AIRBNB',
             icon: '🏡',
             type: `Private Coastal Apartment on Airbnb`,
-            providerTag: 'Airbnb',
+            providerTag: 'Airbnb Superhost',
             times: `7 Nights (${formattedDates}) • Superhost`,
             routeSub: 'Panoramic Terrace, Fully Equipped Kitchen',
             estCost: '€300 total',
             actions: [
-              { label: 'View Rentals on Airbnb ↗', url: directUrls.airbnb, featured: true },
+              { label: 'Reserve Villa on Airbnb ↗', url: directUrls.airbnb, featured: true },
               { label: 'Compare on Booking.com ↗', url: directUrls.booking }
             ]
           }
@@ -261,23 +263,25 @@ function initResultsPage() {
         durationMinutes: 175,
         co2kg: 68,
         stops: 0,
-        provider: 'skyscanner',
+        provider: 'austrian',
         stayScore: 9.3,
         totalPrice: 620,
         highlight: false,
         legs: [
           {
-            carrier: 'Priority Express Flight',
+            carrier: isAustriaOrigin ? 'Austrian Airlines Express' : 'Lufthansa Express Flight',
             carrierCode: 'AIR',
             icon: '✈️',
             type: 'Direct Morning Scheduled Flight',
-            providerTag: 'Skyscanner',
+            providerTag: isAustriaOrigin ? 'Austrian Airlines Direct' : 'Lufthansa Direct',
             times: '06:50 → 09:35 • Direct Jet',
             routeSub: `${originCity} (${originIATA}) → ${destCity} (${destIATA})`,
             estCost: '€165 / traveler',
             actions: [
-              { label: 'Book Flight on Skyscanner ↗', url: directUrls.skyscanner, featured: true },
-              { label: 'Compare on Google Flights ↗', url: directUrls.googleFlights }
+              isAustriaOrigin 
+                ? { label: 'Book Direct on Austrian Airlines ↗', url: directUrls.austrian, featured: true }
+                : { label: 'Book Direct on Lufthansa ↗', url: directUrls.lufthansa, featured: true },
+              { label: 'Book Direct on Lufthansa ↗', url: directUrls.lufthansa }
             ]
           },
           {
@@ -285,12 +289,12 @@ function initResultsPage() {
             carrierCode: 'CAR',
             icon: '🚗',
             type: 'Compact SUV (Unlimited Mileage)',
-            providerTag: 'DiscoverCars',
+            providerTag: 'DiscoverCars Direct',
             times: '7 Days Full Rental • Terminal Pick-up',
             routeSub: 'Full Insurance, Zero Deductible, Free GPS',
             estCost: '€150 total',
             actions: [
-              { label: 'Compare Cars on DiscoverCars ↗', url: directUrls.discoverCars, featured: true }
+              { label: 'Rent Car on DiscoverCars ↗', url: directUrls.discoverCars, featured: true }
             ]
           },
           {
@@ -298,12 +302,12 @@ function initResultsPage() {
             carrierCode: 'HOTEL',
             icon: '🏨',
             type: `Luxury Resort in ${destCity}`,
-            providerTag: 'Booking.com',
+            providerTag: 'Booking.com Direct',
             times: '7 Nights • Verified 9.3/10 Score',
             routeSub: 'Infinity Pool, Private Beach Access',
             estCost: '€305 total',
             actions: [
-              { label: 'View Stays on Booking.com ↗', url: directUrls.booking, featured: true }
+              { label: 'Reserve Room on Booking.com ↗', url: directUrls.booking, featured: true }
             ]
           }
         ]
@@ -321,22 +325,23 @@ function initResultsPage() {
         durationMinutes: 250,
         co2kg: 48,
         stops: 0,
-        provider: 'skyscanner',
+        provider: 'ryanair',
         stayScore: 8.7,
         totalPrice: 340,
         highlight: false,
         legs: [
           {
-            carrier: 'Ryanair / Wizz Air Direct',
+            carrier: 'Ryanair Direct Flight',
             carrierCode: 'FR',
             icon: '✈️',
             type: 'Direct Low-Cost Flight',
-            providerTag: 'Skyscanner',
+            providerTag: 'Ryanair Direct',
             times: '14:20 → 17:05 • Non-Stop Flight',
             routeSub: `${originCity} (${originIATA}) → ${destCity} (${destIATA})`,
             estCost: '€65 / traveler',
             actions: [
-              { label: 'Book Flight on Skyscanner ↗', url: directUrls.skyscanner, featured: true }
+              { label: 'Book Direct on Ryanair ↗', url: directUrls.ryanair, featured: true },
+              { label: 'Book on Wizz Air ↗', url: directUrls.wizzair }
             ]
           },
           {
@@ -344,12 +349,12 @@ function initResultsPage() {
             carrierCode: 'METRO',
             icon: '🚆',
             type: 'Direct Metro / Rail Link',
-            providerTag: 'Trainline',
+            providerTag: 'ÖBB Ticket Shop',
             times: '17:30 → 18:00 • Every 15 min',
             routeSub: 'Airport Station → Old Town Square',
             estCost: '€6 / traveler',
             actions: [
-              { label: 'Book Train on Trainline ↗', url: directUrls.trainline, featured: true }
+              { label: 'Book on ÖBB Ticket Shop ↗', url: directUrls.oebb, featured: true }
             ]
           },
           {
@@ -357,12 +362,12 @@ function initResultsPage() {
             carrierCode: 'AIRBNB',
             icon: '🏡',
             type: `7 Nights Studio in ${destCity}`,
-            providerTag: 'Airbnb',
+            providerTag: 'Airbnb Superhost',
             times: '7 Nights • Rating 8.7/10',
             routeSub: 'Fast WiFi, Central Location, Self Check-in',
             estCost: '€269 total',
             actions: [
-              { label: 'View Rentals on Airbnb ↗', url: directUrls.airbnb, featured: true }
+              { label: 'Reserve Villa on Airbnb ↗', url: directUrls.airbnb, featured: true }
             ]
           }
         ]
@@ -380,31 +385,31 @@ function initResultsPage() {
         durationMinutes: 200,
         co2kg: 85,
         stops: 0,
-        provider: 'booking',
+        provider: 'lufthansa',
         stayScore: 9.7,
         totalPrice: 1180,
         highlight: false,
         legs: [
           {
-            carrier: 'Business Class Direct',
-            carrierCode: 'BIZ',
+            carrier: 'Lufthansa / Austrian Business Class',
+            carrierCode: 'LH',
             icon: '✈️',
             type: 'Premium Business Class Flight',
-            providerTag: 'Google Flights',
+            providerTag: 'Lufthansa Direct',
             times: '10:00 → 12:45 • Priority Lane & Lounge',
             routeSub: `${originCity} (${originIATA}) → ${destCity} (${destIATA})`,
             estCost: '€390 / traveler',
             actions: [
-              { label: 'View on Google Flights ↗', url: directUrls.googleFlights, featured: true },
-              { label: 'Book on Skyscanner ↗', url: directUrls.skyscanner }
+              { label: 'Book Direct on Lufthansa ↗', url: directUrls.lufthansa, featured: true },
+              { label: 'Book Direct on Austrian Airlines ↗', url: directUrls.austrian }
             ]
           },
           {
-            carrier: 'Private Chauffeur',
+            carrier: 'Private Chauffeur & VIP Transfer',
             carrierCode: 'VIP',
             icon: '🚗',
             type: 'Private Mercedes-Benz Transfer',
-            providerTag: 'DiscoverCars',
+            providerTag: 'DiscoverCars VIP',
             times: 'Direct Runway Meet & Greet',
             routeSub: 'Airport → Hotel Lobby • 25m',
             estCost: '€90 total',
@@ -417,12 +422,12 @@ function initResultsPage() {
             carrierCode: 'HOTEL',
             icon: '🏨',
             type: `5-Star Suite in ${destCity}`,
-            providerTag: 'Booking.com',
+            providerTag: 'Booking.com Luxury',
             times: '7 Nights • Verified 9.7/10 Score',
             routeSub: 'Gourmet Breakfast, Spa Access, Private Cabana',
             estCost: '€700 total',
             actions: [
-              { label: 'View Stays on Booking.com ↗', url: directUrls.booking, featured: true }
+              { label: 'Reserve Room on Booking.com ↗', url: directUrls.booking, featured: true }
             ]
           }
         ]
@@ -440,22 +445,23 @@ function initResultsPage() {
         durationMinutes: 315,
         co2kg: 44,
         stops: 1,
-        provider: 'omio',
+        provider: 'ryanair',
         stayScore: 9.0,
         totalPrice: 510,
         highlight: false,
         legs: [
           {
-            carrier: 'Scheduled Coastal Flight',
-            carrierCode: 'FLY',
+            carrier: 'Ryanair / Austrian Direct Flight',
+            carrierCode: 'FR',
             icon: '✈️',
             type: 'Morning Direct Flight',
-            providerTag: 'Skyscanner',
+            providerTag: 'Ryanair Direct',
             times: '09:15 → 12:00 • Non-Stop',
             routeSub: `${originCity} → Main Harbor Hub`,
             estCost: '€110 / traveler',
             actions: [
-              { label: 'Book Flight on Skyscanner ↗', url: directUrls.skyscanner, featured: true }
+              { label: 'Book Direct on Ryanair ↗', url: directUrls.ryanair, featured: true },
+              { label: 'Book on Austrian Airlines ↗', url: directUrls.austrian }
             ]
           },
           {
@@ -463,12 +469,12 @@ function initResultsPage() {
             carrierCode: 'SEA',
             icon: '⛵',
             type: 'Fast Catamaran Ferry',
-            providerTag: 'Omio Ferry',
+            providerTag: 'Official Port Link',
             times: '13:30 → 14:45 • Scenic Sea Crossing',
             routeSub: `Port Terminal → ${destCity} Marina`,
             estCost: '€35 / traveler',
             actions: [
-              { label: 'Book Ferry on Omio ↗', url: directUrls.omio, featured: true }
+              { label: 'Book on Trenitalia / Port ↗', url: directUrls.trenitalia, featured: true }
             ]
           },
           {
@@ -476,12 +482,12 @@ function initResultsPage() {
             carrierCode: 'HOTEL',
             icon: '🏨',
             type: `7 Nights Stay in ${destCity}`,
-            providerTag: 'Booking.com',
+            providerTag: 'Booking.com Direct',
             times: '7 Nights • 9.0/10 Score',
             routeSub: 'Marina View, Rooftop Lounge',
             estCost: '€365 total',
             actions: [
-              { label: 'View Stays on Booking.com ↗', url: directUrls.booking, featured: true }
+              { label: 'Reserve Room on Booking.com ↗', url: directUrls.booking, featured: true }
             ]
           }
         ]
@@ -499,7 +505,7 @@ function initResultsPage() {
         durationMinutes: 465,
         co2kg: 22,
         stops: 1,
-        provider: 'trainline',
+        provider: 'trenitalia',
         stayScore: 8.9,
         totalPrice: 470,
         highlight: false,
@@ -509,12 +515,13 @@ function initResultsPage() {
             carrierCode: 'TRAIN',
             icon: '🚆',
             type: '300 km/h Executive Rail',
-            providerTag: 'Trainline',
+            providerTag: 'Trenitalia Direct',
             times: '08:00 → 14:30 • Free WiFi & Cafe Car',
             routeSub: `${originCity} → Central Pier Station`,
             estCost: '€115 / traveler',
             actions: [
-              { label: 'Book Train on Trainline ↗', url: directUrls.trainline, featured: true }
+              { label: 'Book on Trenitalia ↗', url: directUrls.trenitalia, featured: true },
+              { label: 'Book on Eurostar ↗', url: directUrls.eurostar }
             ]
           },
           {
@@ -522,12 +529,12 @@ function initResultsPage() {
             carrierCode: 'TRAM',
             icon: '🚊',
             type: 'Direct Seaside Tramway',
-            providerTag: 'Omio',
+            providerTag: 'Official City Transit',
             times: '14:50 → 15:15 • Every 10 min',
             routeSub: 'Station → Resort Beachfront',
             estCost: '€4 / traveler',
             actions: [
-              { label: 'Compare on Omio ↗', url: directUrls.omio, featured: true }
+              { label: 'Book on ÖBB Ticket Shop ↗', url: directUrls.oebb, featured: true }
             ]
           },
           {
@@ -535,12 +542,12 @@ function initResultsPage() {
             carrierCode: 'AIRBNB',
             icon: '🏡',
             type: `7 Nights Stay in ${destCity}`,
-            providerTag: 'Airbnb',
+            providerTag: 'Airbnb Superhost',
             times: '7 Nights • 8.9/10 Score',
             routeSub: 'Private Garden & Sea Breeze',
             estCost: '€351 total',
             actions: [
-              { label: 'View Rentals on Airbnb ↗', url: directUrls.airbnb, featured: true }
+              { label: 'Reserve Villa on Airbnb ↗', url: directUrls.airbnb, featured: true }
             ]
           }
         ]
@@ -549,7 +556,7 @@ function initResultsPage() {
       // 8. Swiss Alps Hub & Mediterranean Express
       {
         id: 'pkg-8',
-        title: 'Swiss Hub Connection & Mediterranean Villa',
+        title: 'SWISS Hub Connection & Mediterranean Villa',
         desc: `Smooth 45-minute connection through Zurich/Munich with SWISS International and boutique stay.`,
         badge: '⭐ Premium Reliability',
         badgeClass: 'top-pick',
@@ -558,23 +565,23 @@ function initResultsPage() {
         durationMinutes: 255,
         co2kg: 56,
         stops: 1,
-        provider: 'google',
+        provider: 'swiss',
         stayScore: 9.2,
         totalPrice: 560,
         highlight: false,
         legs: [
           {
-            carrier: 'SWISS / Lufthansa Hub',
+            carrier: 'SWISS International Air Lines',
             carrierCode: 'LX',
             icon: '✈️',
             type: 'Synchronized Connecting Flight',
-            providerTag: 'Google Flights',
+            providerTag: 'SWISS Direct',
             times: '11:10 → 15:00 • 45m Zurich Connection',
             routeSub: `${originCity} → ZRH Hub → ${destCity}`,
             estCost: '€175 / traveler',
             actions: [
-              { label: 'Compare on Google Flights ↗', url: directUrls.googleFlights, featured: true },
-              { label: 'Book on Skyscanner ↗', url: directUrls.skyscanner }
+              { label: 'Book Direct on SWISS ↗', url: directUrls.swiss, featured: true },
+              { label: 'Book Direct on Lufthansa ↗', url: directUrls.lufthansa }
             ]
           },
           {
@@ -582,12 +589,12 @@ function initResultsPage() {
             carrierCode: 'BUS',
             icon: '🚌',
             type: 'Direct Airport Bus',
-            providerTag: 'Omio',
+            providerTag: 'Official Airport Transit',
             times: '15:30 → 16:00 • Non-Stop',
             routeSub: 'Terminal → City Pier',
             estCost: '€10 / traveler',
             actions: [
-              { label: 'Book on Omio ↗', url: directUrls.omio, featured: true }
+              { label: 'Book on ÖBB Ticket Shop ↗', url: directUrls.oebb, featured: true }
             ]
           },
           {
@@ -595,12 +602,12 @@ function initResultsPage() {
             carrierCode: 'HOTEL',
             icon: '🏨',
             type: `7 Nights in ${destCity}`,
-            providerTag: 'Booking.com',
+            providerTag: 'Booking.com Direct',
             times: '7 Nights • Verified 9.2/10 Rating',
             routeSub: 'Panoramic Pool, Breakfast Included',
             estCost: '€375 total',
             actions: [
-              { label: 'View Stays on Booking.com ↗', url: directUrls.booking, featured: true }
+              { label: 'Reserve Room on Booking.com ↗', url: directUrls.booking, featured: true }
             ]
           }
         ]
@@ -618,7 +625,7 @@ function initResultsPage() {
         durationMinutes: 410,
         co2kg: 14,
         stops: 1,
-        provider: 'trainline',
+        provider: 'oebb',
         stayScore: 9.1,
         totalPrice: 445,
         highlight: false,
@@ -628,12 +635,13 @@ function initResultsPage() {
             carrierCode: 'GREEN',
             icon: '🚆',
             type: '100% Renewable Electric Rail',
-            providerTag: 'Trainline',
+            providerTag: 'ÖBB Ticket Shop',
             times: '08:45 → 14:15 • Silent Eco Car',
             routeSub: `${originCity} → Destination Rail Terminal`,
             estCost: '€88 / traveler',
             actions: [
-              { label: 'Book Train on Trainline ↗', url: directUrls.trainline, featured: true }
+              { label: 'Book on ÖBB Ticket Shop ↗', url: directUrls.oebb, featured: true },
+              { label: 'Book on Deutsche Bahn (DB) ↗', url: directUrls.db }
             ]
           },
           {
@@ -641,12 +649,12 @@ function initResultsPage() {
             carrierCode: 'EV',
             icon: '⚡',
             type: 'Zero-Emission EV Transfer',
-            providerTag: 'Omio',
+            providerTag: 'Official Green Transit',
             times: '14:30 → 14:55 • On-Demand',
             routeSub: 'Station → Green Resort',
             estCost: '€12 / traveler',
             actions: [
-              { label: 'Compare on Omio ↗', url: directUrls.omio, featured: true }
+              { label: 'Book on ÖBB Ticket Shop ↗', url: directUrls.oebb, featured: true }
             ]
           },
           {
@@ -654,12 +662,12 @@ function initResultsPage() {
             carrierCode: 'ECO',
             icon: '🏡',
             type: `Eco-Boutique Villa in ${destCity}`,
-            providerTag: 'Booking.com',
+            providerTag: 'Booking.com Eco',
             times: '7 Nights • 9.1/10 Score',
             routeSub: 'Organic Breakfast, 100% Solar Powered',
             estCost: '€345 total',
             actions: [
-              { label: 'View Stays on Booking.com ↗', url: directUrls.booking, featured: true }
+              { label: 'Reserve Room on Booking.com ↗', url: directUrls.booking, featured: true }
             ]
           }
         ]
@@ -677,23 +685,25 @@ function initResultsPage() {
         durationMinutes: 210,
         co2kg: 50,
         stops: 0,
-        provider: 'skyscanner',
+        provider: 'austrian',
         stayScore: 9.5,
         totalPrice: 535,
         highlight: false,
         legs: [
           {
-            carrier: 'Direct Scheduled Airline',
-            carrierCode: 'AIR',
+            carrier: isAustriaOrigin ? 'Austrian Airlines Sunset Flight' : 'British Airways Sunset Flight',
+            carrierCode: isAustriaOrigin ? 'OS' : 'BA',
             icon: '✈️',
             type: 'Afternoon Direct Flight',
-            providerTag: 'Skyscanner',
+            providerTag: isAustriaOrigin ? 'Austrian Airlines Direct' : 'British Airways Direct',
             times: '15:10 → 17:50 • Non-Stop Flight',
             routeSub: `${originCity} (${originIATA}) → ${destCity} (${destIATA})`,
             estCost: '€135 / traveler',
             actions: [
-              { label: 'Book Flight on Skyscanner ↗', url: directUrls.skyscanner, featured: true },
-              { label: 'Compare on Google Flights ↗', url: directUrls.googleFlights }
+              isAustriaOrigin 
+                ? { label: 'Book Direct on Austrian Airlines ↗', url: directUrls.austrian, featured: true }
+                : { label: 'Book Direct on British Airways ↗', url: directUrls.britishAirways, featured: true },
+              { label: 'Book Direct on Lufthansa ↗', url: directUrls.lufthansa }
             ]
           },
           {
@@ -701,12 +711,12 @@ function initResultsPage() {
             carrierCode: 'TAXI',
             icon: '🚕',
             type: 'Express Harbor Taxi',
-            providerTag: 'Omio',
+            providerTag: 'Official Pier Transit',
             times: '18:10 → 18:35 • Direct to Villa',
             routeSub: 'Terminal Pier → Beachfront Walk',
             estCost: '€20 total',
             actions: [
-              { label: 'Book Taxi on Omio ↗', url: directUrls.omio, featured: true }
+              { label: 'Book on ÖBB Ticket Shop ↗', url: directUrls.oebb, featured: true }
             ]
           },
           {
@@ -714,12 +724,12 @@ function initResultsPage() {
             carrierCode: 'AIRBNB',
             icon: '🏡',
             type: `Private Villa on Airbnb`,
-            providerTag: 'Airbnb',
+            providerTag: 'Airbnb Superhost',
             times: '7 Nights • 9.5/10 Superhost',
             routeSub: 'Direct Beach Access, Sunset Patio',
             estCost: '€380 total',
             actions: [
-              { label: 'View Rentals on Airbnb ↗', url: directUrls.airbnb, featured: true },
+              { label: 'Reserve Villa on Airbnb ↗', url: directUrls.airbnb, featured: true },
               { label: 'Compare on Booking.com ↗', url: directUrls.booking }
             ]
           }

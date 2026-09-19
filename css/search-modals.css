@@ -807,7 +807,7 @@ body.search-modal-open .multimodal-search-card,
     animation: slideUpMobile 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
   }
 
-  /* Mobile Top Bar (Skyscanner Style) */
+  /* Mobile Top Bar */
   .modal-top-bar {
     display: flex !important;
     align-items: center !important;

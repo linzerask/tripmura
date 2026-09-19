@@ -38,18 +38,34 @@ function initResultsEngine() {
     return d.toISOString().split('T')[0];
   }
 
-  // Deep Link URL Generators
+  // Direct Carrier & Operator Deep Link URL Generators
   function buildDeepLinks(params) {
     const { origin, dest, originCity, destCity, checkin, checkout, adults } = params;
+    const originIATA = typeof TripMuraIATA !== 'undefined' ? TripMuraIATA.resolveIATA(origin, 'LON') : 'LON';
+    const destIATA = typeof TripMuraIATA !== 'undefined' ? TripMuraIATA.resolveIATA(dest, 'NAP') : 'NAP';
     
+    if (typeof TripMuraIATA !== 'undefined' && TripMuraIATA.buildDirectProviderUrls) {
+      return TripMuraIATA.buildDirectProviderUrls({
+        origin,
+        dest,
+        departDate: checkin,
+        returnDate: checkout,
+        adults
+      });
+    }
+
     return {
-      airbnb: `https://www.airbnb.com/s/${encodeURIComponent(dest)}/homes?checkin=${checkin}&checkout=${checkout}&adults=${adults}`,
-      booking: `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(dest)}&checkin=${checkin}&checkout=${checkout}&group_adults=${adults}`,
-      skyscanner: `https://www.skyscanner.net/transport/flights-from/${encodeURIComponent(originCity)}/to/${encodeURIComponent(destCity)}/`,
-      googleFlights: `https://www.google.com/travel/flights?q=flights+from+${encodeURIComponent(origin)}+to+${encodeURIComponent(dest)}`,
-      trainline: `https://www.thetrainline.com/search/${encodeURIComponent(originCity)}/to/${encodeURIComponent(destCity)}`,
-      omio: `https://www.omio.com/search-frontend/results?travel_mode=train&departure_date=${checkin}`,
-      discoverCars: `https://www.discovercars.com/?utm_source=tripmura&destination=${encodeURIComponent(dest)}`
+      austrian: `https://www.austrian.com/at/de/book-and-manage/flights?origin=${originIATA}&destination=${destIATA}&departDate=${checkin}&returnDate=${checkout}&adults=${adults}`,
+      lufthansa: `https://www.lufthansa.com/at/de/flugsuche?origin=${originIATA}&destination=${destIATA}&outboundDate=${checkin}&inboundDate=${checkout}&adults=${adults}`,
+      ryanair: `https://www.ryanair.com/at/de/trip/flights/select?originIata=${originIATA}&destinationIata=${destIATA}&tpStartDate=${checkin}&tpEndDate=${checkout}&tpAdults=${adults}`,
+      britishAirways: `https://www.britishairways.com/travel/fx/public/en_gb?eId=111011&departure_city=${originIATA}&destination_city=${destIATA}&dep_date=${checkin}&ret_date=${checkout}&adults=${adults}`,
+      oebb: `https://shop.oebbtickets.at/de/ticket?station=${encodeURIComponent(originCity)}&destination=${encodeURIComponent(destCity)}&date=${checkin}`,
+      db: `https://www.bahn.de/buchung/start?ort=${encodeURIComponent(originCity)}&ziel=${encodeURIComponent(destCity)}&datum=${checkin}`,
+      trenitalia: `https://www.trenitalia.com/en.html?origin=${encodeURIComponent(originCity)}&destination=${encodeURIComponent(destCity)}&date=${checkin}`,
+      eurostar: `https://www.eurostar.com/search?origin=${originIATA}&destination=${destIATA}&outboundDate=${checkin}&returnDate=${checkout}&adults=${adults}`,
+      booking: `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(destCity)}&checkin=${checkin}&checkout=${checkout}&group_adults=${adults}&order=price`,
+      airbnb: `https://www.airbnb.com/s/${encodeURIComponent(destCity)}/homes?checkin=${checkin}&checkout=${checkout}&adults=${adults}&sort_price=asc`,
+      discoverCars: `https://www.discovercars.com/?pickup_location=${encodeURIComponent(destCity)}&pickup_date=${checkin}&dropoff_date=${checkout}`
     };
   }
 
@@ -72,13 +88,13 @@ function initResultsEngine() {
           {
             icon: '✈️',
             type: 'Direct Flight to Regional Hub',
-            details: `${originCity} → Naples / Hub Airport • British Airways / easyJet`,
+            details: `${originCity} → Naples / Hub Airport • British Airways / Austrian Airlines`,
             price: '€120 / traveler',
             priceVal: 120,
-            providerTag: 'Skyscanner',
+            providerTag: 'British Airways Direct',
             actions: [
-              { label: 'Book Flight on Skyscanner ↗', url: links.skyscanner, featured: true },
-              { label: 'Compare on Google Flights ↗', url: links.googleFlights }
+              { label: 'Book Direct on British Airways ↗', url: links.britishAirways || links.austrian, featured: true },
+              { label: 'Book Direct on Lufthansa ↗', url: links.lufthansa }
             ]
           },
           {
@@ -87,10 +103,10 @@ function initResultsEngine() {
             details: 'Airport Hub Station → Central Pier • Frecciarossa High-Speed',
             price: '€24 / traveler',
             priceVal: 24,
-            providerTag: 'Trainline',
+            providerTag: 'Trenitalia Direct',
             actions: [
-              { label: 'Book Train on Trainline ↗', url: links.trainline, featured: true },
-              { label: 'Compare on Omio ↗', url: links.omio }
+              { label: 'Book on Trenitalia ↗', url: links.trenitalia, featured: true },
+              { label: 'Book on ÖBB Ticket Shop ↗', url: links.oebb }
             ]
           },
           {
@@ -99,10 +115,10 @@ function initResultsEngine() {
             details: `7 Nights Stay (${datesText}) • Verified Boutique Accommodation`,
             price: '€460 total',
             priceVal: 460,
-            providerTag: 'Booking.com & Airbnb',
+            providerTag: 'Booking.com Direct',
             actions: [
-              { label: 'View Stays on Booking.com ↗', url: links.booking, featured: true },
-              { label: 'View Rentals on Airbnb ↗', url: links.airbnb }
+              { label: 'Reserve Room on Booking.com ↗', url: links.booking, featured: true },
+              { label: 'Reserve Villa on Airbnb ↗', url: links.airbnb }
             ]
           }
         ]
@@ -114,6 +130,7 @@ function initResultsEngine() {
         badge: '🌿 Scenic & Low Emission',
         badgeClass: 'scenic',
         duration: '⏱️ 7h 15m Door-to-Door',
+        durationMinutes: 435,
         totalPrice: 540,
         highlighted: false,
         legs: [
@@ -123,10 +140,10 @@ function initResultsEngine() {
             details: `${originCity} → Zurich / Milan → Coastal Junction • Panoramic Carriage`,
             price: '€160 / traveler',
             priceVal: 160,
-            providerTag: 'Trainline',
+            providerTag: 'Eurostar & DB Direct',
             actions: [
-              { label: 'Book Train on Trainline ↗', url: links.trainline, featured: true },
-              { label: 'Compare on Omio ↗', url: links.omio }
+              { label: 'Book on Eurostar ↗', url: links.eurostar || links.db, featured: true },
+              { label: 'Book on ÖBB Ticket Shop ↗', url: links.oebb }
             ]
           },
           {
@@ -135,9 +152,9 @@ function initResultsEngine() {
             details: `Marina Pier → ${destCity} Port • Fast Hydrofoil Link`,
             price: '€30 / traveler',
             priceVal: 30,
-            providerTag: 'Omio Ferry',
+            providerTag: 'Official Port Link',
             actions: [
-              { label: 'Book Ferry on Omio ↗', url: links.omio, featured: true }
+              { label: 'Book on Trenitalia ↗', url: links.trenitalia, featured: true }
             ]
           },
           {
@@ -146,9 +163,9 @@ function initResultsEngine() {
             details: `7 Nights in ${destCity} • Private Balcony & Sea Views`,
             price: '€350 total',
             priceVal: 350,
-            providerTag: 'Airbnb',
+            providerTag: 'Airbnb Superhost',
             actions: [
-              { label: 'View Rentals on Airbnb ↗', url: links.airbnb, featured: true },
+              { label: 'Reserve Villa on Airbnb ↗', url: links.airbnb, featured: true },
               { label: 'Compare on Booking.com ↗', url: links.booking }
             ]
           }
@@ -161,6 +178,7 @@ function initResultsEngine() {
         badge: '⚡ Fastest Door-to-Door',
         badgeClass: 'fastest',
         duration: '⏱️ 3h 45m Door-to-Door',
+        durationMinutes: 225,
         totalPrice: 780,
         highlighted: false,
         legs: [
@@ -170,10 +188,10 @@ function initResultsEngine() {
             details: `${originCity} → Direct Destination Airport • Scheduled Express`,
             price: '€220 / traveler',
             priceVal: 220,
-            providerTag: 'Skyscanner',
+            providerTag: 'Lufthansa Direct',
             actions: [
-              { label: 'Book Flight on Skyscanner ↗', url: links.skyscanner, featured: true },
-              { label: 'Google Flights ↗', url: links.googleFlights }
+              { label: 'Book Direct on Lufthansa ↗', url: links.lufthansa, featured: true },
+              { label: 'Book Direct on Austrian Airlines ↗', url: links.austrian }
             ]
           },
           {
@@ -182,9 +200,9 @@ function initResultsEngine() {
             details: `Airport Terminal Pick-up & Return • Unlimited Mileage`,
             price: '€180 total',
             priceVal: 180,
-            providerTag: 'DiscoverCars',
+            providerTag: 'DiscoverCars Direct',
             actions: [
-              { label: 'Compare on DiscoverCars ↗', url: links.discoverCars, featured: true }
+              { label: 'Rent Car on DiscoverCars ↗', url: links.discoverCars, featured: true }
             ]
           },
           {
@@ -193,9 +211,9 @@ function initResultsEngine() {
             details: `7 Nights Stay • Premium Breakfast Included`,
             price: '€380 total',
             priceVal: 380,
-            providerTag: 'Booking.com',
+            providerTag: 'Booking.com Luxury',
             actions: [
-              { label: 'View Stays on Booking.com ↗', url: links.booking, featured: true }
+              { label: 'Reserve Room on Booking.com ↗', url: links.booking, featured: true }
             ]
           }
         ]

@@ -1,6 +1,6 @@
 /**
  * TripMura Design System — Search Engine Master Interactive Controller
- * Skyscanner-Style Category Switcher, Real Global Geocoding Autocomplete,
+ * Dynamic Category Switcher, Real Global Geocoding Autocomplete,
  * Dual-Month Range & One-Way Calendar, Travelers Stepper & Micro-Dropdowns.
  */
 
@@ -315,10 +315,7 @@ function initSearchEngine() {
   });
 
   // --------------------------------------------------------------------------
-  // 4. Skyscanner Category Switcher Tabs
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
-  // 4. Skyscanner-Style Category Mode Tabs & Dynamic Context-Aware Controls
+  // 4. Category Mode Tabs & Dynamic Context-Aware Controls
   // --------------------------------------------------------------------------
   const tripTypeBtn = document.getElementById('tripTypeBtn');
   const tripTypeMenu = document.getElementById('tripTypeMenu');
@@ -1078,11 +1075,11 @@ function initSearchEngine() {
 
     // Dynamic rotating status messages every ~400ms
     const messages = [
-      { text: "Scanning 100+ airlines on Skyscanner & Google Flights...", provider: "skyscanner" },
-      { text: "Finding lowest prices on Booking.com & Airbnb...", provider: "booking" },
-      { text: "Comparing high-speed rail on Trainline & Eurostar...", provider: "trainline" },
-      { text: "Calculating synchronized door-to-door TCO...", provider: "omio" },
-      { text: "Synthesizing optimal multimodal itineraries...", provider: "google" }
+      { text: "Scanning direct routes on Austrian Airlines & Lufthansa...", provider: "austrian" },
+      { text: "Finding lowest direct room rates on Booking.com & Airbnb...", provider: "booking" },
+      { text: "Checking real-time tickets on ÖBB Ticket Shop & Deutsche Bahn...", provider: "oebb" },
+      { text: "Comparing low-cost direct flights on Ryanair & easyJet...", provider: "ryanair" },
+      { text: "Synthesizing door-to-door direct carrier itineraries...", provider: "lufthansa" }
     ];
 
     let totalArcLength = 280;

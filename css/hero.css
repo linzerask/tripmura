@@ -160,7 +160,7 @@
   outline-offset: 2px;
 }
 
-/* Skyscanner-Style Sub-Options Bar (Trip Type, Cabin Class, Direct Filter) */
+/* Sub-Options Bar (Trip Type, Cabin Class, Direct Filter) */
 .search-sub-options {
   display: flex;
   align-items: center;
