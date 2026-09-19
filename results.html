@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TripMura — Live Metasearch Results & Multimodal Journeys</title>
+  <meta name="description" content="Compare live multimodal journeys across Skyscanner, Google Flights, Trainline, Omio, Booking.com, and Airbnb with zero markup.">
+  
+  <!-- OpenGraph Metadata -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tripmura.com/results.html">
+  <meta property="og:title" content="TripMura — Live Metasearch Results">
+  <meta property="og:description" content="Compare flights, scenic trains, and boutique stays across 100+ platforms in one click. Direct provider booking at zero extra cost.">
+  <meta property="og:image" content="assets/brand/og_preview_sky.png">
+  
+  <!-- Favicons -->
+  <link rel="icon" type="image/svg+xml" href="assets/brand/favicon.svg">
+  <link rel="alternate icon" type="image/png" sizes="32x32" href="assets/brand/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/brand/apple-touch-icon.png">
+
+  <!-- Typography: Google Fonts Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Design System Stylesheets -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/search-modals.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/preloader.css">
+  <link rel="stylesheet" href="css/results.css">
+  <link rel="stylesheet" href="css/results-page.css">
+</head>
+<body class="results-page-body">
+
+  <!-- ==========================================================================
+       Sticky Top Metasearch Header
+       ========================================================================== -->
+  <header class="results-sticky-header">
+    <div class="container">
+      <div class="results-header-shell">
+        
+        <!-- Brand Logo (Links to Home) -->
+        <a href="index.html" class="brand-link" aria-label="TripMura Homepage">
+          <img src="assets/brand/symbol/tripmura_symbol.svg" alt="TripMura" class="brand-symbol-img" width="34" height="34">
+          <span class="brand-wordmark">TRIPMURA</span>
+        </a>
+
+        <!-- Active Query Summary Pill -->
+        <div class="query-summary-pill" id="querySummaryPill">
+          <div class="query-summary-content">
+            <span style="font-size: 1rem;">✈️</span>
+            <span class="query-route-bold" id="summaryRouteText">Linz (LNZ) ➔ Thessaloniki (SKG)</span>
+            <span class="query-divider">•</span>
+            <span id="summaryDatesText">19 Sep – 26 Sep</span>
+            <span class="query-divider">•</span>
+            <span id="summaryTravelersText">2 Travelers • Economy</span>
+          </div>
+          <button type="button" class="btn-edit-search" id="toggleEditSearchBtn" aria-label="Edit trip search query">
+            <span>Edit Search</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+          </button>
+        </div>
+
+        <!-- Right Utility Actions -->
+        <div class="results-header-actions">
+          <button class="utility-pill-btn" aria-label="Currency">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
+            <span>EUR €</span>
+          </button>
+          <a href="index.html" class="btn-new-search-link">
+            <span>New Search</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Expandable Floating Mini-Search Drawer -->
+    <div class="floating-search-drawer" id="floatingSearchDrawer">
+      <div class="container">
+        <form class="mini-search-grid" id="miniSearchForm">
+          <div class="mini-field-box">
+            <span class="mini-field-label">From (Origin)</span>
+            <input type="text" class="mini-field-input" id="miniOriginInput" placeholder="Departure city or airport">
+          </div>
+          <div class="mini-field-box">
+            <span class="mini-field-label">To (Destination)</span>
+            <input type="text" class="mini-field-input" id="miniDestInput" placeholder="Sun destination or hub">
+          </div>
+          <div class="mini-field-box">
+            <span class="mini-field-label">Depart</span>
+            <input type="date" class="mini-field-input" id="miniDepartInput">
+          </div>
+          <div class="mini-field-box">
+            <span class="mini-field-label">Return</span>
+            <input type="date" class="mini-field-input" id="miniReturnInput">
+          </div>
+          <button type="submit" class="btn-mini-search-submit">
+            <span>Update Results</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       Main Results Page Content & Feeds
+       ========================================================================== -->
+  <main class="results-page-main">
+    <div class="container">
+      
+      <!-- Top Title & Guarantee Notice -->
+      <div class="results-page-title-wrap">
+        <div class="results-badge-live">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>
+          <span>Live Metasearch Aggregation</span>
+        </div>
+        <h1 class="results-main-title">
+          Journeys from <span id="routeOriginName">Linz</span> to <span id="routeDestName">Thessaloniki</span>
+        </h1>
+        <p class="results-main-subtitle">
+          Comparing live multimodal routes across Skyscanner, Google Flights, Trainline, Omio, Booking.com, and Airbnb. Direct official provider booking with zero markup.
+        </p>
+      </div>
+
+      <!-- Sort & Filter Toggle Bar -->
+      <div class="results-sort-bar">
+        <button type="button" class="mobile-filter-open-btn" id="openMobileFilterBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>
+          <span>Filters</span>
+          <span class="filter-active-count" id="mobileFilterCount"></span>
+        </button>
+
+        <div class="sort-tabs-list">
+          <button type="button" class="sort-tab-btn active" data-sort="best-value">⭐ Best Value (Smart Balance)</button>
+          <button type="button" class="sort-tab-btn" data-sort="cheapest">💰 Cheapest First</button>
+          <button type="button" class="sort-tab-btn" data-sort="fastest">⚡ Fastest Door-to-Door</button>
+          <button type="button" class="sort-tab-btn" data-sort="eco">🌿 Lowest CO2</button>
+        </div>
+
+        <span class="results-count-text" id="resultsCountText">Showing 10 Multimodal Journeys</span>
+      </div>
+
+      <!-- Two-Column Layout (Sidebar + Results Feed) -->
+      <div class="results-layout-grid">
+        
+        <!-- ====================================================================
+             Left Column: Filter Sidebar
+             ==================================================================== -->
+        <aside class="results-filter-sidebar" aria-label="Search Results Filters">
+          
+          <div class="filter-sidebar-header">
+            <div class="filter-title-wrap">
+              <span class="filter-sidebar-title">Filters</span>
+              <span class="filter-active-count" id="sidebarFilterCount"></span>
+            </div>
+            <button type="button" class="btn-filter-reset" id="resetSidebarFiltersBtn">Reset All</button>
+          </div>
+
+          <!-- Transport Mode Filter -->
+          <div class="filter-group">
+            <span class="filter-group-title">Transport Combination</span>
+            <div class="filter-options-stack">
+              <label class="filter-checkbox-item">
+                <div class="filter-cb-left">
+                  <input type="radio" name="categoryFilter" value="all" class="filter-cb-input" checked>
+                  <span>All Multimodal Routes</span>
+                </div>
+                <span class="filter-tag-count">10</span>
+              </label>
+              <label class="filter-checkbox-item">
+                <div class="filter-cb-left">
+                  <input type="radio" name="categoryFilter" value="flight-stay" class="filter-cb-input">
+                  <span>✈️ Flights + Curated Stay</span>
+                </div>
+                <span class="filter-tag-count">5</span>
+              </label>
+              <label class="filter-checkbox-item">
+                <div class="filter-cb-left">
+                  <input type="radio" name="categoryFilter" value="train-stay" class="filter-cb-input">
+                  <span>🚆 Scenic Train + Stay</span>
+                </div>
+                <span class="filter-tag-count">3</span>
+              </label>
+              <label class="filter-checkbox-item">
+                <div class="filter-cb-left">
+                  <input type="radio" name="categoryFilter" value="flight-car" class="filter-cb-input">
+                  <span>🚗 Flight + Rental Car</span>
+                </div>
+                <span class="filter-tag-count">1</span>
+              </label>
+              <label class="filter-checkbox-item">
+                <div class="filter-cb-left">
+                  <input type="radio" name="categoryFilter" value="ferry" class="filter-cb-input">
+                  <span>⛵ Ferry & Island Hop</span>
+                </div>
+                <span class="filter-tag-count">1</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Price Range Slider -->
+          <div class="filter-group">
+            <div class="filter-group-title">
+              <span>Max Total Budget</span>
+              <span id="priceDisplayVal" style="color: #0284c7;">€1,500</span>
+            </div>
+            <div class="price-slider-wrap">
+              <input type="range" id="priceRangeSlider" class="price-range-input" min="300" max="1500" step="50" value="1500">
+              <div class="price-slider-display">
+                <span>€300</span>
+                <span>€1,500+</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stops / Connections -->
+          <div class="filter-group">
+            <span class="filter-group-title">Transfers & Stops</span>
+            <div class="filter-options-stack">
+              <label class="filter-checkbox-item">
+                <div class="filter-cb-left">
+                  <input type="radio" name="stopsFilter" value="all" class="filter-cb-input" checked>
+                  <span>All Routes</span>
+                </div>
+              </label>
+              <label class="filter-checkbox-item">
+                <div class="filter-cb-left">
+                  <input type="radio" name="stopsFilter" value="0" class="filter-cb-input">
+                  <span>Direct Non-Stop Only</span>
+                </div>
+              </label>
+              <label class="filter-checkbox-item">
+                <div class="filter-cb-left">
+                  <input type="radio" name="stopsFilter" value="1" class="filter-cb-input">
+                  <span>Max 1 Connection</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Booking Platforms & Providers -->
+          <div class="filter-group">
+            <span class="filter-group-title">Direct Providers</span>
+            <div class="filter-options-stack">
+              <label class="filter-checkbox-item">
+                <div class="filter-cb-left">
+                  <input type="checkbox" class="filter-cb-input" checked disabled>
+                  <span>✈️ Skyscanner</span>
+                </div>
+                <span class="filter-tag-count">Direct</span>
+              </label>
+              <label class="filter-checkbox-item">
+                <div class="filter-cb-left">
+                  <input type="checkbox" class="filter-cb-input" checked disabled>
+                  <span>🌐 Google Flights</span>
+                </div>
+                <span class="filter-tag-count">Direct</span>
+              </label>
+              <label class="filter-checkbox-item">
+                <div class="filter-cb-left">
+                  <input type="checkbox" class="filter-cb-input" checked disabled>
+                  <span>🏨 Booking.com</span>
+                </div>
+                <span class="filter-tag-count">Direct</span>
+              </label>
+              <label class="filter-checkbox-item">
+                <div class="filter-cb-left">
+                  <input type="checkbox" class="filter-cb-input" checked disabled>
+                  <span>🏡 Airbnb</span>
+                </div>
+                <span class="filter-tag-count">Direct</span>
+              </label>
+              <label class="filter-checkbox-item">
+                <div class="filter-cb-left">
+                  <input type="checkbox" class="filter-cb-input" checked disabled>
+                  <span>🚆 Trainline</span>
+                </div>
+                <span class="filter-tag-count">Direct</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Verified Accommodation Score -->
+          <div class="filter-group">
+            <span class="filter-group-title">Accommodation Rating</span>
+            <div class="filter-options-stack">
+              <label class="filter-checkbox-item">
+                <div class="filter-cb-left">
+                  <input type="radio" name="ratingFilter" value="0" class="filter-cb-input" checked>
+                  <span>Any Rating</span>
+                </div>
+              </label>
+              <label class="filter-checkbox-item">
+                <div class="filter-cb-left">
+                  <input type="radio" name="ratingFilter" value="8.5" class="filter-cb-input">
+                  <span>★ Top Rated (8.5+)</span>
+                </div>
+              </label>
+              <label class="filter-checkbox-item">
+                <div class="filter-cb-left">
+                  <input type="radio" name="ratingFilter" value="9.0" class="filter-cb-input">
+                  <span>★ Exceptional (9.0+)</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Eco Filter -->
+          <div class="filter-group">
+            <label class="filter-checkbox-item">
+              <div class="filter-cb-left">
+                <input type="checkbox" id="ecoOnlyFilter" class="filter-cb-input">
+                <span style="font-weight: 700; color: #15803d;">🌿 Low CO2 Emissions (&lt;60kg)</span>
+              </div>
+            </label>
+          </div>
+
+        </aside>
+
+        <!-- ====================================================================
+             Right Column: Dynamic Results Feed
+             ==================================================================== -->
+        <section class="results-feed-col" aria-label="Dynamic Multimodal Results">
+          <div class="results-feed-list" id="resultsFeedList">
+            <!-- Populated dynamically via js/results-page.js -->
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ==========================================================================
+       Interactive Trip Summary & Direct Outbound Booking Drawer
+       ========================================================================== -->
+  <div class="trip-summary-modal-backdrop" id="tripSummaryBackdrop" aria-hidden="true"></div>
+  
+  <div class="trip-summary-drawer" id="tripSummaryModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="drawerHeadline">
+    
+    <!-- Drawer Header -->
+    <div class="drawer-header">
+      <div class="drawer-title-wrap">
+        <div class="drawer-tag-pill">
+          <span>✨ 100% Free Metasearch Engine</span>
+        </div>
+        <h3 class="drawer-headline" id="drawerHeadline">Linz → Thessaloniki</h3>
+        <span class="drawer-meta-sub" id="drawerMetaSub">19 Sep – 26 Sep • 2 Travelers • Austrian Direct Express</span>
+      </div>
+      <button type="button" class="drawer-close-btn" id="closeSummaryDrawerBtn" aria-label="Close trip breakdown">✕</button>
+    </div>
+
+    <!-- Drawer Scrollable Body -->
+    <div class="drawer-scroll-body">
+      
+      <!-- Metasearch Transparency Notice -->
+      <div class="drawer-intro-notice">
+        <span class="drawer-intro-icon">🛡️</span>
+        <div>
+          <strong>Zero Booking Fees:</strong> TripMura is 100% free to use. Compare and book each leg directly with trusted official providers below:
+        </div>
+      </div>
+
+      <!-- Provider Booking Legs List -->
+      <div class="drawer-legs-list" id="drawerLegsList">
+        <!-- Rendered dynamically by js/results-page.js -->
+      </div>
+
+    </div>
+
+    <!-- Drawer Pinned Footer -->
+    <div class="drawer-footer">
+      <div class="drawer-tco-summary-box">
+        <div class="tco-summary-info">
+          <span class="tco-summary-title">Total Estimated Door-to-Door TCO</span>
+          <span class="tco-summary-sub">✓ Direct Provider Rates • Zero Hidden Markups</span>
+        </div>
+        <div class="tco-summary-amount" id="drawerTcoAmount">€495</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==========================================================================
+       Mobile Filter Modal Bottom Sheet
+       ========================================================================== -->
+  <div class="mobile-filter-sheet-backdrop" id="mobileFilterBackdrop" aria-hidden="true"></div>
+  <div class="mobile-filter-sheet" id="mobileFilterModal" role="dialog" aria-modal="true" aria-label="Mobile Filters">
+    <div class="mobile-filter-sheet-header">
+      <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a;">Trip Filters</h3>
+      <button type="button" class="drawer-close-btn" id="closeMobileFilterBtn">✕</button>
+    </div>
+    <div class="mobile-filter-sheet-body">
+      <!-- Transport Mode Filter -->
+      <div class="filter-group">
+        <span class="filter-group-title">Transport Combination</span>
+        <div class="filter-options-stack">
+          <label class="filter-checkbox-item">
+            <div class="filter-cb-left">
+              <input type="radio" name="categoryFilterMobile" value="all" class="filter-cb-input" checked>
+              <span>All Multimodal Routes</span>
+            </div>
+            <span class="filter-tag-count">10</span>
+          </label>
+          <label class="filter-checkbox-item">
+            <div class="filter-cb-left">
+              <input type="radio" name="categoryFilterMobile" value="flight-stay" class="filter-cb-input">
+              <span>✈️ Flights + Curated Stay</span>
+            </div>
+            <span class="filter-tag-count">5</span>
+          </label>
+          <label class="filter-checkbox-item">
+            <div class="filter-cb-left">
+              <input type="radio" name="categoryFilterMobile" value="train-stay" class="filter-cb-input">
+              <span>🚆 Scenic Train + Stay</span>
+            </div>
+            <span class="filter-tag-count">3</span>
+          </label>
+          <label class="filter-checkbox-item">
+            <div class="filter-cb-left">
+              <input type="radio" name="categoryFilterMobile" value="flight-car" class="filter-cb-input">
+              <span>🚗 Flight + Rental Car</span>
+            </div>
+            <span class="filter-tag-count">1</span>
+          </label>
+          <label class="filter-checkbox-item">
+            <div class="filter-cb-left">
+              <input type="radio" name="categoryFilterMobile" value="ferry" class="filter-cb-input">
+              <span>⛵ Ferry & Island Hop</span>
+            </div>
+            <span class="filter-tag-count">1</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Price Range Slider -->
+      <div class="filter-group">
+        <div class="filter-group-title">
+          <span>Max Total Budget</span>
+          <span id="priceDisplayValMobile" style="color: #0284c7;">€1,500</span>
+        </div>
+        <div class="price-slider-wrap">
+          <input type="range" id="priceRangeSliderMobile" class="price-range-input" min="300" max="1500" step="50" value="1500">
+          <div class="price-slider-display">
+            <span>€300</span>
+            <span>€1,500+</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stops / Connections -->
+      <div class="filter-group">
+        <span class="filter-group-title">Transfers & Stops</span>
+        <div class="filter-options-stack">
+          <label class="filter-checkbox-item">
+            <div class="filter-cb-left">
+              <input type="radio" name="stopsFilterMobile" value="all" class="filter-cb-input" checked>
+              <span>All Routes</span>
+            </div>
+          </label>
+          <label class="filter-checkbox-item">
+            <div class="filter-cb-left">
+              <input type="radio" name="stopsFilterMobile" value="0" class="filter-cb-input">
+              <span>Direct Non-Stop Only</span>
+            </div>
+          </label>
+          <label class="filter-checkbox-item">
+            <div class="filter-cb-left">
+              <input type="radio" name="stopsFilterMobile" value="1" class="filter-cb-input">
+              <span>Max 1 Connection</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Eco Filter -->
+      <div class="filter-group">
+        <label class="filter-checkbox-item">
+          <div class="filter-cb-left">
+            <input type="checkbox" id="ecoOnlyFilterMobile" class="filter-cb-input">
+            <span style="font-weight: 700; color: #15803d;">🌿 Low CO2 Emissions (&lt;60kg)</span>
+          </div>
+        </label>
+      </div>
+    </div>
+    <div class="mobile-filter-sheet-footer">
+      <div style="display: flex; gap: 10px;">
+        <button type="button" class="btn-ghost-sm" id="resetMobileFiltersBtn" style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; font-weight: 700;">Reset</button>
+        <button type="button" class="btn-mobile-filter-apply" id="applyMobileFilterBtn" style="flex: 1;">Apply Filters</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Luxury Trust & Ecosystem Footer
+       ========================================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand-col">
+          <a href="index.html" class="footer-logo-link" aria-label="TripMura Home">
+            <div class="footer-brand-lockup">
+              <img src="assets/brand/symbol/tripmura_symbol.svg" alt="TripMura" class="footer-symbol-img" width="32" height="32">
+              <span class="footer-wordmark">TRIPMURA</span>
+            </div>
+          </a>
+          <div class="footer-tagline">Holidays Made Simple.</div>
+          <p class="footer-desc">
+            Synchronizing flights, scenic trains, and boutique stays into one seamless door-to-door trip.
+          </p>
+        </div>
+
+        <div class="footer-nav-col">
+          <h4 class="footer-col-title">Metasearch</h4>
+          <ul class="footer-links">
+            <li><a href="results.html?from=Linz&to=Thessaloniki" class="footer-link">Linz → Thessaloniki</a></li>
+            <li><a href="results.html?from=Vienna&to=Amalfi" class="footer-link">Vienna → Amalfi Coast</a></li>
+            <li><a href="results.html?from=London&to=Capri" class="footer-link">London → Capri Island</a></li>
+            <li><a href="results.html?from=Munich&to=Nice" class="footer-link">Munich → French Riviera</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-nav-col">
+          <h4 class="footer-col-title">Direct Providers</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.skyscanner.net" target="_blank" rel="noopener noreferrer" class="footer-link">Skyscanner Flights</a></li>
+            <li><a href="https://www.thetrainline.com" target="_blank" rel="noopener noreferrer" class="footer-link">Trainline Rail</a></li>
+            <li><a href="https://www.booking.com" target="_blank" rel="noopener noreferrer" class="footer-link">Booking.com Stays</a></li>
+            <li><a href="https://www.airbnb.com" target="_blank" rel="noopener noreferrer" class="footer-link">Airbnb Homes</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-nav-col">
+          <h4 class="footer-col-title">Trust & Legal</h4>
+          <ul class="footer-links">
+            <li><a href="#guarantee" class="footer-link">100% Transfer Guarantee</a></li>
+            <li><a href="#privacy" class="footer-link">Privacy Policy</a></li>
+            <li><a href="#terms" class="footer-link">Terms of Service</a></li>
+            <li><a href="#support" class="footer-link">Support Concierge</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="footer-copyright">
+          &copy; 2026 TripMura Inc. All rights reserved.
+        </div>
+        <div class="footer-credit">
+          <span>Designed & Engineered by </span>
+          <a href="https://anonymcreator.online" target="_blank" rel="noopener noreferrer" class="credit-link">AnonymCreator</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/iata-resolver.js"></script>
+  <script src="js/results-page.js"></script>
+</body>
+</html>

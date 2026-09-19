@@ -232,3 +232,165 @@ body.preloader-done .social-proof-bar {
   transform: none;
   transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.32s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.32s;
 }
+
+/* ==========================================================================
+   6. Luxury Metasearch Loading Transition Overlay (#searchTransitionOverlay)
+   ========================================================================== */
+.search-transition-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999999;
+  background: rgba(15, 23, 42, 0.84);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.search-transition-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.search-transition-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4),
+              0 0 40px rgba(0, 242, 254, 0.25);
+  border-radius: var(--radius-card-lg, 24px);
+  padding: 36px 32px 32px;
+  width: min(480px, 92vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transform: scale(0.92) translateY(10px);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.search-transition-overlay.active .search-transition-card {
+  transform: scale(1) translateY(0);
+}
+
+/* Radar pulse wave behind symbol */
+.search-radar-halo {
+  position: absolute;
+  top: 36px;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 242, 254, 0.6);
+  box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+  animation: search-radar-pulse 1.6s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes search-radar-pulse {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.search-flight-stage {
+  position: relative;
+  width: 280px;
+  height: 70px;
+  margin: 12px 0 16px;
+}
+
+.search-counter-wrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.search-counter-val {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-primary, #0f172a);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.search-progress-bar-shell {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: var(--radius-pill, 9999px);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.search-progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00f2fe 0%, #0284c7 100%);
+  border-radius: var(--radius-pill, 9999px);
+  transition: width 0.05s linear;
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.6);
+}
+
+.search-status-message-box {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  margin-bottom: 20px;
+}
+
+.search-status-text {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary-azure-dark, #0369a1);
+  line-height: 1.4;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.search-status-text.fading {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+.search-providers-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 16px;
+  border-top: 1px dashed #e2e8f0;
+  width: 100%;
+}
+
+.search-provider-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill, 9999px);
+  transition: all 0.2s ease;
+}
+
+.search-provider-pill.active-pulse {
+  background: rgba(2, 132, 199, 0.1);
+  color: #0284c7;
+  border-color: rgba(2, 132, 199, 0.3);
+  transform: translateY(-1px);
+}
+

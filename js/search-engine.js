@@ -1022,11 +1022,160 @@ function initSearchEngine() {
   });
 
   // --------------------------------------------------------------------------
-  // 10. Search CTA Submit & Popover Close Coordinator
+  // 10. Search CTA Submit & Luxury Loading Transition Controller
   // --------------------------------------------------------------------------
+  function triggerSearchTransition() {
+    closeAllPopovers();
+
+    const origin = originInput ? originInput.value.trim() : 'Linz (LNZ)';
+    const dest = destInput ? destInput.value.trim() : 'Thessaloniki (SKG)';
+    
+    // Format dates ISO
+    const departISO = selectedStart ? TripMuraIATA.formatDateISO(selectedStart) : TripMuraIATA.formatDateISO(new Date(), 0);
+    const returnISO = selectedEnd ? TripMuraIATA.formatDateISO(selectedEnd) : (currentTripType === 'oneway' ? '' : TripMuraIATA.formatDateISO(new Date(), 7));
+
+    const adultsVal = document.getElementById('adultsVal');
+    const childrenVal = document.getElementById('childrenVal');
+    const roomsVal = document.getElementById('roomsVal');
+    const directCheck = document.getElementById('directRoutesOnly');
+
+    const adults = adultsVal ? parseInt(adultsVal.textContent, 10) || 2 : 2;
+    const children = childrenVal ? parseInt(childrenVal.textContent, 10) || 0 : 0;
+    const rooms = roomsVal ? parseInt(roomsVal.textContent, 10) || 1 : 1;
+    const direct = directCheck && directCheck.checked ? 1 : 0;
+
+    const overlay = document.getElementById('searchTransitionOverlay');
+
+    function navigateToResults() {
+      const params = new URLSearchParams({
+        from: origin,
+        to: dest,
+        depart: departISO,
+        return: returnISO,
+        travelers: adults,
+        children: children,
+        rooms: rooms,
+        cabin: currentCabinClass || 'economy',
+        direct: direct
+      });
+      window.location.href = `results.html?${params.toString()}`;
+    }
+
+    if (!overlay) {
+      navigateToResults();
+      return;
+    }
+
+    const counterVal = document.getElementById('searchCounterVal');
+    const progressFill = document.getElementById('searchProgressFill');
+    const statusMsg = document.getElementById('searchStatusMsg');
+    const arcActive = overlay.querySelector('.search-arc-active');
+    const jetGroup = overlay.querySelector('.search-jet-group');
+    const providerPills = overlay.querySelectorAll('.search-provider-pill');
+
+    overlay.classList.add('active');
+    document.body.classList.add('search-modal-open');
+
+    // Dynamic rotating status messages every ~400ms
+    const messages = [
+      { text: "Scanning 100+ airlines on Skyscanner & Google Flights...", provider: "skyscanner" },
+      { text: "Finding lowest prices on Booking.com & Airbnb...", provider: "booking" },
+      { text: "Comparing high-speed rail on Trainline & Eurostar...", provider: "trainline" },
+      { text: "Calculating synchronized door-to-door TCO...", provider: "omio" },
+      { text: "Synthesizing optimal multimodal itineraries...", provider: "google" }
+    ];
+
+    let totalArcLength = 280;
+    if (arcActive && arcActive.getTotalLength) {
+      try {
+        totalArcLength = arcActive.getTotalLength();
+        arcActive.style.strokeDasharray = `${totalArcLength} ${totalArcLength}`;
+        arcActive.style.strokeDashoffset = `${totalArcLength}`;
+      } catch (e) {
+        totalArcLength = 280;
+      }
+    }
+
+    const SEARCH_DURATION = 2000; // 2.0s calibrated authentic live search feel
+    let startTimestamp = null;
+    let lastMsgIndex = -1;
+
+    function easeInOut(t) {
+      return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    }
+
+    function step(timestamp) {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const elapsed = timestamp - startTimestamp;
+      const linearProgress = Math.min(elapsed / SEARCH_DURATION, 1);
+      const eased = easeInOut(linearProgress);
+
+      const pct = Math.min(Math.round(eased * 100), 100);
+      if (counterVal) counterVal.textContent = `${pct}%`;
+      if (progressFill) progressFill.style.width = `${pct}%`;
+
+      if (arcActive) {
+        arcActive.style.strokeDashoffset = totalArcLength * (1 - eased);
+      }
+
+      if (jetGroup && arcActive && arcActive.getPointAtLength) {
+        try {
+          const currentDistance = totalArcLength * eased;
+          const point = arcActive.getPointAtLength(currentDistance);
+          const p1 = arcActive.getPointAtLength(Math.max(currentDistance - 2, 0));
+          const p2 = arcActive.getPointAtLength(Math.min(currentDistance + 2, totalArcLength));
+          const angleDeg = (Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180) / Math.PI;
+          jetGroup.style.transform = `translate(${point.x - 12}px, ${point.y - 12}px) rotate(${angleDeg}deg)`;
+        } catch (e) {}
+      }
+
+      // Rotate status message every ~400ms
+      const currentMsgIndex = Math.min(Math.floor((elapsed / SEARCH_DURATION) * messages.length), messages.length - 1);
+      if (currentMsgIndex !== lastMsgIndex) {
+        lastMsgIndex = currentMsgIndex;
+        if (statusMsg) {
+          statusMsg.classList.add('fading');
+          setTimeout(() => {
+            statusMsg.textContent = messages[currentMsgIndex].text;
+            statusMsg.classList.remove('fading');
+          }, 120);
+        }
+
+        // Highlight corresponding provider pill
+        const activeProv = messages[currentMsgIndex].provider;
+        providerPills.forEach(p => {
+          if (p.dataset.provider === activeProv || (activeProv === 'booking' && p.dataset.provider === 'airbnb')) {
+            p.classList.add('active-pulse');
+          } else {
+            p.classList.remove('active-pulse');
+          }
+        });
+      }
+
+      if (linearProgress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        setTimeout(navigateToResults, 200);
+      }
+    }
+
+    requestAnimationFrame(step);
+  }
+
   if (searchForm) {
     searchForm.addEventListener('submit', (e) => {
-      closeAllPopovers();
+      e.preventDefault();
+      triggerSearchTransition();
     });
   }
+
+  if (searchCta) {
+    searchCta.addEventListener('click', (e) => {
+      e.preventDefault();
+      triggerSearchTransition();
+    });
+  }
+
+  // Expose search trigger globally
+  window.tripmuraTriggerSearch = triggerSearchTransition;
 }

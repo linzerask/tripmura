@@ -726,10 +726,65 @@
 
   </div>
 
+  <!-- ==========================================================================
+       Luxury Metasearch Loading Transition Overlay
+       ========================================================================== -->
+  <div id="searchTransitionOverlay" class="search-transition-overlay" role="dialog" aria-modal="true" aria-label="Searching live itineraries">
+    <div class="search-transition-card">
+      <div class="search-radar-halo"></div>
+      
+      <!-- Brand Symbol -->
+      <div class="preloader-brand-wrap" style="margin-bottom: 8px;">
+        <img src="assets/brand/symbol/tripmura_symbol.svg" alt="TripMura" class="preloader-symbol" width="46" height="46">
+      </div>
+
+      <!-- Vector Flight Stage (Arc + 2D Flying Jet) -->
+      <div class="search-flight-stage">
+        <svg class="preloader-flight-svg" viewBox="0 0 280 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path class="flight-path-bg" d="M 20 55 C 90 55, 160 30, 260 15" />
+          <path class="flight-path-active search-arc-active" d="M 20 55 C 90 55, 160 30, 260 15" />
+        </svg>
+
+        <div class="flight-jet-group search-jet-group" style="transform: translate(8px, 43px) rotate(0deg);">
+          <svg viewBox="0 0 24 24" class="flight-jet-icon">
+            <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(90 12 12)"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Live Counter -->
+      <div class="search-counter-wrap">
+        <span class="search-counter-val" id="searchCounterVal">0%</span>
+      </div>
+
+      <!-- Glowing Progress Bar -->
+      <div class="search-progress-bar-shell">
+        <div class="search-progress-bar-fill" id="searchProgressFill"></div>
+      </div>
+
+      <!-- Rotating Status Messages -->
+      <div class="search-status-message-box">
+        <span class="search-status-text" id="searchStatusMsg">Scanning 100+ airlines on Skyscanner & Google Flights...</span>
+      </div>
+
+      <!-- Live Metasearch Providers Strip -->
+      <div class="search-providers-strip">
+        <span class="search-provider-pill" data-provider="skyscanner">✈️ Skyscanner</span>
+        <span class="search-provider-pill" data-provider="google">🌐 Google Flights</span>
+        <span class="search-provider-pill" data-provider="booking">🏨 Booking.com</span>
+        <span class="search-provider-pill" data-provider="airbnb">🏡 Airbnb</span>
+        <span class="search-provider-pill" data-provider="trainline">🚆 Trainline</span>
+        <span class="search-provider-pill" data-provider="omio">⛵ Omio</span>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Search Engine Mobile Backdrop -->
   <div class="search-modal-backdrop" aria-hidden="true"></div>
 
   <!-- Scripts -->
+  <script src="js/iata-resolver.js"></script>
   <script src="js/preloader.js"></script>
   <script src="js/nav.js"></script>
   <script src="js/app.js"></script>
