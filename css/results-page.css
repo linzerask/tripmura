@@ -44,8 +44,9 @@
   border: 1px solid var(--border-light, rgba(15, 23, 42, 0.1));
   border-radius: var(--radius-pill, 9999px);
   padding: 6px 14px 6px 18px;
-  max-width: 680px;
-  flex: 1;
+  max-width: 760px;
+  flex: 1 1 auto;
+  min-width: 0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
@@ -55,18 +56,28 @@
   gap: 8px;
   overflow: hidden;
   white-space: nowrap;
+  text-overflow: ellipsis;
   font-size: 0.88rem;
   color: var(--text-secondary, #475569);
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .query-route-bold {
   font-weight: 800;
   color: var(--text-primary, #0f172a);
+  flex-shrink: 0;
 }
 
 .query-divider {
   color: var(--text-muted, #cbd5e1);
+  flex-shrink: 0;
+}
+
+#summaryDatesText,
+#summaryTravelersText {
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .btn-edit-search {
@@ -83,6 +94,7 @@
   cursor: pointer;
   transition: all var(--transition-fast, 0.15s ease);
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .btn-edit-search:hover {
@@ -95,25 +107,57 @@
 .results-header-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
+}
+
+.utility-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid var(--border-light, rgba(15, 23, 42, 0.12));
+  border-radius: var(--radius-pill, 9999px);
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.15s ease);
+  flex-shrink: 0;
+}
+
+.utility-pill-btn svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.utility-pill-btn:hover {
+  background: var(--primary-azure-50, #f0f9ff);
+  border-color: var(--primary-azure, #0284c7);
+  color: var(--primary-azure-dark, #0369a1);
 }
 
 .btn-new-search-link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.86rem;
+  font-size: 0.84rem;
   font-weight: 700;
-  color: var(--primary-azure, #0284c7);
+  color: var(--primary-azure-dark, #0369a1);
+  background: #ffffff;
+  border: 1px solid var(--border-light, rgba(15, 23, 42, 0.12));
   text-decoration: none;
-  padding: 8px 14px;
+  padding: 7px 14px;
   border-radius: var(--radius-pill, 9999px);
   transition: all var(--transition-fast, 0.15s ease);
+  flex-shrink: 0;
 }
 
 .btn-new-search-link:hover {
   background: var(--primary-azure-50, #f0f9ff);
+  border-color: var(--primary-azure, #0284c7);
 }
 
 /* ==========================================================================
@@ -983,13 +1027,31 @@
     gap: 20px;
   }
 
-  .feed-journey-legs-grid {
+  .feed-journey-legs-grid,
+  .itinerary-legs-grid {
     grid-template-columns: 1fr;
     gap: 10px;
   }
 
   .mini-search-grid {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 840px) {
+  .feed-journey-legs-grid,
+  .itinerary-legs-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .feed-card,
+  .results-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
   }
 }
 
@@ -1047,5 +1109,55 @@
   .engine-pill-btn {
     font-size: 0.72rem;
     padding: 4px 9px;
+  }
+}
+
+@media (max-width: 640px) {
+  .results-sort-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .sort-tabs-list {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 4px;
+    flex-wrap: nowrap;
+  }
+
+  .sort-tabs-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .feed-card-bottom-row,
+  .card-footer-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+
+  .feed-card-actions-group,
+  .card-footer-actions {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .btn-primary-carrier-book,
+  .btn-book-primary,
+  .btn-feed-breakdown {
+    width: 100% !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    justify-content: center !important;
+    font-size: 0.88rem !important;
+    box-sizing: border-box;
   }
 }
