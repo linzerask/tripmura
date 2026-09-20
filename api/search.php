@@ -98,7 +98,16 @@ $iataDatabase = [
     // Switzerland
     'zurich' => 'ZRH', 'geneva' => 'GVA', 'basel' => 'BSL', 'bern' => 'BRN',
     // Netherlands & Belgium
-    'amsterdam' => 'AMS', 'brussels' => 'BRU'
+    'amsterdam' => 'AMS', 'brussels' => 'BRU',
+    // Central & Eastern Europe
+    'prague' => 'PRG', 'praha' => 'PRG', 'budapest' => 'BUD', 'warsaw' => 'WAW', 'warszawa' => 'WAW',
+    'krakow' => 'KRK', 'dubrovnik' => 'DBV', 'split' => 'SPU', 'zagreb' => 'ZAG', 'zadar' => 'ZAD', 'pula' => 'PUY',
+    'ljubljana' => 'LJU', 'bucharest' => 'OTP', 'bucuresti' => 'OTP', 'otopeni' => 'OTP',
+    'timisoara' => 'TSR', 'temeswar' => 'TSR', 'temesvar' => 'TSR', 'traian vuia' => 'TSR',
+    'cluj' => 'CLJ', 'cluj napoca' => 'CLJ', 'iasi' => 'IAS', 'sibiu' => 'SBZ', 'brasov' => 'GHV',
+    'craiova' => 'CRA', 'suceava' => 'SCV', 'bacau' => 'BCM', 'oradea' => 'OMR', 'arad' => 'ARW',
+    'constanta' => 'CND', 'sofia' => 'SOF', 'belgrade' => 'BEG', 'skopje' => 'SKP', 'tirana' => 'TIA',
+    'chisinau' => 'RMO', 'sarajevo' => 'SJJ', 'podgorica' => 'TGD'
 ];
 
 function resolveIATA($str, $db, $fallback = 'VIE') {

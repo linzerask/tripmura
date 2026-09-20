@@ -186,15 +186,53 @@
 
     // Central & Eastern Europe
     'prague': 'PRG',
+    'praha': 'PRG',
     'budapest': 'BUD',
     'warsaw': 'WAW',
+    'warszawa': 'WAW',
     'krakow': 'KRK',
+    'cracow': 'KRK',
     'dubrovnik': 'DBV',
     'split': 'SPU',
     'zagreb': 'ZAG',
+    'zadar': 'ZAD',
+    'pula': 'PUY',
     'ljubljana': 'LJU',
     'bucharest': 'OTP',
+    'bucuresti': 'OTP',
+    'otopeni': 'OTP',
+    'timisoara': 'TSR',
+    'timișoara': 'TSR',
+    'temeswar': 'TSR',
+    'temesvar': 'TSR',
+    'traian vuia': 'TSR',
+    'cluj': 'CLJ',
+    'cluj napoca': 'CLJ',
+    'iasi': 'IAS',
+    'iași': 'IAS',
+    'sibiu': 'SBZ',
+    'brasov': 'GHV',
+    'brașov': 'GHV',
+    'craiova': 'CRA',
+    'suceava': 'SCV',
+    'bacau': 'BCM',
+    'oradea': 'OMR',
+    'arad': 'ARW',
+    'constanta': 'CND',
+    'constanța': 'CND',
     'sofia': 'SOF',
+    'varna': 'VAR',
+    'burgas': 'BOJ',
+    'belgrade': 'BEG',
+    'beograd': 'BEG',
+    'skopje': 'SKP',
+    'tirana': 'TIA',
+    'pristina': 'PRN',
+    'sarajevo': 'SJJ',
+    'podgorica': 'TGD',
+    'tivat': 'TIV',
+    'chisinau': 'RMO',
+    'chișinău': 'RMO',
 
     // Global Hubs
     'tokyo': 'TYO',
@@ -516,20 +554,26 @@
 
   function buildHotellookUrl(destCity, checkin, checkout, adults = 2) {
     const marker = (CONFIG.travelpayouts && CONFIG.travelpayouts.marker) ? CONFIG.travelpayouts.marker : '779382';
-    return `https://search.hotellook.com/?destination=${encodeURIComponent(destCity)}&checkIn=${checkin}&checkOut=${checkout}&adults=${adults}&marker=${encodeURIComponent(marker)}`;
+    const cleanIn = formatDateISO(checkin, 0);
+    const cleanOut = checkout ? formatDateISO(checkout, 7) : formatDateISO(checkin, 7);
+    return `https://search.hotellook.com/?destination=${encodeURIComponent(destCity)}&checkIn=${cleanIn}&checkOut=${cleanOut}&adults=${adults}&marker=${encodeURIComponent(marker)}`;
   }
 
   function buildBookingUrl(destCity, checkin, checkout, adults = 2, rooms = 1) {
     const aid = (CONFIG.affiliate && CONFIG.affiliate.bookingAid) ? CONFIG.affiliate.bookingAid : '779382';
     const marker = (CONFIG.travelpayouts && CONFIG.travelpayouts.marker) ? CONFIG.travelpayouts.marker : '779382';
-    return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(destCity)}&checkin=${checkin}&checkout=${checkout}&group_adults=${adults}&no_rooms=${rooms}&order=price&aid=${encodeURIComponent(aid)}&label=tp${encodeURIComponent(marker)}`;
+    const cleanIn = formatDateISO(checkin, 0);
+    const cleanOut = checkout ? formatDateISO(checkout, 7) : formatDateISO(checkin, 7);
+    return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(destCity)}&checkin=${cleanIn}&checkout=${cleanOut}&group_adults=${adults}&no_rooms=${rooms}&order=price&aid=${encodeURIComponent(aid)}&label=tp${encodeURIComponent(marker)}`;
   }
 
   function buildBookingHotelPropertyUrl(destCity, hotelName, checkin, checkout, adults = 2, rooms = 1) {
     const aid = (CONFIG.affiliate && CONFIG.affiliate.bookingAid) ? CONFIG.affiliate.bookingAid : '779382';
     const marker = (CONFIG.travelpayouts && CONFIG.travelpayouts.marker) ? CONFIG.travelpayouts.marker : '779382';
+    const cleanIn = formatDateISO(checkin, 0);
+    const cleanOut = checkout ? formatDateISO(checkout, 7) : formatDateISO(checkin, 7);
     const query = hotelName ? `${hotelName}, ${destCity}` : destCity;
-    return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(query)}&checkin=${checkin}&checkout=${checkout}&group_adults=${adults}&no_rooms=${rooms}&order=price&aid=${encodeURIComponent(aid)}&label=tp${encodeURIComponent(marker)}`;
+    return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(query)}&checkin=${cleanIn}&checkout=${cleanOut}&group_adults=${adults}&no_rooms=${rooms}&order=price&aid=${encodeURIComponent(aid)}&label=tp${encodeURIComponent(marker)}`;
   }
 
   function buildAirbnbUrl(destCity, checkin, checkout, adults = 2) {
@@ -546,12 +590,24 @@
   // Multi-Aggregator & Aviasales Direct Proposal Deep-Link Builders
   // --------------------------------------------------------------------------
   function buildAviasalesProposalUrl(originIATA, destIATA, departDate, returnDate, adults = 2) {
-    const depDD = formatDateISO(departDate).split('-').reverse(); // [DD, MM, YYYY]
-    const retDD = formatDateISO(returnDate).split('-').reverse();
-    const depCode = `${depDD[0]}${depDD[1]}`;
-    const retCode = `${retDD[0]}${retDD[1]}`;
+    const oIata = (originIATA || 'VIE').toUpperCase();
+    const dIata = (destIATA || 'SKG').toUpperCase();
+    const depISO = formatDateISO(departDate, 0);
+    const depParts = depISO.split('-'); // [YYYY, MM, DD]
+    const depDDMM = `${depParts[2]}${depParts[1]}`;
+    
+    let searchSegment = `${oIata}${depDDMM}${dIata}`;
+    if (returnDate && String(returnDate).trim() && String(returnDate) !== 'null' && String(returnDate) !== 'undefined') {
+      const retISO = formatDateISO(returnDate, 7);
+      const retParts = retISO.split('-');
+      const retDDMM = `${retParts[2]}${retParts[1]}`;
+      searchSegment += `${retDDMM}`;
+    }
+    const pax = Math.max(1, parseInt(adults, 10) || 1);
+    searchSegment += `${pax}`;
+
     const marker = (CONFIG.travelpayouts && CONFIG.travelpayouts.marker) ? CONFIG.travelpayouts.marker : '779382';
-    return `https://www.aviasales.com/search/${originIATA}${depCode}${destIATA}${retCode}${adults}?marker=${encodeURIComponent(marker)}`;
+    return `https://www.aviasales.com/search/${searchSegment}?marker=${encodeURIComponent(marker)}`;
   }
 
   function buildGoogleFlightsUrl(originIATA, destIATA, departDate, returnDate, adults = 2) {
