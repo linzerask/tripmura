@@ -19,17 +19,20 @@
   // Centralized Configuration Fallback (if config.js not yet loaded)
   const CONFIG = (typeof window !== 'undefined' && window.TRIPMURA_CONFIG) ? window.TRIPMURA_CONFIG : {
     travelpayouts: {
-      marker: '575598',
+      token: '178a7f6702fe3171dcbd333a9527840c',
+      marker: '779382',
+      backupMarker: '575598',
       scriptId: 'NTc1NTk4'
     },
     affiliate: {
       enabled: true,
-      bookingAid: '575598',
-      discoverCarsId: '575598',
-      travelpayoutsMarker: '575598',
-      airlineCampaignTag: 'tripmura_575598'
+      marker: '779382',
+      bookingAid: '779382',
+      discoverCarsId: '779382',
+      travelpayoutsMarker: '779382',
+      airlineCampaignTag: 'tripmura_779382'
     },
-    useLiveApi: false
+    useLiveApi: true
   };
 
   // Comprehensive European and Global IATA Database
@@ -454,12 +457,12 @@
   }
 
   function buildBookingUrl(destCity, checkin, checkout, adults = 2, rooms = 1) {
-    const aid = (CONFIG.affiliate && CONFIG.affiliate.bookingAid) ? CONFIG.affiliate.bookingAid : '575598';
+    const aid = (CONFIG.affiliate && CONFIG.affiliate.bookingAid) ? CONFIG.affiliate.bookingAid : '779382';
     return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(destCity)}&checkin=${checkin}&checkout=${checkout}&group_adults=${adults}&no_rooms=${rooms}&order=price&aid=${encodeURIComponent(aid)}`;
   }
 
   function buildBookingHotelPropertyUrl(destCity, hotelName, checkin, checkout, adults = 2, rooms = 1) {
-    const aid = (CONFIG.affiliate && CONFIG.affiliate.bookingAid) ? CONFIG.affiliate.bookingAid : '575598';
+    const aid = (CONFIG.affiliate && CONFIG.affiliate.bookingAid) ? CONFIG.affiliate.bookingAid : '779382';
     const query = hotelName ? `${hotelName}, ${destCity}` : destCity;
     return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(query)}&checkin=${checkin}&checkout=${checkout}&group_adults=${adults}&no_rooms=${rooms}&aid=${encodeURIComponent(aid)}`;
   }
@@ -469,8 +472,8 @@
   }
 
   function buildDiscoverCarsUrl(destCity, checkin, checkout) {
-    const partner = (CONFIG.affiliate && CONFIG.affiliate.discoverCarsId) ? CONFIG.affiliate.discoverCarsId : '575598';
-    const marker = (CONFIG.travelpayouts && CONFIG.travelpayouts.marker) ? CONFIG.travelpayouts.marker : '575598';
+    const partner = (CONFIG.affiliate && CONFIG.affiliate.discoverCarsId) ? CONFIG.affiliate.discoverCarsId : '779382';
+    const marker = (CONFIG.travelpayouts && CONFIG.travelpayouts.marker) ? CONFIG.travelpayouts.marker : '779382';
     return `https://www.discovercars.com/?pickup_location=${encodeURIComponent(destCity)}&pickup_date=${checkin}&dropoff_date=${checkout}&partner=${encodeURIComponent(partner)}&marker=${encodeURIComponent(marker)}`;
   }
 
@@ -482,7 +485,7 @@
     const retDD = formatDateISO(returnDate).split('-').reverse();
     const depCode = `${depDD[0]}${depDD[1]}`;
     const retCode = `${retDD[0]}${retDD[1]}`;
-    const marker = (CONFIG.travelpayouts && CONFIG.travelpayouts.marker) ? CONFIG.travelpayouts.marker : '575598';
+    const marker = (CONFIG.travelpayouts && CONFIG.travelpayouts.marker) ? CONFIG.travelpayouts.marker : '779382';
     return `https://www.aviasales.com/search/${originIATA}${depCode}${destIATA}${retCode}${adults}?marker=${encodeURIComponent(marker)}`;
   }
 

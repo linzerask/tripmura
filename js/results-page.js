@@ -776,7 +776,7 @@ function initResultsPage() {
             <span class="engine-bar-guarantee">Pre-filled • No 404s</span>
           </div>
           <div class="engine-bar-links">
-            <a href="${item.proposalUrl || directUrls.aviasalesProposal}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn aviasales" style="background: #f0f9ff; border-color: #38bdf8; color: #0284c7;" title="Direct Flight Proposal on Aviasales with Marker 575598">
+            <a href="${item.proposalUrl || directUrls.aviasalesProposal}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn aviasales" style="background: #f0f9ff; border-color: #38bdf8; color: #0284c7;" title="Direct Flight Proposal on Aviasales Live Engine">
               <span class="engine-pill-icon">✈️</span>
               <span>Aviasales Live</span>
             </a>
