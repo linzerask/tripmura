@@ -776,6 +776,10 @@ function initResultsPage() {
             <span class="engine-bar-guarantee">Pre-filled • No 404s</span>
           </div>
           <div class="engine-bar-links">
+            <a href="${item.proposalUrl || directUrls.aviasalesProposal}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn aviasales" style="background: #f0f9ff; border-color: #38bdf8; color: #0284c7;" title="Direct Flight Proposal on Aviasales with Marker 575598">
+              <span class="engine-pill-icon">✈️</span>
+              <span>Aviasales Live</span>
+            </a>
             <a href="${directUrls.googleFlights}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn google" title="Search ${flightOriginIATA} to ${destIATA} on Google Flights">
               <span class="engine-pill-icon">⚡</span>
               <span>Google Flights</span>
@@ -1067,6 +1071,9 @@ function initResultsPage() {
           </h4>
           <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 12px;">Compare live search engine rates with 1 click. Zero manual date or route input needed.</p>
           <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <a href="${item.proposalUrl || directUrls.aviasalesProposal}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn aviasales" style="background: #f0f9ff; border-color: #38bdf8; color: #0284c7; padding: 6px 12px; font-size: 0.78rem;">
+              <span>✈️ Aviasales Live Ticket</span>
+            </a>
             <a href="${directUrls.googleFlights}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn google" style="padding: 6px 12px; font-size: 0.78rem;">
               <span>⚡ Google Flights</span>
             </a>
@@ -1113,6 +1120,57 @@ function initResultsPage() {
     }
   });
 
-  // Initial render
+  // --------------------------------------------------------------------------
+  // 7. Live Server-Side Search Engine Fetcher (Travelpayouts / Aviasales Proxy)
+  // --------------------------------------------------------------------------
+  async function fetchLiveProposals() {
+    const config = (typeof window !== 'undefined' && window.TRIPMURA_CONFIG) ? window.TRIPMURA_CONFIG : {};
+    if (config.useLiveApi === false) return;
+
+    try {
+      const apiParams = new URLSearchParams({
+        from: rawFrom,
+        to: rawTo,
+        depart: rawDepart,
+        return: rawReturn,
+        travelers: String(rawTravelers),
+        children: String(rawChildren),
+        rooms: String(rawRooms),
+        cabin: rawCabin,
+        direct: rawDirect ? '1' : '0'
+      });
+
+      if (config.travelpayouts && config.travelpayouts.apiToken) {
+        apiParams.set('token', config.travelpayouts.apiToken);
+      }
+      if (config.travelpayouts && config.travelpayouts.marker) {
+        apiParams.set('marker', config.travelpayouts.marker);
+      }
+
+      const endpoint = config.apiEndpoint || 'api/search.php';
+      const res = await fetch(`${endpoint}?${apiParams.toString()}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      if (data && data.status === 'success' && Array.isArray(data.proposals) && data.proposals.length > 0) {
+        allItineraries = data.proposals;
+        applyFiltersAndSort();
+
+        const liveBadge = document.getElementById('resultsBadgeLive');
+        const liveBadgeText = document.getElementById('resultsBadgeLiveText');
+        if (liveBadge && liveBadgeText) {
+          liveBadgeText.textContent = data.source === 'travelpayouts_live_api'
+            ? '🟢 Live Travelpayouts / Aviasales Rates Synced'
+            : '⚡ Live Direct Carrier Routing Engine';
+        }
+      }
+    } catch (err) {
+      // Gracefully silent on static hosting / local preview without PHP server
+      console.info('[TripMura] Operating on Smart Schedule Engine:', err.message);
+    }
+  }
+
+  // Initial render & live sync
   applyFiltersAndSort();
+  fetchLiveProposals();
 }

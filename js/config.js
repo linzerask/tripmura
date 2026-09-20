@@ -1,15 +1,17 @@
 /**
  * TripMura — Centralized System & Affiliate Configuration
  * Travelpayouts Partner Marker: 575598
- * Script ID: NTc1NTk4
+ * Booking.com AID: 575598
+ * DiscoverCars ID: 575598
  */
 
 const TRIPMURA_CONFIG = {
-  // Travelpayouts Drive Monetization & Performance Marker
+  // Travelpayouts / Aviasales Flight Search & Performance Marker
   travelpayouts: {
     marker: '575598',
     scriptId: 'NTc1NTk4',
-    scriptUrl: 'https://tp-em.com/NTc1NTk4.js?t=575598'
+    apiToken: '', // Optional Travelpayouts Data API token
+    flightSearchApiUrl: 'https://api.travelpayouts.com/aviasales/v3/prices_for_dates'
   },
 
   // Centralized Affiliate Monetization
@@ -21,8 +23,8 @@ const TRIPMURA_CONFIG = {
     airlineCampaignTag: 'tripmura_575598'
   },
 
-  // API Backend Architecture (Toggle to true for live Namecheap cPanel PHP proxy)
-  useLiveApi: false,
+  // API Backend Architecture (Automatically attempts server query, falls back to smart client engine)
+  useLiveApi: true,
   apiEndpoint: 'api/search.php'
 };
 

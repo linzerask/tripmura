@@ -56,6 +56,10 @@ function initResultsEngine() {
     const originIATA = typeof TripMuraIATA !== 'undefined' ? TripMuraIATA.resolveIATA(origin, 'LNZ') : 'LNZ';
     const destIATA = typeof TripMuraIATA !== 'undefined' ? TripMuraIATA.resolveIATA(dest, 'SKG') : 'SKG';
 
+    const depDD = checkin.split('-').reverse();
+    const retDD = checkout.split('-').reverse();
+    const aviasalesCode = `${originIATA}${depDD[0]}${depDD[1]}${destIATA}${retDD[0]}${retDD[1]}${adults}`;
+
     return {
       austrian: `https://www.austrian.com/at/de/book-and-manage/flights?origin=${originIATA}&destination=${destIATA}&departDate=${checkin}&returnDate=${checkout}&adults=${adults}&utm_source=tripmura&utm_campaign=tripmura_575598`,
       lufthansa: `https://www.lufthansa.com/at/de/flugsuche?origin=${originIATA}&destination=${destIATA}&outboundDate=${checkin}&inboundDate=${checkout}&adults=${adults}&utm_source=tripmura&utm_campaign=tripmura_575598`,
@@ -67,6 +71,7 @@ function initResultsEngine() {
       booking: `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(destCity)}&checkin=${checkin}&checkout=${checkout}&group_adults=${adults}&order=price&aid=575598`,
       airbnb: `https://www.airbnb.com/s/${encodeURIComponent(destCity)}/homes?checkin=${checkin}&checkout=${checkout}&adults=${adults}&sort_price=asc`,
       discoverCars: `https://www.discovercars.com/?pickup_location=${encodeURIComponent(destCity)}&pickup_date=${checkin}&dropoff_date=${checkout}&partner=575598&marker=575598`,
+      aviasales: `https://www.aviasales.com/search/${aviasalesCode}?marker=575598`,
       googleFlights: `https://www.google.com/travel/flights?q=Flights%20from%20${originIATA}%20to%20${destIATA}%20on%20${checkin}%20through%20${checkout}&curr=EUR`,
       skyscanner: `https://www.skyscanner.net/transport/flights/${originIATA.toLowerCase()}/${destIATA.toLowerCase()}/${checkin.replace(/-/g,'').slice(2)}/${checkout.replace(/-/g,'').slice(2)}/?adultsv2=${adults}&ref=home`,
       kayak: `https://www.kayak.com/flights/${originIATA}-${destIATA}/${checkin}/${checkout}?sort=price_a`

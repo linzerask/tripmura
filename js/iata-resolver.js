@@ -458,6 +458,12 @@
     return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(destCity)}&checkin=${checkin}&checkout=${checkout}&group_adults=${adults}&no_rooms=${rooms}&order=price&aid=${encodeURIComponent(aid)}`;
   }
 
+  function buildBookingHotelPropertyUrl(destCity, hotelName, checkin, checkout, adults = 2, rooms = 1) {
+    const aid = (CONFIG.affiliate && CONFIG.affiliate.bookingAid) ? CONFIG.affiliate.bookingAid : '575598';
+    const query = hotelName ? `${hotelName}, ${destCity}` : destCity;
+    return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(query)}&checkin=${checkin}&checkout=${checkout}&group_adults=${adults}&no_rooms=${rooms}&aid=${encodeURIComponent(aid)}`;
+  }
+
   function buildAirbnbUrl(destCity, checkin, checkout, adults = 2) {
     return `https://www.airbnb.com/s/${encodeURIComponent(destCity)}/homes?checkin=${checkin}&checkout=${checkout}&adults=${adults}&sort_price=asc`;
   }
@@ -469,8 +475,17 @@
   }
 
   // --------------------------------------------------------------------------
-  // Multi-Aggregator 1-Click Comparison Deep-Link Builders
+  // Multi-Aggregator & Aviasales Direct Proposal Deep-Link Builders
   // --------------------------------------------------------------------------
+  function buildAviasalesProposalUrl(originIATA, destIATA, departDate, returnDate, adults = 2) {
+    const depDD = formatDateISO(departDate).split('-').reverse(); // [DD, MM, YYYY]
+    const retDD = formatDateISO(returnDate).split('-').reverse();
+    const depCode = `${depDD[0]}${depDD[1]}`;
+    const retCode = `${retDD[0]}${retDD[1]}`;
+    const marker = (CONFIG.travelpayouts && CONFIG.travelpayouts.marker) ? CONFIG.travelpayouts.marker : '575598';
+    return `https://www.aviasales.com/search/${originIATA}${depCode}${destIATA}${retCode}${adults}?marker=${encodeURIComponent(marker)}`;
+  }
+
   function buildGoogleFlightsUrl(originIATA, destIATA, departDate, returnDate, adults = 2) {
     return `https://www.google.com/travel/flights?q=Flights%20from%20${originIATA}%20to%20${destIATA}%20on%20${departDate}%20through%20${returnDate}&curr=EUR`;
   }
@@ -544,12 +559,14 @@
 
       // 🏨 Direct Stays & Accommodations (Lowest Price Room Filter)
       booking: buildBookingUrl(destCity, departDate, returnDate, adults, rooms),
+      bookingHotelProperty: (hotelName) => buildBookingHotelPropertyUrl(destCity, hotelName, departDate, returnDate, adults, rooms),
       airbnb: buildAirbnbUrl(destCity, departDate, returnDate, adults),
 
       // 🚗 Direct Car Rental
       discoverCars: buildDiscoverCarsUrl(destCity, departDate, returnDate),
 
       // ⚡ 1-Click Multi-Engine Comparison Bar URLs
+      aviasalesProposal: buildAviasalesProposalUrl(flightOriginIATA, destIATA, departDate, returnDate, adults),
       googleFlights: buildGoogleFlightsUrl(flightOriginIATA, destIATA, departDate, returnDate, adults),
       skyscanner: buildSkyscannerUrl(flightOriginIATA, destIATA, departDate, returnDate, adults, cabin),
       kayak: buildKayakUrl(flightOriginIATA, destIATA, departDate, returnDate, adults)
@@ -577,8 +594,10 @@
     buildTrenitaliaUrl,
     buildEurostarUrl,
     buildBookingUrl,
+    buildBookingHotelPropertyUrl,
     buildAirbnbUrl,
     buildDiscoverCarsUrl,
+    buildAviasalesProposalUrl,
     buildGoogleFlightsUrl,
     buildSkyscannerUrl,
     buildKayakUrl,
