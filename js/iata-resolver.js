@@ -456,15 +456,80 @@
     return `https://www.eurostar.com/search?origin=${originIATA}&destination=${destIATA}&outboundDate=${departDate}&returnDate=${returnDate || ''}&adults=${adults}`;
   }
 
+  /**
+   * Geographic Country & Region Detection
+   */
+  function detectGeoRegion(iata, city) {
+    const code = (iata || '').toUpperCase();
+    const c = (city || '').toLowerCase();
+
+    // Austria
+    if (['VIE', 'LNZ', 'SZG', 'GRZ', 'INN', 'KLU'].includes(code) || c.includes('austria') || ['vienna', 'wien', 'linz', 'salzburg', 'graz', 'innsbruck', 'klagenfurt'].includes(c)) {
+      return 'AT';
+    }
+    // Germany
+    if (['MUC', 'FRA', 'BER', 'HAM', 'DUS', 'CGN', 'STR', 'NUE', 'HAJ', 'LEJ'].includes(code) || c.includes('germany') || ['munich', 'muenchen', 'frankfurt', 'berlin', 'hamburg', 'dusseldorf', 'cologne', 'stuttgart', 'nuremberg', 'hannover', 'leipzig'].includes(c)) {
+      return 'DE';
+    }
+    // United Kingdom & Ireland
+    if (['LON', 'LHR', 'LGW', 'STN', 'LTN', 'LCY', 'MAN', 'BHX', 'EDI', 'GLA', 'BRS', 'DUB'].includes(code) || c.includes('uk') || c.includes('united kingdom') || ['london', 'manchester', 'birmingham', 'edinburgh', 'glasgow', 'dublin'].includes(c)) {
+      return 'GB';
+    }
+    // France
+    if (['CDG', 'ORY', 'NCE', 'MRS', 'LYS', 'BOD', 'TLS', 'NTE'].includes(code) || c.includes('france') || ['paris', 'nice', 'marseille', 'lyon', 'bordeaux', 'toulouse', 'nantes', 'cannes', 'st tropez'].includes(c)) {
+      return 'FR';
+    }
+    // Italy
+    if (['FCO', 'CIA', 'MXP', 'LIN', 'BGY', 'NAP', 'VCE', 'FLR', 'BLQ', 'CTA', 'PMO', 'BRI', 'TRN'].includes(code) || c.includes('italy') || ['rome', 'roma', 'milan', 'milano', 'naples', 'napoli', 'venice', 'venezia', 'florence', 'firenze', 'bologna', 'palermo', 'catania', 'bari', 'amalfi', 'positano', 'capri', 'sorrento'].includes(c)) {
+      return 'IT';
+    }
+    // Spain & Portugal
+    if (['MAD', 'BCN', 'AGP', 'VLC', 'SVQ', 'BIO', 'PMI', 'IBZ', 'ALC', 'LIS', 'OPO', 'FAO'].includes(code) || c.includes('spain') || ['madrid', 'barcelona', 'malaga', 'valencia', 'seville', 'palma', 'ibiza', 'alicante', 'bilbao', 'lisbon', 'porto'].includes(c)) {
+      return 'ES';
+    }
+    // Switzerland
+    if (['ZRH', 'GVA', 'BSL', 'BRN'].includes(code) || c.includes('switzerland') || ['zurich', 'geneva', 'basel', 'bern'].includes(c)) {
+      return 'CH';
+    }
+    return 'EU';
+  }
+
+  function buildTrainlineUrl(originCity, destCity, departDate) {
+    return `https://www.thetrainline.com/book/results?origin=${encodeURIComponent(originCity)}&destination=${encodeURIComponent(destCity)}&outwardDate=${departDate}`;
+  }
+
+  function buildSncfUrl(originCity, destCity, departDate) {
+    return `https://www.sncf-connect.com`;
+  }
+
+  function buildRenfeUrl(originCity, destCity, departDate) {
+    return `https://www.renfe.com`;
+  }
+
+  function buildSbbUrl(originCity, destCity, departDate) {
+    return `https://www.sbb.ch`;
+  }
+
+  function buildOmioUrl(originIATA, destIATA, departDate, adults = 2) {
+    return `https://www.omio.com/search-frontend/results/${originIATA}/${destIATA}/${departDate}?adults=${adults}`;
+  }
+
+  function buildHotellookUrl(destCity, checkin, checkout, adults = 2) {
+    const marker = (CONFIG.travelpayouts && CONFIG.travelpayouts.marker) ? CONFIG.travelpayouts.marker : '779382';
+    return `https://search.hotellook.com/?destination=${encodeURIComponent(destCity)}&checkIn=${checkin}&checkOut=${checkout}&adults=${adults}&marker=${encodeURIComponent(marker)}`;
+  }
+
   function buildBookingUrl(destCity, checkin, checkout, adults = 2, rooms = 1) {
     const aid = (CONFIG.affiliate && CONFIG.affiliate.bookingAid) ? CONFIG.affiliate.bookingAid : '779382';
-    return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(destCity)}&checkin=${checkin}&checkout=${checkout}&group_adults=${adults}&no_rooms=${rooms}&order=price&aid=${encodeURIComponent(aid)}`;
+    const marker = (CONFIG.travelpayouts && CONFIG.travelpayouts.marker) ? CONFIG.travelpayouts.marker : '779382';
+    return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(destCity)}&checkin=${checkin}&checkout=${checkout}&group_adults=${adults}&no_rooms=${rooms}&order=price&aid=${encodeURIComponent(aid)}&label=tp${encodeURIComponent(marker)}`;
   }
 
   function buildBookingHotelPropertyUrl(destCity, hotelName, checkin, checkout, adults = 2, rooms = 1) {
     const aid = (CONFIG.affiliate && CONFIG.affiliate.bookingAid) ? CONFIG.affiliate.bookingAid : '779382';
+    const marker = (CONFIG.travelpayouts && CONFIG.travelpayouts.marker) ? CONFIG.travelpayouts.marker : '779382';
     const query = hotelName ? `${hotelName}, ${destCity}` : destCity;
-    return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(query)}&checkin=${checkin}&checkout=${checkout}&group_adults=${adults}&no_rooms=${rooms}&aid=${encodeURIComponent(aid)}`;
+    return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(query)}&checkin=${checkin}&checkout=${checkout}&group_adults=${adults}&no_rooms=${rooms}&order=price&aid=${encodeURIComponent(aid)}&label=tp${encodeURIComponent(marker)}`;
   }
 
   function buildAirbnbUrl(destCity, checkin, checkout, adults = 2) {
@@ -530,11 +595,93 @@
     const flightOriginIATA = hubRoute.needsHubTransfer ? hubRoute.hubIATA : originIATA;
     const flightOriginCity = hubRoute.needsHubTransfer ? hubRoute.hubCity : originCity;
 
+    // Geographic Country & Rail Operator
+    const originRegion = detectGeoRegion(originIATA, originCity);
+    const trainlineUrl = buildTrainlineUrl(originCity, destCity, departDate);
+    const dbUrl = buildDbUrl(originCity, destCity, departDate);
+    const oebbUrl = buildOebbUrl(originCity, hubRoute.needsHubTransfer ? hubRoute.transitLinkDestination : destCity, departDate);
+    const trenitaliaUrl = `https://www.trenitalia.com/en.html?origin=${encodeURIComponent(originCity)}&destination=${encodeURIComponent(destCity)}&date=${departDate}`;
+    const eurostarUrl = buildEurostarUrl(originIATA, destIATA, departDate, returnDate, adults);
+    const sncfUrl = buildSncfUrl(originCity, destCity, departDate);
+    const renfeUrl = buildRenfeUrl(originCity, destCity, departDate);
+    const sbbUrl = buildSbbUrl(originCity, destCity, departDate);
+
+    const geoRailConfig = {
+      'AT': {
+        operator: 'ÖBB Ticket Shop',
+        url: oebbUrl,
+        label: 'Book on ÖBB Ticket Shop ↗',
+        transitName: 'ÖBB Railjet Airport Direct',
+        scenicCarrier: 'ÖBB Railjet & EuroCity',
+        ecoCarrier: 'ÖBB / SBB Green Railjet'
+      },
+      'GB': {
+        operator: 'Trainline / Eurostar',
+        url: trainlineUrl,
+        label: 'Book on Trainline ↗',
+        transitName: 'Heathrow Express / Elizabeth Line',
+        scenicCarrier: 'LNER & Avanti West Coast',
+        ecoCarrier: 'Eurostar & High Speed 1 Electric Rail'
+      },
+      'DE': {
+        operator: 'Deutsche Bahn (DB)',
+        url: dbUrl,
+        label: 'Book on Deutsche Bahn (DB) ↗',
+        transitName: 'Deutsche Bahn ICE Airport Express',
+        scenicCarrier: 'Deutsche Bahn ICE & EuroCity',
+        ecoCarrier: 'Deutsche Bahn 100% Green ICE'
+      },
+      'IT': {
+        operator: 'Trenitalia (Frecciarossa)',
+        url: trenitaliaUrl,
+        label: 'Book on Trenitalia ↗',
+        transitName: 'Leonardo Express / Malpensa Express',
+        scenicCarrier: 'Trenitalia Frecciarossa High-Speed',
+        ecoCarrier: 'Frecciarossa Electric High-Speed'
+      },
+      'FR': {
+        operator: 'SNCF Connect (TGV InOui)',
+        url: trainlineUrl,
+        label: 'Book on SNCF / Trainline ↗',
+        transitName: 'RER B Airport Express / TGV',
+        scenicCarrier: 'SNCF TGV InOui & Eurostar',
+        ecoCarrier: 'SNCF TGV 100% Electric High-Speed'
+      },
+      'ES': {
+        operator: 'Renfe (AVE)',
+        url: trainlineUrl,
+        label: 'Book on Renfe / Trainline ↗',
+        transitName: 'Renfe Cercanías / Aerobús Direct',
+        scenicCarrier: 'Renfe AVE High-Speed',
+        ecoCarrier: 'Renfe AVE Solar Electric Rail'
+      },
+      'CH': {
+        operator: 'SBB Swiss Railways',
+        url: sbbUrl,
+        label: 'Book on SBB Swiss Railways ↗',
+        transitName: 'SBB Swiss Airport Express',
+        scenicCarrier: 'SBB Panorama & Glacier Express',
+        ecoCarrier: 'SBB 100% Hydroelectric Rail'
+      },
+      'EU': {
+        operator: 'Trainline / Omio',
+        url: trainlineUrl,
+        label: 'Book on Trainline ↗',
+        transitName: 'Airport Express Shuttle',
+        scenicCarrier: 'EuroCity & Scenic Rail',
+        ecoCarrier: 'European Electric InterCity Rail'
+      }
+    };
+
+    const activeRail = geoRailConfig[originRegion] || geoRailConfig['EU'];
+
     return {
       originCity,
       destCity,
       originIATA,
       destIATA,
+      originRegion,
+      activeRail,
       departDate,
       returnDate,
       adults,
@@ -555,14 +702,19 @@
       airFrance: buildAirFranceUrl(flightOriginIATA, destIATA, departDate, returnDate, adults),
 
       // 🚆 Direct Rail Ticket Shops
-      oebb: buildOebbUrl(originCity, hubRoute.needsHubTransfer ? hubRoute.transitLinkDestination : destCity, departDate),
-      db: buildDbUrl(originCity, destCity, departDate),
-      trenitalia: buildTrenitaliaUrl(originCity, destCity, departDate),
-      eurostar: buildEurostarUrl(originIATA, destIATA, departDate, returnDate, adults),
+      oebb: oebbUrl,
+      db: dbUrl,
+      trenitalia: trenitaliaUrl,
+      eurostar: eurostarUrl,
+      trainline: trainlineUrl,
+      sncf: sncfUrl,
+      renfe: renfeUrl,
+      sbb: sbbUrl,
 
       // 🏨 Direct Stays & Accommodations (Lowest Price Room Filter)
       booking: buildBookingUrl(destCity, departDate, returnDate, adults, rooms),
       bookingHotelProperty: (hotelName) => buildBookingHotelPropertyUrl(destCity, hotelName, departDate, returnDate, adults, rooms),
+      hotellook: buildHotellookUrl(destCity, departDate, returnDate, adults),
       airbnb: buildAirbnbUrl(destCity, departDate, returnDate, adults),
 
       // 🚗 Direct Car Rental
@@ -583,6 +735,7 @@
     getCleanCityName,
     formatDateYYMMDD,
     formatDateISO,
+    detectGeoRegion,
     resolveSmartHubRoute,
     buildAustrianAirlinesUrl,
     buildRyanairUrl,
@@ -596,6 +749,12 @@
     buildDbUrl,
     buildTrenitaliaUrl,
     buildEurostarUrl,
+    buildTrainlineUrl,
+    buildSncfUrl,
+    buildRenfeUrl,
+    buildSbbUrl,
+    buildOmioUrl,
+    buildHotellookUrl,
     buildBookingUrl,
     buildBookingHotelPropertyUrl,
     buildAirbnbUrl,

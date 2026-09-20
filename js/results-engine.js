@@ -86,9 +86,35 @@ function initResultsEngine() {
     const links = buildDeepLinks(params);
     const { originCity, destCity, datesText, adults } = params;
 
-    const isAustriaOrigin = params.origin && (params.origin.includes('Linz') || params.origin.includes('LNZ') || params.origin.includes('Vienna') || params.origin.includes('VIE'));
-    const carrierName = isAustriaOrigin ? 'Austrian Airlines' : 'Lufthansa';
-    const carrierUrl = isAustriaOrigin ? (links.austrian || links.lufthansa) : links.lufthansa;
+    const originRegion = links.originRegion || 'AT';
+    const activeRail = links.activeRail || {
+      operator: 'ÖBB Ticket Shop',
+      url: links.oebb,
+      label: 'Book on ÖBB Ticket Shop ↗',
+      transitName: 'ÖBB Railjet Airport Direct',
+      scenicCarrier: 'ÖBB Railjet & EuroCity',
+      ecoCarrier: 'ÖBB / SBB Green Railjet'
+    };
+
+    let carrierName = 'Austrian Airlines';
+    let carrierUrl = links.austrian;
+    if (originRegion === 'GB') {
+      carrierName = 'British Airways';
+      carrierUrl = links.britishAirways || links.easyjet || links.aviasalesProposal;
+    } else if (originRegion === 'DE') {
+      carrierName = 'Lufthansa';
+      carrierUrl = links.lufthansa || links.aviasalesProposal;
+    } else if (originRegion === 'FR') {
+      carrierName = 'Air France';
+      carrierUrl = links.airFrance || links.aviasalesProposal;
+    } else if (originRegion === 'CH') {
+      carrierName = 'Swiss International';
+      carrierUrl = links.swiss || links.aviasalesProposal;
+    } else if (originRegion === 'IT') {
+      carrierName = 'ITA Airways';
+      carrierUrl = links.ryanair || links.aviasalesProposal;
+    }
+    const flightBookingUrl = links.aviasalesProposal || carrierUrl;
 
     return [
       {
@@ -101,29 +127,29 @@ function initResultsEngine() {
         totalPrice: 485,
         highlighted: true,
         primaryCtaLabel: `✈️ Book Lowest Rate on ${carrierName} ➔`,
-        primaryCtaUrl: carrierUrl,
+        primaryCtaUrl: flightBookingUrl,
         legs: [
           {
             icon: '🚆',
-            type: 'ÖBB Railjet Airport Express',
-            details: `${originCity} Hbf → Vienna Airport (VIE) • 1h 40m Direct`,
+            type: activeRail.transitName || 'Airport Express Rail',
+            details: `${originCity} → Main Hub Station • Express Direct`,
             price: '€24 / traveler',
             priceVal: 24,
-            providerTag: 'ÖBB Ticket Shop',
+            providerTag: activeRail.operator,
             actions: [
-              { label: 'Book on ÖBB Ticket Shop ↗', url: links.oebb, featured: true }
+              { label: activeRail.label, url: activeRail.url, featured: true }
             ]
           },
           {
             icon: '✈️',
             type: `Direct Flight on ${carrierName}`,
-            details: `Vienna (VIE) → ${destCity} • Non-Stop Scheduled Jet`,
+            details: `${links.flightOriginCity || originCity} (${links.flightOriginIATA || 'VIE'}) → ${destCity} • Non-Stop Scheduled Jet`,
             price: '€145 / traveler',
             priceVal: 145,
             providerTag: `${carrierName} Direct`,
             actions: [
               { label: `Book Direct on ${carrierName} ↗`, url: carrierUrl, featured: true },
-              { label: 'Book Direct on Lufthansa ↗', url: links.lufthansa }
+              { label: 'Aviasales Proposal Link ↗', url: links.aviasalesProposal }
             ]
           },
           {
@@ -135,7 +161,7 @@ function initResultsEngine() {
             providerTag: 'Booking.com Direct',
             actions: [
               { label: 'Reserve Room on Booking.com ↗', url: links.booking, featured: true },
-              { label: 'Compare on Airbnb ↗', url: links.airbnb }
+              { label: 'Compare on Hotellook ↗', url: links.hotellook || links.booking }
             ]
           }
         ]
@@ -143,25 +169,25 @@ function initResultsEngine() {
       {
         id: 'pkg-scenic-train',
         title: 'Scenic EuroRail & Coastal Ferry',
-        desc: `Relaxed 100% ground and sea journey via Austrian Railjet network and high-speed coastal ferry. Zero flight emissions.`,
+        desc: `Relaxed 100% ground and sea journey via ${activeRail.operator} network and high-speed coastal ferry. Zero flight emissions.`,
         badge: '🚆 100% Scenic Ground',
         badgeClass: 'scenic',
         duration: '⏱️ 8h 30m Door-to-Door',
         totalPrice: 420,
         highlighted: false,
-        primaryCtaLabel: '🚆 Book on ÖBB Ticket Shop ➔',
-        primaryCtaUrl: links.oebb,
+        primaryCtaLabel: `🚆 ${activeRail.label.replace('↗', '➔')}`,
+        primaryCtaUrl: activeRail.url,
         legs: [
           {
             icon: '🚆',
-            type: 'High-Speed Railjet & EuroCity',
+            type: activeRail.scenicCarrier || 'High-Speed Express & EuroCity',
             details: `${originCity} → Coast Junction • Scenic Panoramic Car`,
             price: '€95 / traveler',
             priceVal: 95,
-            providerTag: 'ÖBB Ticket Shop',
+            providerTag: activeRail.operator,
             actions: [
-              { label: 'Book on ÖBB Ticket Shop ↗', url: links.oebb, featured: true },
-              { label: 'Book on Deutsche Bahn (DB) ↗', url: links.db }
+              { label: activeRail.label, url: activeRail.url, featured: true },
+              { label: 'Book on Trainline / Omio ↗', url: links.trainline }
             ]
           },
           {
@@ -172,7 +198,7 @@ function initResultsEngine() {
             priceVal: 25,
             providerTag: 'Official Port Link',
             actions: [
-              { label: 'Book on Trenitalia ↗', url: links.trenitalia, featured: true }
+              { label: `Book on ${activeRail.operator} ↗`, url: activeRail.url, featured: true }
             ]
           },
           {
@@ -181,10 +207,10 @@ function initResultsEngine() {
             details: `7 Nights (${datesText}) • Panoramic Balcony`,
             price: '€300 total',
             priceVal: 300,
-            providerTag: 'Airbnb Superhost',
+            providerTag: 'Booking.com & Hotellook',
             actions: [
-              { label: 'Reserve Villa on Airbnb ↗', url: links.airbnb, featured: true },
-              { label: 'Compare on Booking.com ↗', url: links.booking }
+              { label: 'Reserve Room on Booking.com ↗', url: links.booking, featured: true },
+              { label: 'Compare on Hotellook ↗', url: links.hotellook || links.booking }
             ]
           }
         ]
@@ -199,7 +225,7 @@ function initResultsEngine() {
         totalPrice: 330,
         highlighted: false,
         primaryCtaLabel: '✈️ Book Lowest Rate on Ryanair ➔',
-        primaryCtaUrl: links.ryanair,
+        primaryCtaUrl: links.aviasalesProposal || links.ryanair,
         legs: [
           {
             icon: '✈️',
@@ -209,18 +235,19 @@ function initResultsEngine() {
             priceVal: 58,
             providerTag: 'Ryanair Direct',
             actions: [
-              { label: 'Book Direct on Ryanair ↗', url: links.ryanair, featured: true }
+              { label: 'Book Direct on Ryanair ↗', url: links.ryanair, featured: true },
+              { label: 'Aviasales Proposal Link ↗', url: links.aviasalesProposal }
             ]
           },
           {
             icon: '🚆',
-            type: 'Direct Metro Line',
+            type: 'Direct Airport Transit',
             details: `Airport Station → ${destCity} Old Town • 25m`,
             price: '€6 / traveler',
             priceVal: 6,
             providerTag: 'Official Transit',
             actions: [
-              { label: 'Book on ÖBB Ticket Shop ↗', url: links.oebb, featured: true }
+              { label: activeRail.label, url: activeRail.url, featured: true }
             ]
           },
           {
@@ -229,10 +256,10 @@ function initResultsEngine() {
             details: `7 Nights (${datesText}) • Fast WiFi, AC`,
             price: '€266 total',
             priceVal: 266,
-            providerTag: 'Airbnb Superhost',
+            providerTag: 'Booking.com & Hotellook',
             actions: [
-              { label: 'Reserve Villa on Airbnb ↗', url: links.airbnb, featured: true },
-              { label: 'Compare on Booking.com ↗', url: links.booking }
+              { label: 'Reserve on Booking.com ↗', url: links.booking, featured: true },
+              { label: 'Compare on Hotellook ↗', url: links.hotellook || links.booking }
             ]
           }
         ]
@@ -293,6 +320,9 @@ function initResultsEngine() {
               <span class="engine-bar-label">⚡ Compare Live Fares:</span>
             </div>
             <div class="engine-bar-links">
+              <a href="${links.aviasalesProposal}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn aviasales" style="background: #f0f9ff; border-color: #38bdf8; color: #0284c7;">
+                <span>✈️ Aviasales Live</span>
+              </a>
               <a href="${links.googleFlights}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn google">
                 <span>⚡ Google Flights</span>
               </a>
@@ -304,6 +334,9 @@ function initResultsEngine() {
               </a>
               <a href="${links.booking}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn booking">
                 <span>🏨 Booking.com</span>
+              </a>
+              <a href="${links.hotellook || links.booking}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn hotellook">
+                <span>🔍 Hotellook</span>
               </a>
               <a href="${links.airbnb}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn airbnb">
                 <span>🏡 Airbnb</span>
@@ -396,6 +429,9 @@ function initResultsEngine() {
             <span>⚡ Verify Fares on Major Search Engines</span>
           </h4>
           <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <a href="${links.aviasalesProposal}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn aviasales" style="background: #f0f9ff; border-color: #38bdf8; color: #0284c7;">
+              <span>✈️ Aviasales Live</span>
+            </a>
             <a href="${links.googleFlights}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn google">
               <span>⚡ Google Flights</span>
             </a>
@@ -407,6 +443,9 @@ function initResultsEngine() {
             </a>
             <a href="${links.booking}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn booking">
               <span>🏨 Booking.com</span>
+            </a>
+            <a href="${links.hotellook || links.booking}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn hotellook">
+              <span>🔍 Hotellook</span>
             </a>
             <a href="${links.airbnb}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn airbnb">
               <span>🏡 Airbnb</span>

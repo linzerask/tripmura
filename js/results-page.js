@@ -126,19 +126,26 @@ function initResultsPage() {
   }
 
   // --------------------------------------------------------------------------
-  // 1. Dynamic Multimodal Itinerary Generator (10 Realistic Packages with Hubs)
+  // 1. Dynamic Multimodal Itinerary Generator (Realistic Packages with Geo Routing)
   // --------------------------------------------------------------------------
   function generateItineraries() {
-    const isAustriaOrigin = originIATA === 'LNZ' || originIATA === 'VIE' || originIATA === 'SZG' || originIATA === 'GRZ' || originIATA === 'KLU';
-    const isUKOrigin = originIATA === 'LON' || originIATA === 'LHR' || originIATA === 'STN';
-    const isGermanyOrigin = originIATA === 'MUC' || originIATA === 'FRA' || originIATA === 'BER' || originIATA === 'NUE' || originIATA === 'STR';
+    const originRegion = directUrls.originRegion || 'EU';
+    const activeRail = directUrls.activeRail || {
+      operator: 'Trainline / Eurostar',
+      url: directUrls.trainline,
+      label: 'Book on Trainline ↗',
+      transitName: 'Airport Express Shuttle',
+      scenicCarrier: 'EuroCity & Scenic Rail',
+      ecoCarrier: 'European Electric InterCity Rail'
+    };
 
     // Primary operating carrier determination
-    const primaryAirlineName = isAustriaOrigin ? 'Austrian Airlines' : (isUKOrigin ? 'British Airways' : (isGermanyOrigin ? 'Lufthansa' : 'Austrian Airlines'));
-    const primaryAirlineUrl = isAustriaOrigin ? directUrls.austrian : (isUKOrigin ? directUrls.britishAirways : directUrls.lufthansa);
+    const primaryAirlineName = originRegion === 'AT' ? 'Austrian Airlines' : (originRegion === 'GB' ? 'British Airways' : (originRegion === 'FR' ? 'Air France' : (originRegion === 'IT' ? 'ITA Airways' : (originRegion === 'ES' ? 'Iberia' : (originRegion === 'CH' ? 'SWISS' : 'Lufthansa')))));
+    const primaryAirlineCode = originRegion === 'AT' ? 'OS' : (originRegion === 'GB' ? 'BA' : (originRegion === 'FR' ? 'AF' : (originRegion === 'IT' ? 'AZ' : (originRegion === 'ES' ? 'IB' : (originRegion === 'CH' ? 'LX' : 'LH')))));
+    const primaryAirlineUrl = originRegion === 'AT' ? directUrls.austrian : (originRegion === 'GB' ? directUrls.britishAirways : (originRegion === 'FR' ? directUrls.airFrance : (originRegion === 'CH' ? directUrls.swiss : directUrls.lufthansa)));
 
     return [
-      // 1. Top Pick: Austrian / Lufthansa Hub Connection + Boutique Stay
+      // 1. Top Pick: Scheduled Flight & Curated Boutique Stay
       {
         id: 'pkg-1',
         title: hubRoute.needsHubTransfer
@@ -154,38 +161,39 @@ function initResultsPage() {
         durationMinutes: hubRoute.needsHubTransfer ? 255 : 175,
         co2kg: hubRoute.needsHubTransfer ? 46 : 52,
         stops: hubRoute.needsHubTransfer ? 1 : 0,
-        provider: isAustriaOrigin ? 'austrian' : 'lufthansa',
+        provider: originRegion === 'AT' ? 'austrian' : 'lufthansa',
         primaryCtaLabel: `✈️ Book Lowest Rate on ${primaryAirlineName} ➔`,
-        primaryCtaUrl: primaryAirlineUrl,
+        primaryCtaUrl: directUrls.aviasalesProposal,
+        proposalUrl: directUrls.aviasalesProposal,
         stayScore: 9.2,
         totalPrice: 485,
         highlight: true,
         legs: hubRoute.needsHubTransfer ? [
           {
             carrier: hubRoute.transitType,
-            carrierCode: 'ÖBB',
+            carrierCode: 'RAIL',
             icon: '🚆',
             type: 'Direct Airport Rail Link',
             providerTag: hubRoute.transitOperator,
-            times: `07:15 → 08:55 • Non-Stop Railjet`,
+            times: `07:15 → 08:55 • Non-Stop Rail Link`,
             routeSub: `${originCity} Hbf → ${hubRoute.hubAirportName}`,
             estCost: '€24 / traveler',
             actions: [
-              { label: 'Book on ÖBB Ticket Shop ↗', url: directUrls.oebb, featured: true }
+              { label: activeRail.label, url: activeRail.url, featured: true }
             ]
           },
           {
             carrier: `${primaryAirlineName} Non-Stop`,
-            carrierCode: isAustriaOrigin ? 'OS' : 'LH',
+            carrierCode: primaryAirlineCode,
             icon: '✈️',
             type: 'Direct Scheduled Flight',
             providerTag: `${primaryAirlineName} Direct`,
-            times: `10:25 → 13:10 • Flight ${isAustriaOrigin ? 'OS 811' : 'LH 1750'}`,
+            times: `10:25 → 13:10 • Flight ${primaryAirlineCode} 811`,
             routeSub: `${flightOriginCity} (${flightOriginIATA}) → ${destCity} (${destIATA})`,
             estCost: '€145 / traveler',
             actions: [
-              { label: `Book Direct on ${primaryAirlineName} ↗`, url: primaryAirlineUrl, featured: true },
-              { label: 'Book Direct on Lufthansa ↗', url: directUrls.lufthansa }
+              { label: 'Aviasales Proposal Link ↗', url: directUrls.aviasalesProposal, featured: true },
+              { label: `Book Direct on ${primaryAirlineName} ↗`, url: primaryAirlineUrl }
             ]
           },
           {
@@ -199,22 +207,22 @@ function initResultsPage() {
             estCost: '€316 total',
             actions: [
               { label: 'Reserve Room on Booking.com ↗', url: directUrls.booking, featured: true },
-              { label: 'Compare on Airbnb ↗', url: directUrls.airbnb }
+              { label: 'Compare on Hotellook ↗', url: directUrls.hotellook }
             ]
           }
         ] : [
           {
             carrier: `${primaryAirlineName} Direct Flight`,
-            carrierCode: isAustriaOrigin ? 'OS' : 'LH',
+            carrierCode: primaryAirlineCode,
             icon: '✈️',
             type: 'Direct Scheduled Flight',
             providerTag: `${primaryAirlineName} Direct`,
-            times: `09:40 → 12:25 • Flight ${isAustriaOrigin ? 'OS 811' : 'LH 1750'}`,
+            times: `09:40 → 12:25 • Flight ${primaryAirlineCode} 811`,
             routeSub: `${originCity} (${originIATA}) → ${destCity} (${destIATA})`,
             estCost: '€155 / traveler',
             actions: [
-              { label: `Book Direct on ${primaryAirlineName} ↗`, url: primaryAirlineUrl, featured: true },
-              { label: 'Book Direct on Lufthansa ↗', url: directUrls.lufthansa }
+              { label: 'Aviasales Proposal Link ↗', url: directUrls.aviasalesProposal, featured: true },
+              { label: `Book Direct on ${primaryAirlineName} ↗`, url: primaryAirlineUrl }
             ]
           },
           {
@@ -227,7 +235,7 @@ function initResultsPage() {
             routeSub: 'Terminal → Hotel Waterfront',
             estCost: '€14 / traveler',
             actions: [
-              { label: 'Book on ÖBB Ticket Shop ↗', url: directUrls.oebb, featured: true }
+              { label: activeRail.label, url: activeRail.url, featured: true }
             ]
           },
           {
@@ -241,17 +249,17 @@ function initResultsPage() {
             estCost: '€316 total',
             actions: [
               { label: 'Reserve Room on Booking.com ↗', url: directUrls.booking, featured: true },
-              { label: 'Compare on Airbnb ↗', url: directUrls.airbnb }
+              { label: 'Compare on Hotellook ↗', url: directUrls.hotellook }
             ]
           }
         ]
       },
 
-      // 2. Scenic Ground & Sea Link (ÖBB Nightjet / Railjet + Ferry)
+      // 2. Scenic Ground & Regional Rail Link
       {
         id: 'pkg-2',
         title: 'Scenic EuroRail Express & Seaside Villa',
-        desc: `Relaxed overland travel: scenic high-speed Austrian & European rail network with panoramic views and verified private villa.`,
+        desc: `Relaxed overland travel: scenic high-speed ${activeRail.scenicCarrier} rail network with panoramic views and verified private villa.`,
         badge: '🚆 Scenic Rail • Zero Flight Carbon',
         badgeClass: 'scenic',
         category: 'train-stay',
@@ -259,25 +267,26 @@ function initResultsPage() {
         durationMinutes: 510,
         co2kg: 18,
         stops: 1,
-        provider: 'oebb',
-        primaryCtaLabel: '🚆 Book on ÖBB Ticket Shop ➔',
-        primaryCtaUrl: directUrls.oebb,
+        provider: 'rail',
+        primaryCtaLabel: `🚆 ${activeRail.label} ➔`,
+        primaryCtaUrl: activeRail.url,
+        proposalUrl: directUrls.aviasalesProposal,
         stayScore: 9.4,
         totalPrice: 420,
         highlight: false,
         legs: [
           {
-            carrier: 'ÖBB Railjet & EuroCity',
-            carrierCode: 'ÖBB',
+            carrier: activeRail.scenicCarrier,
+            carrierCode: 'RAIL',
             icon: '🚆',
-            type: 'High-Speed Railjet & Scenic Car',
-            providerTag: 'ÖBB Ticket Shop',
+            type: 'High-Speed Scenic Rail',
+            providerTag: activeRail.operator,
             times: '07:15 → 13:40 • EuroCity Scenic Route',
             routeSub: `${originCity} Main Station → Coastal Junction • Panoramic Car`,
             estCost: '€95 / traveler',
             actions: [
-              { label: 'Book on ÖBB Ticket Shop ↗', url: directUrls.oebb, featured: true },
-              { label: 'Book on Deutsche Bahn (DB) ↗', url: directUrls.db }
+              { label: activeRail.label, url: activeRail.url, featured: true },
+              { label: 'Book on Trainline ↗', url: directUrls.trainline }
             ]
           },
           {
@@ -290,7 +299,7 @@ function initResultsPage() {
             routeSub: `Main Pier → ${destCity} Waterfront • 45m`,
             estCost: '€25 / traveler',
             actions: [
-              { label: 'Book on Trenitalia ↗', url: directUrls.trenitalia, featured: true }
+              { label: 'Official Port Ticket ↗', url: activeRail.url, featured: true }
             ]
           },
           {
@@ -304,7 +313,7 @@ function initResultsPage() {
             estCost: '€300 total',
             actions: [
               { label: 'Reserve Villa on Airbnb ↗', url: directUrls.airbnb, featured: true },
-              { label: 'Compare on Booking.com ↗', url: directUrls.booking }
+              { label: 'Compare on Hotellook ↗', url: directUrls.hotellook }
             ]
           }
         ]
@@ -326,7 +335,8 @@ function initResultsPage() {
         stops: hubRoute.needsHubTransfer ? 1 : 0,
         provider: 'ryanair',
         primaryCtaLabel: '✈️ Book Lowest Rate on Ryanair ➔',
-        primaryCtaUrl: directUrls.ryanair,
+        primaryCtaUrl: directUrls.aviasalesProposal,
+        proposalUrl: directUrls.aviasalesProposal,
         stayScore: 8.8,
         totalPrice: 330,
         highlight: false,
@@ -341,8 +351,8 @@ function initResultsPage() {
             routeSub: `${flightOriginCity} (${flightOriginIATA}) → ${destCity} (${destIATA})`,
             estCost: '€58 / traveler',
             actions: [
-              { label: 'Book Direct on Ryanair ↗', url: directUrls.ryanair, featured: true },
-              { label: 'Book on Wizz Air ↗', url: directUrls.wizzair }
+              { label: 'Aviasales Proposal Link ↗', url: directUrls.aviasalesProposal, featured: true },
+              { label: 'Book Direct on Ryanair ↗', url: directUrls.ryanair }
             ]
           },
           {
@@ -355,7 +365,7 @@ function initResultsPage() {
             routeSub: 'Airport Station → Old Town Center',
             estCost: '€6 / traveler',
             actions: [
-              { label: 'Book on ÖBB Ticket Shop ↗', url: directUrls.oebb, featured: true }
+              { label: activeRail.label, url: activeRail.url, featured: true }
             ]
           },
           {
@@ -368,8 +378,8 @@ function initResultsPage() {
             routeSub: 'Fast Fiber WiFi, Air Conditioning, Self Check-in',
             estCost: '€266 total',
             actions: [
-              { label: 'Reserve Villa on Airbnb ↗', url: directUrls.airbnb, featured: true },
-              { label: 'Compare on Booking.com ↗', url: directUrls.booking }
+              { label: 'Reserve Studio on Airbnb ↗', url: directUrls.airbnb, featured: true },
+              { label: 'Compare on Hotellook ↗', url: directUrls.hotellook }
             ]
           }
         ]
@@ -387,9 +397,10 @@ function initResultsPage() {
         durationMinutes: 195,
         co2kg: 68,
         stops: 0,
-        provider: 'austrian',
-        primaryCtaLabel: `✈️ Book Direct on ${primaryAirlineName} ➔`,
-        primaryCtaUrl: primaryAirlineUrl,
+        provider: 'discovercars',
+        primaryCtaLabel: `🚗 Reserve Car on DiscoverCars ➔`,
+        primaryCtaUrl: directUrls.discoverCars,
+        proposalUrl: directUrls.aviasalesProposal,
         stayScore: 9.3,
         totalPrice: 590,
         highlight: false,
@@ -404,8 +415,8 @@ function initResultsPage() {
             routeSub: `${flightOriginCity} (${flightOriginIATA}) → ${destCity} (${destIATA})`,
             estCost: '€160 / traveler',
             actions: [
-              { label: `Book Direct on ${primaryAirlineName} ↗`, url: primaryAirlineUrl, featured: true },
-              { label: 'Book Direct on Lufthansa ↗', url: directUrls.lufthansa }
+              { label: 'Aviasales Proposal Link ↗', url: directUrls.aviasalesProposal, featured: true },
+              { label: `Book Direct on ${primaryAirlineName} ↗`, url: primaryAirlineUrl }
             ]
           },
           {
@@ -431,7 +442,8 @@ function initResultsPage() {
             routeSub: 'Private Beach, Infinity Pool, Free Parking',
             estCost: '€290 total',
             actions: [
-              { label: 'Reserve Room on Booking.com ↗', url: directUrls.booking, featured: true }
+              { label: 'Reserve Room on Booking.com ↗', url: directUrls.booking, featured: true },
+              { label: 'Compare on Hotellook ↗', url: directUrls.hotellook }
             ]
           }
         ]
@@ -449,25 +461,26 @@ function initResultsPage() {
         durationMinutes: 200,
         co2kg: 85,
         stops: 0,
-        provider: 'lufthansa',
-        primaryCtaLabel: '✈️ Book Business Class on Lufthansa ➔',
-        primaryCtaUrl: directUrls.lufthansa,
+        provider: 'luxury',
+        primaryCtaLabel: `✈️ Book Premium Ticket on Aviasales ➔`,
+        primaryCtaUrl: directUrls.aviasalesProposal,
+        proposalUrl: directUrls.aviasalesProposal,
         stayScore: 9.7,
         totalPrice: 1150,
         highlight: false,
         legs: [
           {
-            carrier: 'Lufthansa / Austrian Business Class',
-            carrierCode: 'LH',
+            carrier: `${primaryAirlineName} Business Class`,
+            carrierCode: primaryAirlineCode,
             icon: '✈️',
             type: 'Premium Business Class Flight',
-            providerTag: 'Lufthansa Direct',
+            providerTag: `${primaryAirlineName} Direct`,
             times: '10:00 → 12:45 • Priority Fast Track & Lounge',
             routeSub: `${flightOriginCity} (${flightOriginIATA}) → ${destCity} (${destIATA})`,
             estCost: '€380 / traveler',
             actions: [
-              { label: 'Book Direct on Lufthansa ↗', url: directUrls.lufthansa, featured: true },
-              { label: 'Book Direct on Austrian Airlines ↗', url: directUrls.austrian }
+              { label: 'Aviasales Proposal Link ↗', url: directUrls.aviasalesProposal, featured: true },
+              { label: `Book Direct on ${primaryAirlineName} ↗`, url: primaryAirlineUrl }
             ]
           },
           {
@@ -493,7 +506,8 @@ function initResultsPage() {
             routeSub: 'Gourmet Breakfast, Sea View Balcony, Private Beach Cabana',
             estCost: '€680 total',
             actions: [
-              { label: 'Reserve Room on Booking.com ↗', url: directUrls.booking, featured: true }
+              { label: 'Reserve Room on Booking.com ↗', url: directUrls.booking, featured: true },
+              { label: 'Compare on Hotellook ↗', url: directUrls.hotellook }
             ]
           }
         ]
@@ -512,8 +526,9 @@ function initResultsPage() {
         co2kg: 44,
         stops: 1,
         provider: 'ryanair',
-        primaryCtaLabel: '✈️ Book Flight on Ryanair ➔',
-        primaryCtaUrl: directUrls.ryanair,
+        primaryCtaLabel: '✈️ Book Flight on Aviasales ➔',
+        primaryCtaUrl: directUrls.aviasalesProposal,
+        proposalUrl: directUrls.aviasalesProposal,
         stayScore: 9.0,
         totalPrice: 495,
         highlight: false,
@@ -528,7 +543,8 @@ function initResultsPage() {
             routeSub: `${flightOriginCity} (${flightOriginIATA}) → ${destCity} (${destIATA})`,
             estCost: '€75 / traveler',
             actions: [
-              { label: 'Book Direct on Ryanair ↗', url: directUrls.ryanair, featured: true }
+              { label: 'Aviasales Proposal Link ↗', url: directUrls.aviasalesProposal, featured: true },
+              { label: 'Book Direct on Ryanair ↗', url: directUrls.ryanair }
             ]
           },
           {
@@ -541,7 +557,7 @@ function initResultsPage() {
             routeSub: `Main Port → Island Marina`,
             estCost: '€38 / traveler',
             actions: [
-              { label: 'Book on Trenitalia ↗', url: directUrls.trenitalia, featured: true }
+              { label: 'Official Port Ticket ↗', url: activeRail.url, featured: true }
             ]
           },
           {
@@ -554,7 +570,8 @@ function initResultsPage() {
             routeSub: 'Panoramic Sea View, Private Infinity Pool',
             estCost: '€382 total',
             actions: [
-              { label: 'Reserve Villa on Airbnb ↗', url: directUrls.airbnb, featured: true }
+              { label: 'Reserve Villa on Airbnb ↗', url: directUrls.airbnb, featured: true },
+              { label: 'Compare on Hotellook ↗', url: directUrls.hotellook }
             ]
           }
         ]
@@ -564,7 +581,7 @@ function initResultsPage() {
       {
         id: 'pkg-7',
         title: 'SWISS Hub Connection & Mediterranean Villa',
-        desc: `Smooth 45-minute connection through Zurich/Munich with SWISS International Air Lines and boutique villa stay.`,
+        desc: `Smooth connection through Zurich hub with SWISS International Air Lines and boutique villa stay.`,
         badge: '⭐ Premium Reliability',
         badgeClass: 'top-pick',
         category: 'flight-stay',
@@ -574,7 +591,8 @@ function initResultsPage() {
         stops: 1,
         provider: 'swiss',
         primaryCtaLabel: '✈️ Book Direct on SWISS ➔',
-        primaryCtaUrl: directUrls.swiss,
+        primaryCtaUrl: directUrls.aviasalesProposal,
+        proposalUrl: directUrls.aviasalesProposal,
         stayScore: 9.2,
         totalPrice: 550,
         highlight: false,
@@ -589,8 +607,8 @@ function initResultsPage() {
             routeSub: `${originCity} → ZRH Hub → ${destCity}`,
             estCost: '€170 / traveler',
             actions: [
-              { label: 'Book Direct on SWISS ↗', url: directUrls.swiss, featured: true },
-              { label: 'Book Direct on Lufthansa ↗', url: directUrls.lufthansa }
+              { label: 'Aviasales Proposal Link ↗', url: directUrls.aviasalesProposal, featured: true },
+              { label: 'Book Direct on SWISS ↗', url: directUrls.swiss }
             ]
           },
           {
@@ -603,7 +621,7 @@ function initResultsPage() {
             routeSub: 'Terminal → City Waterfront',
             estCost: '€10 / traveler',
             actions: [
-              { label: 'Book on ÖBB Ticket Shop ↗', url: directUrls.oebb, featured: true }
+              { label: activeRail.label, url: activeRail.url, featured: true }
             ]
           },
           {
@@ -616,7 +634,8 @@ function initResultsPage() {
             routeSub: 'Panoramic Pool, Breakfast Included',
             estCost: '€370 total',
             actions: [
-              { label: 'Reserve Room on Booking.com ↗', url: directUrls.booking, featured: true }
+              { label: 'Reserve Room on Booking.com ↗', url: directUrls.booking, featured: true },
+              { label: 'Compare on Hotellook ↗', url: directUrls.hotellook }
             ]
           }
         ]
@@ -626,7 +645,7 @@ function initResultsPage() {
       {
         id: 'pkg-8',
         title: 'Eco-Express Rail Link & Certified Green Stay',
-        desc: `Lowest ecological footprint: 100% renewable electric rail transit and certified eco-boutique property.`,
+        desc: `Lowest ecological footprint: 100% renewable electric rail transit on ${activeRail.ecoCarrier} and certified eco-boutique property.`,
         badge: '🌿 Eco Pioneer (<20kg CO2)',
         badgeClass: 'eco',
         category: 'train-stay',
@@ -634,25 +653,26 @@ function initResultsPage() {
         durationMinutes: 410,
         co2kg: 14,
         stops: 1,
-        provider: 'oebb',
-        primaryCtaLabel: '🚆 Book on ÖBB Ticket Shop ➔',
-        primaryCtaUrl: directUrls.oebb,
+        provider: 'rail',
+        primaryCtaLabel: `🚆 ${activeRail.label} ➔`,
+        primaryCtaUrl: activeRail.url,
+        proposalUrl: directUrls.aviasalesProposal,
         stayScore: 9.1,
         totalPrice: 435,
         highlight: false,
         legs: [
           {
-            carrier: 'ÖBB / SBB Green Railjet',
+            carrier: activeRail.ecoCarrier,
             carrierCode: 'GREEN',
             icon: '🚆',
             type: '100% Renewable Electric Rail',
-            providerTag: 'ÖBB Ticket Shop',
+            providerTag: activeRail.operator,
             times: '08:45 → 14:15 • Silent Eco Car',
             routeSub: `${originCity} → Destination Rail Terminal`,
             estCost: '€85 / traveler',
             actions: [
-              { label: 'Book on ÖBB Ticket Shop ↗', url: directUrls.oebb, featured: true },
-              { label: 'Book on Deutsche Bahn (DB) ↗', url: directUrls.db }
+              { label: activeRail.label, url: activeRail.url, featured: true },
+              { label: 'Book on Trainline ↗', url: directUrls.trainline }
             ]
           },
           {
@@ -665,7 +685,7 @@ function initResultsPage() {
             routeSub: 'Station → Green Eco Resort',
             estCost: '€10 / traveler',
             actions: [
-              { label: 'Book on ÖBB Ticket Shop ↗', url: directUrls.oebb, featured: true }
+              { label: activeRail.label, url: activeRail.url, featured: true }
             ]
           },
           {
@@ -678,7 +698,8 @@ function initResultsPage() {
             routeSub: 'Organic Breakfast, 100% Solar Powered',
             estCost: '€340 total',
             actions: [
-              { label: 'Reserve Room on Booking.com ↗', url: directUrls.booking, featured: true }
+              { label: 'Reserve Room on Booking.com ↗', url: directUrls.booking, featured: true },
+              { label: 'Compare on Hotellook ↗', url: directUrls.hotellook }
             ]
           }
         ]
@@ -686,7 +707,7 @@ function initResultsPage() {
     ];
   }
 
-  const allItineraries = generateItineraries();
+  let allItineraries = generateItineraries();
 
   // --------------------------------------------------------------------------
   // 2. Sorting & Filtering State
@@ -795,6 +816,10 @@ function initResultsPage() {
             <a href="${directUrls.booking}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn booking" title="Compare Lowest Price Stays in ${destCity} on Booking.com">
               <span class="engine-pill-icon">🏨</span>
               <span>Booking.com</span>
+            </a>
+            <a href="${directUrls.hotellook}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn hotellook" title="Compare Hotels on Hotellook">
+              <span class="engine-pill-icon">🔍</span>
+              <span>Hotellook</span>
             </a>
             <a href="${directUrls.airbnb}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn airbnb" title="Search Airbnb Stays in ${destCity}">
               <span class="engine-pill-icon">🏡</span>
@@ -1086,6 +1111,9 @@ function initResultsPage() {
             <a href="${directUrls.booking}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn booking" style="padding: 6px 12px; font-size: 0.78rem;">
               <span>🏨 Booking.com</span>
             </a>
+            <a href="${directUrls.hotellook}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn hotellook" style="padding: 6px 12px; font-size: 0.78rem;">
+              <span>🔍 Hotellook</span>
+            </a>
             <a href="${directUrls.airbnb}" target="_blank" rel="noopener noreferrer" class="engine-pill-btn airbnb" style="padding: 6px 12px; font-size: 0.78rem;">
               <span>🏡 Airbnb</span>
             </a>
@@ -1140,8 +1168,8 @@ function initResultsPage() {
         direct: rawDirect ? '1' : '0'
       });
 
-      if (config.travelpayouts && config.travelpayouts.apiToken) {
-        apiParams.set('token', config.travelpayouts.apiToken);
+      if (config.travelpayouts && (config.travelpayouts.token || config.travelpayouts.apiToken)) {
+        apiParams.set('token', config.travelpayouts.token || config.travelpayouts.apiToken);
       }
       if (config.travelpayouts && config.travelpayouts.marker) {
         apiParams.set('marker', config.travelpayouts.marker);

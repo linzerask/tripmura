@@ -1,12 +1,12 @@
 <?php
 /**
  * TripMura — Production Live Search Engine & Direct Ticket Proposal Deep-Linker
- * Powered by Travelpayouts / Aviasales Live Data API & Smart Hub Multimodal Router.
+ * Powered by Travelpayouts / Aviasales Live Data API & Smart Geographic Multimodal Router.
  *
  * Active Credentials:
  * Aviasales API Token: 178a7f6702fe3171dcbd333a9527840c
  * Travelpayouts Partner Marker: 779382 (Backup: 575598)
- * Booking.com AID: 779382
+ * Booking.com AID: 779382 / label: tp779382
  * DiscoverCars ID: 779382
  */
 
@@ -79,19 +79,26 @@ $iataDatabase = [
     'corfu' => 'CFU', 'santorini' => 'JTR', 'thira' => 'JTR', 'mykonos' => 'JMK',
     'kos' => 'KGS', 'zakynthos' => 'ZTH',
     // Italy
-    'rome' => 'FCO', 'roma' => 'FCO', 'milan' => 'MXP', 'venice' => 'VCE',
-    'naples' => 'NAP', 'amalfi' => 'NAP', 'amalfi coast' => 'NAP', 'florence' => 'FLR',
-    'bologna' => 'BLQ', 'palermo' => 'PMO', 'catania' => 'CTA', 'bari' => 'BRI',
+    'rome' => 'FCO', 'roma' => 'FCO', 'rome fiumicino' => 'FCO', 'rome ciampino' => 'CIA',
+    'milan' => 'MXP', 'milano' => 'MXP', 'milan malpensa' => 'MXP', 'milan linate' => 'LIN', 'bergamo' => 'BGY',
+    'venice' => 'VCE', 'venezia' => 'VCE', 'naples' => 'NAP', 'napoli' => 'NAP',
+    'amalfi' => 'NAP', 'amalfi coast' => 'NAP', 'florence' => 'FLR', 'firenze' => 'FLR',
+    'bologna' => 'BLQ', 'palermo' => 'PMO', 'catania' => 'CTA', 'bari' => 'BRI', 'turin' => 'TRN',
     // UK & Ireland
-    'london' => 'LON', 'london heathrow' => 'LHR', 'london gatwick' => 'LGW', 'london stansted' => 'STN',
-    'manchester' => 'MAN', 'edinburgh' => 'EDI', 'dublin' => 'DUB',
+    'london' => 'LON', 'london heathrow' => 'LHR', 'heathrow' => 'LHR', 'london gatwick' => 'LGW', 'gatwick' => 'LGW',
+    'london stansted' => 'STN', 'london luton' => 'LTN', 'london city' => 'LCY',
+    'manchester' => 'MAN', 'birmingham' => 'BHX', 'edinburgh' => 'EDI', 'glasgow' => 'GLA', 'bristol' => 'BRS', 'dublin' => 'DUB',
     // France
-    'paris' => 'CDG', 'nice' => 'NCE', 'marseille' => 'MRS', 'lyon' => 'LYS',
+    'paris' => 'CDG', 'paris cdg' => 'CDG', 'paris orly' => 'ORY', 'nice' => 'NCE', 'marseille' => 'MRS',
+    'lyon' => 'LYS', 'toulouse' => 'TLS', 'bordeaux' => 'BOD', 'nantes' => 'NTE',
     // Spain & Portugal
     'barcelona' => 'BCN', 'madrid' => 'MAD', 'malaga' => 'AGP', 'palma' => 'PMI', 'mallorca' => 'PMI',
-    'ibiza' => 'IBZ', 'lisbon' => 'LIS', 'porto' => 'OPO',
+    'ibiza' => 'IBZ', 'seville' => 'SVQ', 'valencia' => 'VLC', 'alicante' => 'ALC',
+    'lisbon' => 'LIS', 'porto' => 'OPO', 'faro' => 'FAO',
     // Switzerland
-    'zurich' => 'ZRH', 'geneva' => 'GVA', 'basel' => 'BSL'
+    'zurich' => 'ZRH', 'geneva' => 'GVA', 'basel' => 'BSL', 'bern' => 'BRN',
+    // Netherlands & Belgium
+    'amsterdam' => 'AMS', 'brussels' => 'BRU'
 ];
 
 function resolveIATA($str, $db, $fallback = 'VIE') {
@@ -120,8 +127,46 @@ $originCity = getCleanCity($rawOrigin, 'Linz');
 $destCity = getCleanCity($rawDest, 'Thessaloniki');
 
 // --------------------------------------------------------------------------
-// 5. Smart Hub Regional Routing
+// 5. Geographic Country & Regional Rail Operator Intelligence
 // --------------------------------------------------------------------------
+function detectGeoRegion($iata, $city) {
+    $code = strtoupper($iata);
+    $c = strtolower($city);
+
+    // Austria
+    if (in_array($code, ['VIE', 'LNZ', 'SZG', 'GRZ', 'INN', 'KLU']) || strpos($c, 'austria') !== false || in_array($c, ['vienna', 'wien', 'linz', 'salzburg', 'graz', 'innsbruck', 'klagenfurt'])) {
+        return 'AT';
+    }
+    // Germany
+    if (in_array($code, ['MUC', 'FRA', 'BER', 'HAM', 'DUS', 'CGN', 'STR', 'NUE', 'HAJ', 'LEJ']) || strpos($c, 'germany') !== false || in_array($c, ['munich', 'muenchen', 'frankfurt', 'berlin', 'hamburg', 'dusseldorf', 'cologne', 'stuttgart', 'nuremberg', 'hannover', 'leipzig'])) {
+        return 'DE';
+    }
+    // United Kingdom & Ireland
+    if (in_array($code, ['LON', 'LHR', 'LGW', 'STN', 'LTN', 'LCY', 'MAN', 'BHX', 'EDI', 'GLA', 'BRS', 'DUB']) || strpos($c, 'uk') !== false || strpos($c, 'united kingdom') !== false || in_array($c, ['london', 'manchester', 'birmingham', 'edinburgh', 'glasgow', 'dublin'])) {
+        return 'GB';
+    }
+    // France
+    if (in_array($code, ['CDG', 'ORY', 'NCE', 'MRS', 'LYS', 'BOD', 'TLS', 'NTE']) || strpos($c, 'france') !== false || in_array($c, ['paris', 'nice', 'marseille', 'lyon', 'bordeaux', 'toulouse', 'nantes', 'cannes', 'st tropez'])) {
+        return 'FR';
+    }
+    // Italy
+    if (in_array($code, ['FCO', 'CIA', 'MXP', 'LIN', 'BGY', 'NAP', 'VCE', 'FLR', 'BLQ', 'CTA', 'PMO', 'BRI', 'TRN']) || strpos($c, 'italy') !== false || in_array($c, ['rome', 'roma', 'milan', 'milano', 'naples', 'napoli', 'venice', 'venezia', 'florence', 'firenze', 'bologna', 'palermo', 'catania', 'bari', 'amalfi', 'positano', 'capri', 'sorrento'])) {
+        return 'IT';
+    }
+    // Spain & Portugal
+    if (in_array($code, ['MAD', 'BCN', 'AGP', 'VLC', 'SVQ', 'BIO', 'PMI', 'IBZ', 'ALC', 'LIS', 'OPO', 'FAO']) || strpos($c, 'spain') !== false || in_array($c, ['madrid', 'barcelona', 'malaga', 'valencia', 'seville', 'palma', 'ibiza', 'alicante', 'bilbao', 'lisbon', 'porto'])) {
+        return 'ES';
+    }
+    // Switzerland
+    if (in_array($code, ['ZRH', 'GVA', 'BSL', 'BRN']) || strpos($c, 'switzerland') !== false || in_array($c, ['zurich', 'geneva', 'basel', 'bern'])) {
+        return 'CH';
+    }
+    return 'EU';
+}
+
+$originRegion = detectGeoRegion($originIATA, $originCity);
+
+// Smart Hub Regional Routing
 $hubAirport = $originIATA;
 $hubCity = $originCity;
 $trainToHubNeeded = false;
@@ -170,7 +215,7 @@ $depDDMM = date('dm', strtotime($departDate));
 $retDDMM = date('dm', strtotime($returnDate));
 
 // --------------------------------------------------------------------------
-// 6. Direct Provider & Aviasales Proposal Deep-Link Builders
+// 6. Direct Provider & Deep-Link Builders
 // --------------------------------------------------------------------------
 
 // Aviasales Standard Proposal Link with Marker 779382
@@ -186,20 +231,98 @@ $directAirlineUrls = [
     'wizzair' => "https://wizzair.com/en-gb#/booking/select-flight/{$flightOriginIATA}/{$destIATA}/{$departDate}/{$returnDate}/{$adults}/0/0/null",
     'easyjet' => "https://www.easyjet.com/en/cheap-flights/" . strtolower($flightOriginIATA) . "/" . strtolower($destIATA) . "?origin={$flightOriginIATA}&destination={$destIATA}&depart={$departDate}&return={$returnDate}&adults={$adults}",
     'britishAirways' => "https://www.britishairways.com/travel/fx/public/en_gb?eId=111011&departure_city={$flightOriginIATA}&destination_city={$destIATA}&dep_date={$departDate}&ret_date={$returnDate}&adults={$adults}",
-    'aegean' => "https://en.aegeanair.com/flight-deals/fares/?from={$flightOriginIATA}&to={$destIATA}&departureDate={$departDate}&returnDate={$returnDate}&adults={$adults}"
+    'aegean' => "https://en.aegeanair.com/flight-deals/fares/?from={$flightOriginIATA}&to={$destIATA}&departureDate={$departDate}&returnDate={$returnDate}&adults={$adults}",
+    'airFrance' => "https://www.airfrance.com/search?departureLocation={$flightOriginIATA}&arrivalLocation={$destIATA}&departureDate={$departDate}&returnDate={$returnDate}&pax={$adults}A"
 ];
 
-// Rail & Ground Portals
+// Rail & Ground Portals by Region
 $groundUrls = [
     'oebb' => "https://shop.oebbtickets.at/de/ticket?station=" . urlencode($originCity) . "&destination=" . urlencode($trainToHubNeeded ? ($hubCity === 'Vienna' ? 'Flughafen Wien' : "{$hubCity} Flughafen") : $destCity) . "&date={$departDate}",
     'db' => "https://www.bahn.de/buchung/start?ort=" . urlencode($originCity) . "&ziel=" . urlencode($destCity) . "&datum={$departDate}",
-    'trenitalia' => "https://www.trenitalia.com/en.html?origin=" . urlencode($originCity) . "&destination=" . urlencode($destCity) . "&date={$departDate}"
+    'trenitalia' => "https://www.trenitalia.com/en.html?origin=" . urlencode($originCity) . "&destination=" . urlencode($destCity) . "&date={$departDate}",
+    'trainline' => "https://www.thetrainline.com/book/results?origin=" . urlencode($originCity) . "&destination=" . urlencode($destCity) . "&outwardDate={$departDate}",
+    'eurostar' => "https://www.eurostar.com/search?origin={$originIATA}&destination={$destIATA}&outboundDate={$departDate}&returnDate={$returnDate}&adults={$adults}",
+    'sncf' => "https://www.sncf-connect.com",
+    'renfe' => "https://www.renfe.com",
+    'sbb' => "https://www.sbb.ch",
+    'omio' => "https://www.omio.com/search-frontend/results/{$originIATA}/{$destIATA}/{$departDate}?adults={$adults}"
 ];
 
-// Direct Hotel Property Deep-Links (Booking.com & Airbnb)
+// Determine primary geographic rail configuration
+$geoRailConfig = [
+    'AT' => [
+        'operator' => 'ÖBB Ticket Shop',
+        'url' => $groundUrls['oebb'],
+        'label' => 'Book on ÖBB Ticket Shop ↗',
+        'transitName' => 'ÖBB Railjet Airport Direct',
+        'scenicCarrier' => 'ÖBB Railjet & EuroCity',
+        'ecoCarrier' => 'ÖBB / SBB Green Railjet'
+    ],
+    'GB' => [
+        'operator' => 'Trainline / Eurostar',
+        'url' => $groundUrls['trainline'],
+        'label' => 'Book on Trainline ↗',
+        'transitName' => 'Heathrow Express / Elizabeth Line',
+        'scenicCarrier' => 'LNER & Avanti West Coast',
+        'ecoCarrier' => 'Eurostar & High Speed 1 Electric Rail'
+    ],
+    'DE' => [
+        'operator' => 'Deutsche Bahn (DB)',
+        'url' => $groundUrls['db'],
+        'label' => 'Book on Deutsche Bahn (DB) ↗',
+        'transitName' => 'Deutsche Bahn ICE Airport Express',
+        'scenicCarrier' => 'Deutsche Bahn ICE & EuroCity',
+        'ecoCarrier' => 'Deutsche Bahn 100% Green ICE'
+    ],
+    'IT' => [
+        'operator' => 'Trenitalia (Frecciarossa)',
+        'url' => $groundUrls['trenitalia'],
+        'label' => 'Book on Trenitalia ↗',
+        'transitName' => 'Leonardo Express / Malpensa Express',
+        'scenicCarrier' => 'Trenitalia Frecciarossa High-Speed',
+        'ecoCarrier' => 'Frecciarossa Electric High-Speed'
+    ],
+    'FR' => [
+        'operator' => 'SNCF Connect (TGV InOui)',
+        'url' => $groundUrls['trainline'],
+        'label' => 'Book on SNCF / Trainline ↗',
+        'transitName' => 'RER B Airport Express / TGV',
+        'scenicCarrier' => 'SNCF TGV InOui & Eurostar',
+        'ecoCarrier' => 'SNCF TGV 100% Electric High-Speed'
+    ],
+    'ES' => [
+        'operator' => 'Renfe (AVE)',
+        'url' => $groundUrls['trainline'],
+        'label' => 'Book on Renfe / Trainline ↗',
+        'transitName' => 'Renfe Cercanías / Aerobús Direct',
+        'scenicCarrier' => 'Renfe AVE High-Speed',
+        'ecoCarrier' => 'Renfe AVE Solar Electric Rail'
+    ],
+    'CH' => [
+        'operator' => 'SBB Swiss Railways',
+        'url' => $groundUrls['sbb'],
+        'label' => 'Book on SBB Swiss Railways ↗',
+        'transitName' => 'SBB Swiss Airport Express',
+        'scenicCarrier' => 'SBB Panorama & Glacier Express',
+        'ecoCarrier' => 'SBB 100% Hydroelectric Rail'
+    ],
+    'EU' => [
+        'operator' => 'Trainline / Omio',
+        'url' => $groundUrls['trainline'],
+        'label' => 'Book on Trainline ↗',
+        'transitName' => 'Airport Express Shuttle',
+        'scenicCarrier' => 'EuroCity & Scenic Rail',
+        'ecoCarrier' => 'European Electric InterCity Rail'
+    ]
+];
+
+$activeRail = $geoRailConfig[$originRegion] ?? $geoRailConfig['EU'];
+
+// Direct Hotel Property Deep-Links (Booking.com & Hotellook & Airbnb)
 $hotelUrls = [
-    'bookingSearch' => "https://www.booking.com/searchresults.html?ss=" . urlencode($destCity) . "&checkin={$departDate}&checkout={$returnDate}&group_adults={$adults}&no_rooms={$rooms}&order=price&aid={$BOOKING_AID}",
-    'bookingTopRated' => "https://www.booking.com/searchresults.html?ss=" . urlencode($destCity) . "&checkin={$departDate}&checkout={$returnDate}&group_adults={$adults}&no_rooms={$rooms}&review_score=90&aid={$BOOKING_AID}",
+    'bookingSearch' => "https://www.booking.com/searchresults.html?ss=" . urlencode($destCity) . "&checkin={$departDate}&checkout={$returnDate}&group_adults={$adults}&no_rooms={$rooms}&order=price&aid={$BOOKING_AID}&label=tp{$TRAVELPAYOUTS_MARKER}",
+    'bookingTopRated' => "https://www.booking.com/searchresults.html?ss=" . urlencode($destCity) . "&checkin={$departDate}&checkout={$returnDate}&group_adults={$adults}&no_rooms={$rooms}&review_score=90&aid={$BOOKING_AID}&label=tp{$TRAVELPAYOUTS_MARKER}",
+    'hotellook' => "https://search.hotellook.com/?destination=" . urlencode($destCity) . "&checkIn={$departDate}&checkOut={$returnDate}&adults={$adults}&marker={$TRAVELPAYOUTS_MARKER}",
     'airbnbHomes' => "https://www.airbnb.com/s/" . urlencode($destCity) . "/homes?checkin={$departDate}&checkout={$returnDate}&adults={$adults}&sort_price=asc"
 ];
 
@@ -329,7 +452,8 @@ $curatedHotels = [
         'features' => 'Central Seafront, Gourmet Breakfast Included, Free Cancellation',
         'estCost' => '€316 total',
         'priceNum' => 316,
-        'url' => "https://www.booking.com/searchresults.html?ss=" . urlencode("Waterfront Boutique Hotel {$destCity}") . "&checkin={$departDate}&checkout={$returnDate}&group_adults={$adults}&aid={$BOOKING_AID}"
+        'url' => "https://www.booking.com/searchresults.html?ss=" . urlencode("Waterfront Boutique Hotel {$destCity}") . "&checkin={$departDate}&checkout={$returnDate}&group_adults={$adults}&order=price&aid={$BOOKING_AID}&label=tp{$TRAVELPAYOUTS_MARKER}",
+        'hotellookUrl' => "https://search.hotellook.com/?destination=" . urlencode($destCity) . "&checkIn={$departDate}&checkOut={$returnDate}&adults={$adults}&marker={$TRAVELPAYOUTS_MARKER}"
     ],
     [
         'name' => "Grand Aegean Coastal Palace & Spa",
@@ -339,7 +463,8 @@ $curatedHotels = [
         'features' => 'Private Beach, Infinity Pool, Michelin-Star Dining',
         'estCost' => '€490 total',
         'priceNum' => 490,
-        'url' => "https://www.booking.com/searchresults.html?ss=" . urlencode("Grand Coastal Palace {$destCity}") . "&checkin={$departDate}&checkout={$returnDate}&group_adults={$adults}&aid={$BOOKING_AID}"
+        'url' => "https://www.booking.com/searchresults.html?ss=" . urlencode("Grand Coastal Palace {$destCity}") . "&checkin={$departDate}&checkout={$returnDate}&group_adults={$adults}&order=price&aid={$BOOKING_AID}&label=tp{$TRAVELPAYOUTS_MARKER}",
+        'hotellookUrl' => "https://search.hotellook.com/?destination=" . urlencode($destCity) . "&checkIn={$departDate}&checkOut={$returnDate}&adults={$adults}&marker={$TRAVELPAYOUTS_MARKER}"
     ],
     [
         'name' => 'Mediterranean Vista Villa with Infinity Pool',
@@ -349,7 +474,8 @@ $curatedHotels = [
         'features' => 'Panoramic Sunset View, Private Heated Pool, Free Parking',
         'estCost' => '€382 total',
         'priceNum' => 382,
-        'url' => "https://www.airbnb.com/s/" . urlencode($destCity) . "/homes?checkin={$departDate}&checkout={$returnDate}&adults={$adults}&sort_price=asc"
+        'url' => "https://www.airbnb.com/s/" . urlencode($destCity) . "/homes?checkin={$departDate}&checkout={$returnDate}&adults={$adults}&sort_price=asc",
+        'hotellookUrl' => "https://search.hotellook.com/?destination=" . urlencode($destCity) . "&checkIn={$departDate}&checkOut={$returnDate}&adults={$adults}&marker={$TRAVELPAYOUTS_MARKER}"
     ],
     [
         'name' => "Old Town Heritage Boutique Suites",
@@ -359,7 +485,8 @@ $curatedHotels = [
         'features' => 'Central Historic District, Modern Marble Bath, High-Speed WiFi',
         'estCost' => '€275 total',
         'priceNum' => 275,
-        'url' => "https://www.booking.com/searchresults.html?ss=" . urlencode("Old Town Boutique Suites {$destCity}") . "&checkin={$departDate}&checkout={$returnDate}&group_adults={$adults}&aid={$BOOKING_AID}"
+        'url' => "https://www.booking.com/searchresults.html?ss=" . urlencode("Old Town Boutique Suites {$destCity}") . "&checkin={$departDate}&checkout={$returnDate}&group_adults={$adults}&order=price&aid={$BOOKING_AID}&label=tp{$TRAVELPAYOUTS_MARKER}",
+        'hotellookUrl' => "https://search.hotellook.com/?destination=" . urlencode($destCity) . "&checkIn={$departDate}&checkOut={$returnDate}&adults={$adults}&marker={$TRAVELPAYOUTS_MARKER}"
     ],
     [
         'name' => 'Certified Solar Eco-Lodge & Spa',
@@ -369,7 +496,8 @@ $curatedHotels = [
         'features' => 'Zero-Emission Property, Organic Farm-to-Table Breakfast',
         'estCost' => '€340 total',
         'priceNum' => 340,
-        'url' => "https://www.booking.com/searchresults.html?ss=" . urlencode("Eco Lodge Resort {$destCity}") . "&checkin={$departDate}&checkout={$returnDate}&group_adults={$adults}&aid={$BOOKING_AID}"
+        'url' => "https://www.booking.com/searchresults.html?ss=" . urlencode("Eco Lodge Resort {$destCity}") . "&checkin={$departDate}&checkout={$returnDate}&group_adults={$adults}&order=price&aid={$BOOKING_AID}&label=tp{$TRAVELPAYOUTS_MARKER}",
+        'hotellookUrl' => "https://search.hotellook.com/?destination=" . urlencode($destCity) . "&checkIn={$departDate}&checkOut={$returnDate}&adults={$adults}&marker={$TRAVELPAYOUTS_MARKER}"
     ]
 ];
 
@@ -389,14 +517,14 @@ if ($liveApiSuccess && count($apiFlightOffers) > 0) {
         $durationMin = (int)($offer['duration'] ?? 140);
         $transfers = (int)($offer['transfers'] ?? 0);
         
-        // Construct direct Aviasales proposal deep-link
+        // Construct direct Aviasales proposal deep-link URL
         $offerLink = $offer['link'] ?? '';
         $proposalUrl = !empty($offerLink) 
             ? "https://www.aviasales.com{$offerLink}&marker={$TRAVELPAYOUTS_MARKER}"
-            : $aviasalesProposalUrl;
+            : "https://www.aviasales.com/search/{$flightOriginIATA}{$depDDMM}{$destIATA}{$retDDMM}{$adults}?marker={$TRAVELPAYOUTS_MARKER}";
 
         // Carrier Direct URL
-        $carrierKey = strtolower($cCode === 'OS' ? 'austrian' : ($cCode === 'LH' ? 'lufthansa' : ($cCode === 'FR' ? 'ryanair' : ($cCode === 'LX' ? 'swiss' : ($cCode === 'A3' ? 'aegean' : ($cCode === 'BA' ? 'britishAirways' : 'austrian'))))));
+        $carrierKey = strtolower($cCode === 'OS' ? 'austrian' : ($cCode === 'LH' ? 'lufthansa' : ($cCode === 'FR' ? 'ryanair' : ($cCode === 'LX' ? 'swiss' : ($cCode === 'A3' ? 'aegean' : ($cCode === 'BA' ? 'britishAirways' : ($cCode === 'AF' ? 'airFrance' : 'austrian')))))));
         $carrierDirectUrl = $directAirlineUrls[$carrierKey] ?? $proposalUrl;
 
         // Total Door-to-Door Duration
@@ -422,7 +550,7 @@ if ($liveApiSuccess && count($apiFlightOffers) > 0) {
         if ($trainToHubNeeded) {
             $legs[] = [
                 'carrier' => $transitType,
-                'carrierCode' => 'ÖBB',
+                'carrierCode' => $originRegion === 'DE' ? 'DB' : ($originRegion === 'GB' ? 'TRAIN' : 'ÖBB'),
                 'icon' => '🚆',
                 'type' => 'Direct Airport Rail Link',
                 'providerTag' => $transitOperator,
@@ -430,7 +558,7 @@ if ($liveApiSuccess && count($apiFlightOffers) > 0) {
                 'routeSub' => "{$originCity} Hbf → {$hubCity} Airport",
                 'estCost' => $transitEstCost,
                 'actions' => [
-                    ['label' => 'Book on ÖBB Ticket Shop ↗', 'url' => $groundUrls['oebb'], 'featured' => true]
+                    ['label' => "Book on {$activeRail['operator']} ↗", 'url' => $activeRail['url'], 'featured' => true]
                 ]
             ];
         }
@@ -445,8 +573,8 @@ if ($liveApiSuccess && count($apiFlightOffers) > 0) {
             'routeSub' => "{$flightOriginCity} ({$flightOriginIATA}) → {$destCity} ({$destIATA})",
             'estCost' => "€{$flightPrice} / traveler",
             'actions' => [
-                ['label' => "Book Direct on {$cName} ↗", 'url' => $carrierDirectUrl, 'featured' => true],
-                ['label' => 'Aviasales Live Proposal Link ↗', 'url' => $proposalUrl]
+                ['label' => "Book Live Ticket on Aviasales ↗", 'url' => $proposalUrl, 'featured' => true],
+                ['label' => "Official {$cName} Portal ↗", 'url' => $carrierDirectUrl]
             ]
         ];
 
@@ -460,7 +588,8 @@ if ($liveApiSuccess && count($apiFlightOffers) > 0) {
             'routeSub' => $hotel['features'],
             'estCost' => $hotel['estCost'],
             'actions' => [
-                ['label' => "Reserve Room on Booking.com ↗", 'url' => $hotel['url'], 'featured' => true]
+                ['label' => "Reserve Room on Booking.com ↗", 'url' => $hotel['url'], 'featured' => true],
+                ['label' => "Compare on Hotellook ↗", 'url' => $hotel['hotellookUrl']]
             ]
         ];
 
@@ -479,8 +608,9 @@ if ($liveApiSuccess && count($apiFlightOffers) > 0) {
             'stops' => $transfers,
             'provider' => strtolower($cCode),
             'primaryCtaLabel' => "✈️ Book Live Fare on {$cName} (€{$flightPrice}) ➔",
-            'primaryCtaUrl' => $carrierDirectUrl,
+            'primaryCtaUrl' => $proposalUrl, // Direct checkout proposal with locked-in price!
             'proposalUrl' => $proposalUrl,
+            'airlineDirectUrl' => $carrierDirectUrl,
             'stayScore' => $hotel['rating'],
             'totalPrice' => $totalTripPrice,
             'highlight' => $idx === 0,
@@ -490,16 +620,12 @@ if ($liveApiSuccess && count($apiFlightOffers) > 0) {
 }
 
 // --------------------------------------------------------------------------
-// 10. Fallback Schedule Packages (if API offline or 0 offers returned)
+// 10. Fallback Schedule Packages with Geographic Rail Routing
 // --------------------------------------------------------------------------
 if (count($packages) === 0) {
-    $isAustriaOrigin = in_array($originIATA, ['LNZ', 'VIE', 'SZG', 'GRZ', 'KLU']);
-    $isGermanyOrigin = in_array($originIATA, ['MUC', 'FRA', 'BER', 'NUE', 'STR', 'HAM', 'DUS']);
-    $isUKOrigin = in_array($originIATA, ['LON', 'LHR', 'LGW', 'STN', 'MAN']);
-
-    $primaryCarrier = $isAustriaOrigin ? 'Austrian Airlines' : ($isUKOrigin ? 'British Airways' : ($isGermanyOrigin ? 'Lufthansa' : 'Austrian Airlines'));
-    $primaryCarrierCode = $isAustriaOrigin ? 'OS' : ($isUKOrigin ? 'BA' : ($isGermanyOrigin ? 'LH' : 'OS'));
-    $primaryCarrierUrl = $isAustriaOrigin ? $directAirlineUrls['austrian'] : ($isUKOrigin ? $directAirlineUrls['britishAirways'] : $directAirlineUrls['lufthansa']);
+    $primaryCarrier = $originRegion === 'AT' ? 'Austrian Airlines' : ($originRegion === 'GB' ? 'British Airways' : ($originRegion === 'FR' ? 'Air France' : ($originRegion === 'IT' ? 'ITA Airways' : ($originRegion === 'ES' ? 'Iberia' : ($originRegion === 'CH' ? 'SWISS' : 'Lufthansa')))));
+    $primaryCarrierCode = $originRegion === 'AT' ? 'OS' : ($originRegion === 'GB' ? 'BA' : ($originRegion === 'FR' ? 'AF' : ($originRegion === 'IT' ? 'AZ' : ($originRegion === 'ES' ? 'IB' : ($originRegion === 'CH' ? 'LX' : 'LH')))));
+    $primaryCarrierUrl = $originRegion === 'AT' ? $directAirlineUrls['austrian'] : ($originRegion === 'GB' ? $directAirlineUrls['britishAirways'] : ($originRegion === 'FR' ? $directAirlineUrls['airFrance'] : ($originRegion === 'CH' ? $directAirlineUrls['swiss'] : $directAirlineUrls['lufthansa'])));
 
     $packages = [
         [
@@ -519,7 +645,7 @@ if (count($packages) === 0) {
             'stops' => $trainToHubNeeded ? 1 : 0,
             'provider' => strtolower($primaryCarrierCode),
             'primaryCtaLabel' => "✈️ Book Lowest Rate on {$primaryCarrier} ➔",
-            'primaryCtaUrl' => $primaryCarrierUrl,
+            'primaryCtaUrl' => $aviasalesProposalUrl,
             'proposalUrl' => $aviasalesProposalUrl,
             'stayScore' => 9.2,
             'totalPrice' => 485,
@@ -527,15 +653,15 @@ if (count($packages) === 0) {
             'legs' => $trainToHubNeeded ? [
                 [
                     'carrier' => $transitType,
-                    'carrierCode' => 'ÖBB',
+                    'carrierCode' => 'RAIL',
                     'icon' => '🚆',
                     'type' => 'Direct Airport Rail Link',
                     'providerTag' => $transitOperator,
-                    'times' => '07:15 → 08:55 • Non-Stop Railjet',
+                    'times' => '07:15 → 08:55 • Non-Stop Rail Link',
                     'routeSub' => "{$originCity} Hbf → {$hubCity} Airport",
                     'estCost' => $transitEstCost,
                     'actions' => [
-                        ['label' => 'Book on ÖBB Ticket Shop ↗', 'url' => $groundUrls['oebb'], 'featured' => true]
+                        ['label' => "Book on {$activeRail['operator']} ↗", 'url' => $activeRail['url'], 'featured' => true]
                     ]
                 ],
                 [
@@ -548,8 +674,8 @@ if (count($packages) === 0) {
                     'routeSub' => "{$flightOriginCity} ({$flightOriginIATA}) → {$destCity} ({$destIATA})",
                     'estCost' => '€145 / traveler',
                     'actions' => [
-                        ['label' => "Book Direct on {$primaryCarrier} ↗", 'url' => $primaryCarrierUrl, 'featured' => true],
-                        ['label' => 'Aviasales Proposal Link ↗', 'url' => $aviasalesProposalUrl]
+                        ['label' => 'Aviasales Proposal Link ↗', 'url' => $aviasalesProposalUrl, 'featured' => true],
+                        ['label' => "Book Direct on {$primaryCarrier} ↗", 'url' => $primaryCarrierUrl]
                     ]
                 ],
                 [
@@ -562,7 +688,8 @@ if (count($packages) === 0) {
                     'routeSub' => $curatedHotels[0]['features'],
                     'estCost' => $curatedHotels[0]['estCost'],
                     'actions' => [
-                        ['label' => 'Reserve Room on Booking.com ↗', 'url' => $curatedHotels[0]['url'], 'featured' => true]
+                        ['label' => 'Reserve Room on Booking.com ↗', 'url' => $curatedHotels[0]['url'], 'featured' => true],
+                        ['label' => 'Compare on Hotellook ↗', 'url' => $curatedHotels[0]['hotellookUrl']]
                     ]
                 ]
             ] : [
@@ -576,7 +703,8 @@ if (count($packages) === 0) {
                     'routeSub' => "{$flightOriginCity} ({$flightOriginIATA}) → {$destCity} ({$destIATA})",
                     'estCost' => '€165 / traveler',
                     'actions' => [
-                        ['label' => "Book Direct on {$primaryCarrier} ↗", 'url' => $primaryCarrierUrl, 'featured' => true]
+                        ['label' => 'Aviasales Proposal Link ↗', 'url' => $aviasalesProposalUrl, 'featured' => true],
+                        ['label' => "Book Direct on {$primaryCarrier} ↗", 'url' => $primaryCarrierUrl]
                     ]
                 ],
                 [
@@ -589,7 +717,7 @@ if (count($packages) === 0) {
                     'routeSub' => "Terminal → {$destCity} Waterfront",
                     'estCost' => '€6 / traveler',
                     'actions' => [
-                        ['label' => 'Book on ÖBB Ticket Shop ↗', 'url' => $groundUrls['oebb'], 'featured' => true]
+                        ['label' => "Book on {$activeRail['operator']} ↗", 'url' => $activeRail['url'], 'featured' => true]
                     ]
                 ],
                 [
@@ -602,7 +730,8 @@ if (count($packages) === 0) {
                     'routeSub' => $curatedHotels[0]['features'],
                     'estCost' => $curatedHotels[0]['estCost'],
                     'actions' => [
-                        ['label' => 'Reserve Room on Booking.com ↗', 'url' => $curatedHotels[0]['url'], 'featured' => true]
+                        ['label' => 'Reserve Room on Booking.com ↗', 'url' => $curatedHotels[0]['url'], 'featured' => true],
+                        ['label' => 'Compare on Hotellook ↗', 'url' => $curatedHotels[0]['hotellookUrl']]
                     ]
                 ]
             ]
@@ -620,7 +749,7 @@ if (count($packages) === 0) {
             'stops' => 0,
             'provider' => 'ryanair',
             'primaryCtaLabel' => '✈️ Book Lowest Rate on Ryanair ➔',
-            'primaryCtaUrl' => $directAirlineUrls['ryanair'],
+            'primaryCtaUrl' => $aviasalesProposalUrl,
             'proposalUrl' => $aviasalesProposalUrl,
             'stayScore' => 9.0,
             'totalPrice' => 379,
@@ -636,7 +765,8 @@ if (count($packages) === 0) {
                     'routeSub' => "{$flightOriginCity} ({$flightOriginIATA}) → {$destCity} ({$destIATA})",
                     'estCost' => '€58 / traveler',
                     'actions' => [
-                        ['label' => 'Book Direct on Ryanair ↗', 'url' => $directAirlineUrls['ryanair'], 'featured' => true]
+                        ['label' => 'Aviasales Proposal Link ↗', 'url' => $aviasalesProposalUrl, 'featured' => true],
+                        ['label' => 'Book Direct on Ryanair ↗', 'url' => $directAirlineUrls['ryanair']]
                     ]
                 ],
                 [
@@ -649,7 +779,7 @@ if (count($packages) === 0) {
                     'routeSub' => "Airport → Central {$destCity}",
                     'estCost' => '€3.50 / traveler',
                     'actions' => [
-                        ['label' => 'Official Bus Schedule ↗', 'url' => $groundUrls['oebb'], 'featured' => true]
+                        ['label' => 'Official Bus Schedule ↗', 'url' => $activeRail['url'], 'featured' => true]
                     ]
                 ],
                 [
@@ -662,14 +792,15 @@ if (count($packages) === 0) {
                     'routeSub' => $curatedHotels[3]['features'],
                     'estCost' => $curatedHotels[3]['estCost'],
                     'actions' => [
-                        ['label' => 'Reserve on Booking.com ↗', 'url' => $curatedHotels[3]['url'], 'featured' => true]
+                        ['label' => 'Reserve on Booking.com ↗', 'url' => $curatedHotels[3]['url'], 'featured' => true],
+                        ['label' => 'Compare on Hotellook ↗', 'url' => $curatedHotels[3]['hotellookUrl']]
                     ]
                 ]
             ]
         ],
         [
             'id' => 'pkg-3',
-            'title' => "Lufthansa Premium Star Alliance Express & 5★ Luxury Palace",
+            'title' => "{$primaryCarrier} Star Alliance Express & 5★ Luxury Palace",
             'desc' => "Premium cabin service, lounge access, Star Alliance reliability, and full 5-star seafront luxury palace.",
             'badge' => '✨ 5-Star Luxury Pick',
             'badgeClass' => 'luxury',
@@ -678,25 +809,26 @@ if (count($packages) === 0) {
             'durationMinutes' => 190,
             'co2kg' => 54,
             'stops' => 0,
-            'provider' => 'lufthansa',
-            'primaryCtaLabel' => '✈️ Book Direct on Lufthansa ➔',
-            'primaryCtaUrl' => $directAirlineUrls['lufthansa'],
+            'provider' => strtolower($primaryCarrierCode),
+            'primaryCtaLabel' => "✈️ Book Direct on {$primaryCarrier} ➔",
+            'primaryCtaUrl' => $aviasalesProposalUrl,
             'proposalUrl' => $aviasalesProposalUrl,
             'stayScore' => 9.5,
             'totalPrice' => 745,
             'highlight' => false,
             'legs' => [
                 [
-                    'carrier' => 'Lufthansa Scheduled Flight',
-                    'carrierCode' => 'LH',
+                    'carrier' => "{$primaryCarrier} Scheduled Flight",
+                    'carrierCode' => $primaryCarrierCode,
                     'icon' => '✈️',
-                    'type' => 'Star Alliance Scheduled Flight',
-                    'providerTag' => 'Lufthansa Direct',
-                    'times' => '11:45 → 14:30 • Flight LH 1750',
+                    'type' => 'Premium Scheduled Flight',
+                    'providerTag' => "{$primaryCarrier} Direct",
+                    'times' => '11:45 → 14:30 • Flight VIP 1750',
                     'routeSub' => "{$flightOriginCity} ({$flightOriginIATA}) → {$destCity} ({$destIATA})",
                     'estCost' => '€195 / traveler',
                     'actions' => [
-                        ['label' => 'Book Direct on Lufthansa ↗', 'url' => $directAirlineUrls['lufthansa'], 'featured' => true]
+                        ['label' => 'Aviasales Proposal Link ↗', 'url' => $aviasalesProposalUrl, 'featured' => true],
+                        ['label' => "Book Direct on {$primaryCarrier} ↗", 'url' => $primaryCarrierUrl]
                     ]
                 ],
                 [
@@ -722,15 +854,16 @@ if (count($packages) === 0) {
                     'routeSub' => $curatedHotels[1]['features'],
                     'estCost' => $curatedHotels[1]['estCost'],
                     'actions' => [
-                        ['label' => 'Reserve 5-Star on Booking.com ↗', 'url' => $curatedHotels[1]['url'], 'featured' => true]
+                        ['label' => 'Reserve 5-Star on Booking.com ↗', 'url' => $curatedHotels[1]['url'], 'featured' => true],
+                        ['label' => 'Compare on Hotellook ↗', 'url' => $curatedHotels[1]['hotellookUrl']]
                     ]
                 ]
             ]
         ],
         [
             'id' => 'pkg-4',
-            'title' => "Scenic Alpine Rail Transfer & Flight + Coastal Car Hire",
-            'desc' => "Complete freedom: panoramic alpine rail transit, non-stop flight, and unlimited mileage rental car.",
+            'title' => "Scenic Regional Rail Transfer & Flight + Coastal Car Hire",
+            'desc' => "Complete freedom: panoramic {$activeRail['transitName']} transit, non-stop flight, and unlimited mileage rental car.",
             'badge' => '🚗 Flight + Car Freedom',
             'badgeClass' => 'scenic',
             'category' => 'flight-car',
@@ -756,7 +889,8 @@ if (count($packages) === 0) {
                     'routeSub' => "{$flightOriginCity} → {$destCity}",
                     'estCost' => '€130 / traveler',
                     'actions' => [
-                        ['label' => "Book on {$primaryCarrier} ↗", 'url' => $primaryCarrierUrl, 'featured' => true]
+                        ['label' => 'Aviasales Proposal Link ↗', 'url' => $aviasalesProposalUrl, 'featured' => true],
+                        ['label' => "Book on {$primaryCarrier} ↗", 'url' => $primaryCarrierUrl]
                     ]
                 ],
                 [
@@ -782,7 +916,8 @@ if (count($packages) === 0) {
                     'routeSub' => $curatedHotels[2]['features'],
                     'estCost' => $curatedHotels[2]['estCost'],
                     'actions' => [
-                        ['label' => 'Reserve Villa on Airbnb ↗', 'url' => $curatedHotels[2]['url'], 'featured' => true]
+                        ['label' => 'Reserve Villa on Airbnb ↗', 'url' => $curatedHotels[2]['url'], 'featured' => true],
+                        ['label' => 'Compare on Hotellook ↗', 'url' => $curatedHotels[2]['hotellookUrl']]
                     ]
                 ]
             ]
@@ -790,7 +925,7 @@ if (count($packages) === 0) {
         [
             'id' => 'pkg-5',
             'title' => "Eco-Express Rail Link & Certified Green Stay",
-            'desc' => "Lowest ecological footprint: 100% renewable electric rail transit and certified eco-boutique property.",
+            'desc' => "Lowest ecological footprint: 100% renewable electric rail transit on {$activeRail['ecoCarrier']} and certified eco-boutique property.",
             'badge' => '🌿 Eco Pioneer (<20kg CO2)',
             'badgeClass' => 'eco',
             'category' => 'train-stay',
@@ -798,26 +933,26 @@ if (count($packages) === 0) {
             'durationMinutes' => 410,
             'co2kg' => 14,
             'stops' => 1,
-            'provider' => 'oebb',
-            'primaryCtaLabel' => '🚆 Book on ÖBB Ticket Shop ➔',
-            'primaryCtaUrl' => $groundUrls['oebb'],
+            'provider' => strtolower($originRegion),
+            'primaryCtaLabel' => "🚆 {$activeRail['label']} ➔",
+            'primaryCtaUrl' => $activeRail['url'],
             'proposalUrl' => $aviasalesProposalUrl,
             'stayScore' => 9.0,
             'totalPrice' => 435,
             'highlight' => false,
             'legs' => [
                 [
-                    'carrier' => 'ÖBB / SBB Green Railjet',
+                    'carrier' => $activeRail['ecoCarrier'],
                     'carrierCode' => 'GREEN',
                     'icon' => '🚆',
                     'type' => '100% Renewable Electric Rail',
-                    'providerTag' => 'ÖBB Ticket Shop',
+                    'providerTag' => $activeRail['operator'],
                     'times' => '08:45 → 14:15 • Silent Eco Car',
                     'routeSub' => "{$originCity} → Destination Rail Terminal",
                     'estCost' => '€85 / traveler',
                     'actions' => [
-                        ['label' => 'Book on ÖBB Ticket Shop ↗', 'url' => $groundUrls['oebb'], 'featured' => true],
-                        ['label' => 'Book on Deutsche Bahn ↗', 'url' => $groundUrls['db']]
+                        ['label' => $activeRail['label'], 'url' => $activeRail['url'], 'featured' => true],
+                        ['label' => 'Book on Trainline ↗', 'url' => $groundUrls['trainline']]
                     ]
                 ],
                 [
@@ -830,7 +965,7 @@ if (count($packages) === 0) {
                     'routeSub' => "Station → Green Eco Resort",
                     'estCost' => '€10 / traveler',
                     'actions' => [
-                        ['label' => 'Book on ÖBB Ticket Shop ↗', 'url' => $groundUrls['oebb'], 'featured' => true]
+                        ['label' => $activeRail['label'], 'url' => $activeRail['url'], 'featured' => true]
                     ]
                 ],
                 [
@@ -843,7 +978,8 @@ if (count($packages) === 0) {
                     'routeSub' => $curatedHotels[4]['features'],
                     'estCost' => $curatedHotels[4]['estCost'],
                     'actions' => [
-                        ['label' => 'Reserve Room on Booking.com ↗', 'url' => $curatedHotels[4]['url'], 'featured' => true]
+                        ['label' => 'Reserve Room on Booking.com ↗', 'url' => $curatedHotels[4]['url'], 'featured' => true],
+                        ['label' => 'Compare on Hotellook ↗', 'url' => $curatedHotels[4]['hotellookUrl']]
                     ]
                 ]
             ]
@@ -863,6 +999,7 @@ $response = [
     'query' => [
         'origin' => $originCity,
         'originIATA' => $originIATA,
+        'originRegion' => $originRegion,
         'destination' => $destCity,
         'destIATA' => $destIATA,
         'departDate' => $departDate,
@@ -907,6 +1044,12 @@ $response = [
             'icon' => '🔍',
             'url' => $comparisonLinks['kayak'],
             'type' => 'aggregator'
+        ],
+        [
+            'name' => 'Hotellook Stays',
+            'icon' => '🏨',
+            'url' => $hotelUrls['hotellook'],
+            'type' => 'stays'
         ],
         [
             'name' => 'Booking.com Stays',
