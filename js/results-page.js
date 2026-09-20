@@ -1198,7 +1198,48 @@ function initResultsPage() {
     }
   }
 
-  // Initial render & live sync
+  // --------------------------------------------------------------------------
+  // 8. Global 10,000+ IATA Asynchronous Refinement (Travelpayouts Places API)
+  // --------------------------------------------------------------------------
+  async function refineGlobalIataContext() {
+    if (typeof TripMuraIATA === 'undefined' || !TripMuraIATA.resolveGlobalIata) return;
+
+    try {
+      const [refinedOriginIATA, refinedDestIATA] = await Promise.all([
+        TripMuraIATA.resolveGlobalIata(rawFrom, originIATA),
+        TripMuraIATA.resolveGlobalIata(rawTo, destIATA)
+      ]);
+
+      let updated = false;
+      if (refinedOriginIATA && refinedOriginIATA !== searchState.originIATA) {
+        searchState.originIATA = refinedOriginIATA;
+        updated = true;
+      }
+      if (refinedDestIATA && refinedDestIATA !== searchState.destIATA) {
+        searchState.destIATA = refinedDestIATA;
+        updated = true;
+      }
+
+      if (updated) {
+        const newDirectUrls = TripMuraIATA.buildDirectProviderUrls(searchState);
+        Object.assign(directUrls, newDirectUrls);
+
+        if (summaryRouteText) {
+          summaryRouteText.textContent = directUrls.hubRoute.needsHubTransfer
+            ? `${originCity} ➔ ${directUrls.hubRoute.hubCity} (${directUrls.hubRoute.hubIATA}) ➔ ${destCity} (${directUrls.destIATA})`
+            : `${originCity} (${directUrls.originIATA}) ➔ ${destCity} (${directUrls.destIATA})`;
+        }
+
+        allItineraries = generateItineraries();
+        applyFiltersAndSort();
+      }
+    } catch (e) {
+      // Gracefully ignore
+    }
+  }
+
+  // Initial render, global IATA sync & live proposals fetch
   applyFiltersAndSort();
+  refineGlobalIataContext();
   fetchLiveProposals();
 }

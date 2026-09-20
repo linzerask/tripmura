@@ -234,15 +234,47 @@
     'chisinau': 'RMO',
     'chișinău': 'RMO',
 
-    // Global Hubs
+    // Global & Holiday Hubs
     'tokyo': 'TYO',
     'tokyo haneda': 'HND',
     'tokyo narita': 'NRT',
     'new york': 'NYC',
     'new york jfk': 'JFK',
+    'newark': 'EWR',
     'dubai': 'DXB',
     'singapore': 'SIN',
-    'bangkok': 'BKK'
+    'bangkok': 'BKK',
+    'bali': 'DPS',
+    'denpasar': 'DPS',
+    'phuket': 'HKT',
+    'koh samui': 'USM',
+    'maldives': 'MLE',
+    'male': 'MLE',
+    'seychelles': 'SEZ',
+    'mauritius': 'MRU',
+    'cancun': 'CUN',
+    'punta cana': 'PUJ',
+    'los angeles': 'LAX',
+    'miami': 'MIA',
+    'orlando': 'MCO',
+    'san francisco': 'SFO',
+    'toronto': 'YYZ',
+    'vancouver': 'YVR',
+    'sydney': 'SYD',
+    'melbourne': 'MEL',
+    'auckland': 'AKL',
+    'cape town': 'CPT',
+    'johannesburg': 'JNB',
+    'cairo': 'CAI',
+    'hurghada': 'HRG',
+    'sharm el sheikh': 'SSH',
+    'istanbul': 'IST',
+    'antalya': 'AYT',
+    'bodrum': 'BJV',
+    'dalaman': 'DLM',
+    'izmir': 'ADB',
+    'marrakech': 'RAK',
+    'casablanca': 'CMN'
   };
 
   /**
@@ -337,6 +369,23 @@
   }
 
   /**
+   * Formats a date into DDMM format (e.g. 2026-09-27 -> 2709).
+   */
+  function formatDateDDMM(dateStr, offsetDays = 0) {
+    let dateObj;
+    if (dateStr && !isNaN(Date.parse(dateStr))) {
+      dateObj = new Date(dateStr);
+    } else {
+      dateObj = new Date();
+      dateObj.setDate(dateObj.getDate() + offsetDays);
+    }
+
+    const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const dd = String(dateObj.getDate()).padStart(2, '0');
+    return `${dd}${mm}`;
+  }
+
+  /**
    * Formats a date into standard ISO YYYY-MM-DD format.
    */
   function formatDateISO(dateStr, offsetDays = 0) {
@@ -352,6 +401,85 @@
     const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
     const dd = String(dateObj.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
+  }
+
+  // In-memory cache for fast repeated global API lookups
+  const IATA_CACHE = {};
+
+  /**
+   * Asynchronously resolves any city/airport string across 10,000+ global destinations
+   * using the official Travelpayouts Places API with instant local dictionary fallback.
+   */
+  async function resolveGlobalIata(locationString, fallbackCode = 'LON') {
+    if (!locationString || typeof locationString !== 'string') {
+      return fallbackCode.toUpperCase();
+    }
+
+    const str = locationString.trim();
+
+    // 1. Explicit 3-letter IATA match in string (e.g. "London (LON)" or "TSR")
+    const match = str.match(/\(([A-Za-z]{3})\)/);
+    if (match && match[1]) {
+      return match[1].toUpperCase();
+    }
+    if (/^[A-Za-z]{3}$/.test(str)) {
+      return str.toUpperCase();
+    }
+
+    // 2. Check local database match first
+    const normalized = str.toLowerCase().replace(/[,.-]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (IATA_DATABASE[normalized]) {
+      return IATA_DATABASE[normalized];
+    }
+    const cleanCity = getCleanCityName(str, str).toLowerCase();
+    if (IATA_DATABASE[cleanCity]) {
+      return IATA_DATABASE[cleanCity];
+    }
+
+    // 3. Check memory & localStorage cache
+    const cleanKey = str.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (IATA_CACHE[cleanKey]) {
+      return IATA_CACHE[cleanKey];
+    }
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const cached = localStorage.getItem(`tripmura_iata_${cleanKey}`);
+        if (cached && /^[A-Z]{3}$/.test(cached)) {
+          IATA_CACHE[cleanKey] = cached;
+          return cached;
+        }
+      } catch (e) {}
+    }
+
+    // 4. Query Travelpayouts Global 10,000+ Places Autocomplete API
+    try {
+      const cleanQuery = getCleanCityName(str, str);
+      const endpoint = `https://autocomplete.travelpayouts.com/places2?term=${encodeURIComponent(cleanQuery)}&locale=en&types[]=airport&types[]=city`;
+      const res = await fetch(endpoint);
+      if (res.ok) {
+        const places = await res.json();
+        if (Array.isArray(places) && places.length > 0) {
+          for (const item of places) {
+            const code = (item.code || item.city_code || '').toUpperCase();
+            if (code && /^[A-Z]{3}$/.test(code)) {
+              IATA_CACHE[cleanKey] = code;
+              IATA_DATABASE[cleanKey] = code;
+              if (typeof window !== 'undefined' && window.localStorage) {
+                try {
+                  localStorage.setItem(`tripmura_iata_${cleanKey}`, code);
+                } catch (e) {}
+              }
+              return code;
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.info('[TripMura IATA] Autocomplete API offline, using local dictionary:', err.message);
+    }
+
+    // 5. Fallback to offline heuristic
+    return resolveIATA(str, fallbackCode);
   }
 
   /**
@@ -788,8 +916,10 @@
     CONFIG,
     IATA_DATABASE,
     resolveIATA,
+    resolveGlobalIata,
     getCleanCityName,
     formatDateYYMMDD,
+    formatDateDDMM,
     formatDateISO,
     detectGeoRegion,
     resolveSmartHubRoute,
