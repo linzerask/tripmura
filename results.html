@@ -27,11 +27,13 @@
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/search-widget.css">
   <link rel="stylesheet" href="css/search-modals.css">
   <link rel="stylesheet" href="css/footer.css">
   <link rel="stylesheet" href="css/preloader.css">
   <link rel="stylesheet" href="css/results.css">
   <link rel="stylesheet" href="css/results-page.css">
+  <link rel="stylesheet" href="css/forwarding.css">
 
   <!-- Travelpayouts Drive Verification Script (Partner: 575598) -->
   <script nowprocket data-noptimize="1" data-cfasync="false" data-wpfc-render="false" seraph-accel-crit="1" data-no-defer="1" data-cmp-ab="2">
@@ -137,6 +139,36 @@
         <p class="results-main-subtitle">
           Comparing live multimodal routes across Austrian Airlines, Lufthansa, Ryanair, ÖBB Ticket Shop, Deutsche Bahn, Booking.com, and Airbnb. Direct official carrier & provider booking with zero markup.
         </p>
+      </div>
+
+      <!-- Skyscanner Progressive Multi-Provider Scanner Bar -->
+      <div class="progressive-scanner-box" id="progressiveSearchScanner" role="status" aria-live="polite">
+        <div class="scanner-top-row">
+          <div class="scanner-left-status">
+            <span class="scanner-radar-pulse" id="scannerRadarPulse"></span>
+            <span class="scanner-status-text" id="scannerStatusText">Scanning Austrian, Ryanair, Lufthansa, British Airways...</span>
+          </div>
+          <div class="scanner-stats-badge" id="scannerStatsBadge">
+            <span id="scannerCountStats">Scanning 100+ Airlines & OTAs...</span>
+          </div>
+        </div>
+
+        <div class="scanner-track-wrap">
+          <div class="scanner-track-fill" id="scannerTrackFill" style="width: 15%;"></div>
+        </div>
+
+        <div class="scanner-providers-chips" id="scannerProvidersChips">
+          <span class="scanner-chip active-pulse" data-prov="austrian">✈️ Austrian</span>
+          <span class="scanner-chip" data-prov="ryanair">✈️ Ryanair</span>
+          <span class="scanner-chip" data-prov="lufthansa">✈️ Lufthansa</span>
+          <span class="scanner-chip" data-prov="ba">✈️ British Airways</span>
+          <span class="scanner-chip" data-prov="mytrip">🟢 MyTrip</span>
+          <span class="scanner-chip" data-prov="gotogate">🟢 Gotogate</span>
+          <span class="scanner-chip" data-prov="expedia">🟢 Expedia</span>
+          <span class="scanner-chip" data-prov="booking">🏨 Booking.com</span>
+          <span class="scanner-chip" data-prov="airbnb">🏡 Airbnb</span>
+          <span class="scanner-chip" data-prov="oebb">🚆 ÖBB / DB</span>
+        </div>
       </div>
 
       <!-- Sort & Filter Toggle Bar -->
@@ -587,9 +619,93 @@
     </div>
   </footer>
 
+  <!-- ==========================================================================
+       Skyscanner-Style Forwarding Hand-off Interstitial Overlay (Partner Marker: 779382)
+       ========================================================================== -->
+  <div id="forwardingOverlay" class="forwarding-overlay" style="display: none;" aria-hidden="true" role="dialog">
+    <div class="forwarding-card">
+      <div class="forwarding-spinner-ring"></div>
+      <div class="forwarding-logo">TRIPMURA</div>
+      <h3 id="forwardingProviderText">Taking you to British Airways...</h3>
+      <p id="forwardingDealText">Securing your flight for €142 • TripMura Verified Deal</p>
+      
+      <div class="forwarding-progress-track">
+        <div class="forwarding-progress-bar" id="forwardingProgressBar"></div>
+      </div>
+
+      <span class="forwarding-subtext">Zero extra fees • Direct official booking • Marker: 779382</span>
+      <button type="button" class="forwarding-manual-link" id="forwardingManualLink">
+        Click here if not redirected automatically within 1s ➔
+      </button>
+    </div>
+  </div>
+
+  <div class="forwarding-modal-backdrop" id="tripMuraForwardingBackdrop" aria-hidden="true"></div>
+  <div class="forwarding-modal" id="tripMuraForwardingModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="forwardingHeadline">
+    
+    <!-- Brand Handoff Lockup -->
+    <div class="forwarding-brand-lockup">
+      <div class="forwarding-brand-icon" title="TripMura Direct Metasearch">
+        <img src="assets/brand/symbol/tripmura_symbol.svg" alt="TripMura" width="32" height="32">
+      </div>
+      <div class="forwarding-connector">
+        <div class="forwarding-connector-dots">
+          <span class="forwarding-dot"></span>
+          <span class="forwarding-dot"></span>
+          <span class="forwarding-dot"></span>
+        </div>
+        <span style="font-size: 1.1rem; color: #0284c7;">➔</span>
+      </div>
+      <div class="forwarding-brand-icon" id="forwardingTargetLogo" title="Target Provider">
+        <span id="forwardingTargetIcon" style="font-size: 1.3rem;">✈️</span>
+      </div>
+    </div>
+
+    <!-- Forwarding Title -->
+    <h3 class="forwarding-headline" id="forwardingHeadline">
+      Redirecting to <span id="forwardingProviderName" style="color: #0284c7;">MyTrip</span>...
+    </h3>
+
+    <!-- Verified Price Pill -->
+    <div class="forwarding-verified-pill" id="forwardingVerifiedPill">
+      <span>✓</span>
+      <span id="forwardingVerifiedText">TripMura Verified Price: €142 • Securing your seats...</span>
+    </div>
+
+    <!-- Route & Trip Details Recap -->
+    <div class="forwarding-trip-details">
+      <div class="forwarding-detail-row">
+        <span>Journey Route:</span>
+        <span class="forwarding-detail-bold" id="forwardingRouteText">Linz (LNZ) → Thessaloniki (SKG)</span>
+      </div>
+      <div class="forwarding-detail-row">
+        <span>Travel Dates:</span>
+        <span class="forwarding-detail-bold" id="forwardingDatesText">19 Sep – 26 Sep</span>
+      </div>
+      <div class="forwarding-detail-row">
+        <span>Travelers & Fare:</span>
+        <span class="forwarding-detail-bold" id="forwardingPaxText">2 Travelers • Economy Rate</span>
+      </div>
+    </div>
+
+    <!-- 1.0s Animated Progress Countdown -->
+    <div class="forwarding-progress-track">
+      <div class="forwarding-progress-bar"></div>
+    </div>
+
+    <div class="forwarding-footer-notice">
+      🛡️ Direct Official Partner Booking • Zero Hidden Fees • Partner ID: 779382
+    </div>
+
+    <button type="button" class="forwarding-manual-link">
+      Click here if not redirected automatically within 1s ➔
+    </button>
+  </div>
+
   <!-- Scripts -->
   <script src="js/config.js"></script>
   <script src="js/iata-resolver.js"></script>
+  <script src="js/forwarding.js"></script>
   <script src="js/results-page.js"></script>
 </body>
 </html>

@@ -1231,3 +1231,550 @@ html, body {
     padding: 4px 8px;
   }
 }
+
+/* ==========================================================================
+   10. Skyscanner Engine: Progressive Multi-Provider Scanner
+   ========================================================================== */
+.progressive-scanner-box {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(2, 132, 199, 0.18);
+  border-radius: 18px;
+  padding: 16px 20px;
+  margin-bottom: 22px;
+  box-shadow: 0 10px 30px -8px rgba(2, 132, 199, 0.08), 0 2px 8px rgba(15, 23, 42, 0.03);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scanner-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.scanner-left-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.scanner-radar-pulse {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--azure-600, #0284c7);
+  flex-shrink: 0;
+}
+
+.scanner-radar-pulse::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--azure-600, #0284c7);
+  animation: radarPulse 1.4s ease-out infinite;
+  opacity: 0.8;
+}
+
+@keyframes radarPulse {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.scanner-status-text {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity 0.15s ease;
+}
+
+.scanner-status-text.fading {
+  opacity: 0.3;
+}
+
+.scanner-stats-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: var(--azure-50, #f0f9ff);
+  border: 1px solid rgba(2, 132, 199, 0.2);
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--azure-700, #0369a1);
+  flex-shrink: 0;
+}
+
+.scanner-track-wrap {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.scanner-track-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00f2fe 0%, #0284c7 100%);
+  border-radius: 9999px;
+  transition: width 0.15s linear;
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+}
+
+.scanner-providers-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+
+.scanner-providers-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.scanner-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #64748b;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.scanner-chip.active-pulse {
+  background: #f0f9ff;
+  border-color: #38bdf8;
+  color: #0284c7;
+  font-weight: 800;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.35);
+  transform: translateY(-1px);
+}
+
+.scanner-chip.verified-done {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #16a34a;
+}
+
+/* ==========================================================================
+   11. Skyscanner Multi-Provider Deal Matrix
+   ========================================================================== */
+.card-deal-matrix-strip {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.deal-strip-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.deal-strip-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.deal-mini-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.deal-mini-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.deal-mini-pill:hover {
+  border-color: #0284c7;
+  color: #0284c7;
+  background: #f0f9ff;
+}
+
+.deal-mini-pill.cheapest {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #15803d;
+  font-weight: 800;
+}
+
+.btn-toggle-deal-matrix {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #0284c7;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background 0.15s ease;
+}
+
+.btn-toggle-deal-matrix:hover {
+  background: #e0f2fe;
+}
+
+.card-deal-matrix-expandable {
+  margin-top: 10px;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeInDown 0.2s ease-out forwards;
+}
+
+.card-deal-matrix-expandable.open {
+  display: flex;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.deal-provider-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  transition: all 0.15s ease;
+}
+
+.deal-provider-row:hover {
+  border-color: #38bdf8;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.06);
+}
+
+.deal-provider-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.deal-provider-logo {
+  font-size: 1.1rem;
+}
+
+.deal-provider-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.deal-provider-name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.deal-provider-name {
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.deal-provider-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.deal-provider-badge.cheapest {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.deal-provider-badge.direct {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.deal-provider-badge.popular {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.deal-provider-sub {
+  font-size: 0.74rem;
+  color: #64748b;
+}
+
+.deal-provider-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.deal-provider-price {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.btn-book-provider-deal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #0284c7;
+  color: #ffffff !important;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+}
+
+.btn-book-provider-deal:hover {
+  background: #0369a1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+}
+
+.btn-book-provider-deal.cheapest {
+  background: #16a34a;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+}
+
+.btn-book-provider-deal.cheapest:hover {
+  background: #15803d;
+}
+
+/* ==========================================================================
+   12. Skyscanner Forwarding Interstitial Modal
+   ========================================================================== */
+.forwarding-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.forwarding-modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.forwarding-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -46%) scale(0.96);
+  width: 92%;
+  max-width: 520px;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 32px 28px;
+  z-index: 2001;
+  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.3), 0 0 0 1px rgba(15, 23, 42, 0.05);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: center;
+}
+
+.forwarding-modal.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.forwarding-brand-lockup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.forwarding-brand-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.forwarding-connector {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+}
+
+.forwarding-connector-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.forwarding-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38bdf8;
+  animation: forwardingPulse 1s ease-in-out infinite alternate;
+}
+
+.forwarding-dot:nth-child(2) { animation-delay: 0.2s; }
+.forwarding-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes forwardingPulse {
+  from { transform: scale(0.8); opacity: 0.4; }
+  to { transform: scale(1.3); opacity: 1; }
+}
+
+.forwarding-headline {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.forwarding-verified-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #15803d;
+  margin-bottom: 18px;
+}
+
+.forwarding-trip-details {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.forwarding-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: #475569;
+  margin-bottom: 6px;
+}
+
+.forwarding-detail-row:last-child {
+  margin-bottom: 0;
+}
+
+.forwarding-detail-bold {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.forwarding-progress-track {
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.forwarding-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00f2fe 0%, #0284c7 100%);
+  border-radius: 9999px;
+  animation: forwardingProgress 1s cubic-bezier(0.1, 0.7, 0.1, 1) forwards;
+}
+
+@keyframes forwardingProgress {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+.forwarding-footer-notice {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  margin-bottom: 12px;
+}
+
+.forwarding-manual-link {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #0284c7;
+  text-decoration: underline;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}

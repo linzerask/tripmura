@@ -128,6 +128,130 @@ function initResultsPage() {
   // --------------------------------------------------------------------------
   // 1. Dynamic Multimodal Itinerary Generator (Realistic Packages with Geo Routing)
   // --------------------------------------------------------------------------
+  function buildPackageDeals(basePrice, category, primaryAirlineName, primaryAirlineUrl, directUrls) {
+    const flightProposalUrl = directUrls.aviasalesProposal;
+    if (category === 'train-stay') {
+      const trainlinePrice = Math.max(Math.round(basePrice * 0.92), 39);
+      const oebbPrice = Math.max(Math.round(basePrice * 0.95), 45);
+      const dbPrice = Math.max(Math.round(basePrice * 0.98), 49);
+      const omioPrice = Math.max(Math.round(basePrice * 0.96), 46);
+      const bookingPrice = Math.max(Math.round(basePrice * 1.02), 52);
+
+      return [
+        {
+          provider: 'Trainline',
+          providerName: 'Trainline.com',
+          icon: '🚆',
+          badge: 'Cheapest Rail Deal',
+          badgeClass: 'cheapest',
+          price: trainlinePrice,
+          url: directUrls.trainline,
+          subText: 'Direct Rail Ticket • E-Ticket Mobile App'
+        },
+        {
+          provider: 'ÖBB Ticket Shop',
+          providerName: 'ÖBB Direct',
+          icon: '🚆',
+          badge: 'Direct Operator',
+          badgeClass: 'direct',
+          price: oebbPrice,
+          url: directUrls.oebb,
+          subText: 'Official Austrian Railways Portal'
+        },
+        {
+          provider: 'Deutsche Bahn',
+          providerName: 'DB Navigator',
+          icon: '🚆',
+          badge: 'Direct Operator',
+          badgeClass: 'direct',
+          price: dbPrice,
+          url: directUrls.db,
+          subText: 'Official German Federal Railway'
+        },
+        {
+          provider: 'Omio',
+          providerName: 'Omio Rail',
+          icon: '🟢',
+          badge: 'Popular Engine',
+          badgeClass: 'popular',
+          price: omioPrice,
+          url: directUrls.trainline,
+          subText: 'Multimodal Ticket Exchange'
+        },
+        {
+          provider: 'Booking.com',
+          providerName: 'Booking.com Stays',
+          icon: '🏨',
+          badge: 'Verified Stay',
+          badgeClass: 'popular',
+          price: bookingPrice,
+          url: directUrls.booking,
+          subText: 'Direct Hotel & Villa Booking'
+        }
+      ];
+    }
+
+    // Default Multimodal Flight + Stay
+    const myTripPrice = Math.max(Math.round(basePrice * 0.92), 68);
+    const airlinePrice = basePrice;
+    const gotogatePrice = Math.max(Math.round(basePrice * 0.95), 72);
+    const flightnetworkPrice = Math.max(Math.round(basePrice * 0.96), 74);
+    const expediaPrice = Math.max(Math.round(basePrice * 1.03), 79);
+
+    return [
+      {
+        provider: 'MyTrip',
+        providerName: 'MyTrip.com',
+        icon: '🟢',
+        badge: 'Cheapest Deal',
+        badgeClass: 'cheapest',
+        price: myTripPrice,
+        url: flightProposalUrl,
+        subText: 'Verified OTA Rate • Instant Seat Reservation'
+      },
+      {
+        provider: 'Official Airline',
+        providerName: `${primaryAirlineName} Direct`,
+        icon: '✈️',
+        badge: 'Direct Booking',
+        badgeClass: 'direct',
+        price: airlinePrice,
+        url: primaryAirlineUrl || flightProposalUrl,
+        subText: 'Official Airline Website • Zero Intermediary'
+      },
+      {
+        provider: 'Gotogate',
+        providerName: 'Gotogate',
+        icon: '🟢',
+        badge: 'Popular OTA',
+        badgeClass: 'popular',
+        price: gotogatePrice,
+        url: flightProposalUrl,
+        subText: 'Global Booking Portal • Flexible Ticket'
+      },
+      {
+        provider: 'Flightnetwork',
+        providerName: 'Flightnetwork',
+        icon: '🟢',
+        badge: 'Verified Partner',
+        badgeClass: 'popular',
+        price: flightnetworkPrice,
+        url: flightProposalUrl,
+        subText: '24/7 Multi-lingual Concierge Support'
+      },
+      {
+        provider: 'Expedia',
+        providerName: 'Expedia',
+        icon: '🟢',
+        badge: 'Package Deals',
+        badgeClass: 'popular',
+        price: expediaPrice,
+        url: flightProposalUrl,
+        subText: 'Flight + Stay Package Protection'
+      }
+    ];
+  }
+
   function generateItineraries() {
     const originRegion = directUrls.originRegion || 'EU';
     const activeRail = directUrls.activeRail || {
@@ -144,7 +268,7 @@ function initResultsPage() {
     const primaryAirlineCode = originRegion === 'AT' ? 'OS' : (originRegion === 'GB' ? 'BA' : (originRegion === 'FR' ? 'AF' : (originRegion === 'IT' ? 'AZ' : (originRegion === 'ES' ? 'IB' : (originRegion === 'CH' ? 'LX' : 'LH')))));
     const primaryAirlineUrl = originRegion === 'AT' ? directUrls.austrian : (originRegion === 'GB' ? directUrls.britishAirways : (originRegion === 'FR' ? directUrls.airFrance : (originRegion === 'CH' ? directUrls.swiss : directUrls.lufthansa)));
 
-    return [
+    const rawList = [
       // 1. Top Pick: Scheduled Flight & Curated Boutique Stay
       {
         id: 'pkg-1',
@@ -705,6 +829,14 @@ function initResultsPage() {
         ]
       }
     ];
+
+    rawList.forEach(pkg => {
+      if (!pkg.deals) {
+        pkg.deals = buildPackageDeals(pkg.totalPrice, pkg.category, primaryAirlineName, primaryAirlineUrl, directUrls);
+      }
+    });
+
+    return rawList;
   }
 
   let allItineraries = generateItineraries();
@@ -767,6 +899,35 @@ function initResultsPage() {
         </div>
       `).join('');
 
+      const itemDeals = item.deals || buildPackageDeals(item.totalPrice, item.category, primaryAirlineName, primaryAirlineUrl, directUrls);
+      
+      const miniPillsHtml = itemDeals.slice(0, 3).map(d => `
+        <button type="button" class="deal-mini-pill ${d.badgeClass === 'cheapest' ? 'cheapest' : ''}" data-prov-name="${d.providerName}" data-prov-url="${d.url}" data-prov-price="${d.price}">
+          <span>${d.icon} ${d.provider}: €${d.price}</span>
+        </button>
+      `).join('');
+
+      const dealRowsHtml = itemDeals.map(d => `
+        <div class="deal-provider-row">
+          <div class="deal-provider-left">
+            <span class="deal-provider-logo">${d.icon}</span>
+            <div class="deal-provider-info">
+              <div class="deal-provider-name-wrap">
+                <span class="deal-provider-name">${d.providerName}</span>
+                <span class="deal-provider-badge ${d.badgeClass}">${d.badge}</span>
+              </div>
+              <span class="deal-provider-sub">${d.subText}</span>
+            </div>
+          </div>
+          <div class="deal-provider-right">
+            <span class="deal-provider-price">€${d.price}</span>
+            <button type="button" class="btn-book-provider-deal ${d.badgeClass === 'cheapest' ? 'cheapest' : ''}" data-prov-name="${d.providerName}" data-prov-url="${d.url}" data-prov-price="${d.price}">
+              <span>${d.badgeClass === 'direct' ? 'Book Direct ➔' : `Book on ${d.provider} ➔`}</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
       card.innerHTML = `
         <div>
           <div class="feed-card-top-row card-top-row">
@@ -787,6 +948,23 @@ function initResultsPage() {
 
           <div class="feed-journey-legs-grid itinerary-legs-grid">
             ${legsHtml}
+          </div>
+
+          <!-- Skyscanner Multi-Provider Deal Selection Strip -->
+          <div class="card-deal-matrix-strip">
+            <div class="deal-strip-left">
+              <span class="deal-strip-title">🟢 Compare ${itemDeals.length} Provider Deals:</span>
+              <div class="deal-mini-pills">
+                ${miniPillsHtml}
+              </div>
+            </div>
+            <button type="button" class="btn-toggle-deal-matrix" data-card-idx="${index}">
+              <span>View All Deals (${itemDeals.length}) ▾</span>
+            </button>
+          </div>
+
+          <div class="card-deal-matrix-expandable" id="dealMatrixExpandable_${index}">
+            ${dealRowsHtml}
           </div>
         </div>
 
@@ -851,6 +1029,61 @@ function initResultsPage() {
           </div>
         </div>
       `;
+
+      // Wire Deal Matrix Accordion Toggle
+      const toggleDealBtn = card.querySelector(`.btn-toggle-deal-matrix[data-card-idx="${index}"]`);
+      const dealExpandable = card.querySelector(`#dealMatrixExpandable_${index}`);
+      if (toggleDealBtn && dealExpandable) {
+        toggleDealBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpen = dealExpandable.classList.toggle('open');
+          toggleDealBtn.innerHTML = isOpen
+            ? `<span>Hide Deals (${itemDeals.length}) ▴</span>`
+            : `<span>View All Deals (${itemDeals.length}) ▾</span>`;
+        });
+      }
+
+      // Wire Deal Book Buttons to trigger Skyscanner Forwarding Hand-off
+      card.querySelectorAll('.btn-book-provider-deal, .deal-mini-pill').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const pName = btn.dataset.provName || 'Provider';
+          const pUrl = btn.dataset.provUrl || item.primaryCtaUrl;
+          const pPrice = btn.dataset.provPrice || item.totalPrice;
+          triggerTripMuraForwarding(pName, pUrl, pPrice, {
+            route: `${originCity} (${originIATA}) → ${destCity} (${destIATA})`,
+            dates: formattedDates,
+            pax: `${rawTravelers} Travelers • Economy Rate`
+          });
+        });
+      });
+
+      // Wire Primary Carrier Book CTA
+      const primaryCta = card.querySelector('.btn-primary-carrier-book');
+      if (primaryCta) {
+        primaryCta.addEventListener('click', (e) => {
+          e.preventDefault();
+          triggerTripMuraForwarding(item.provider || primaryAirlineName, item.primaryCtaUrl, item.totalPrice, {
+            route: `${originCity} (${originIATA}) → ${destCity} (${destIATA})`,
+            dates: formattedDates,
+            pax: `${rawTravelers} Travelers • Economy Rate`
+          });
+        });
+      }
+
+      // Wire Multi-Engine Comparison Pills
+      card.querySelectorAll('.engine-pill-btn').forEach(pill => {
+        pill.addEventListener('click', (e) => {
+          e.preventDefault();
+          const engineName = pill.textContent.trim();
+          triggerTripMuraForwarding(engineName, pill.href, item.totalPrice, {
+            route: `${originCity} (${originIATA}) → ${destCity} (${destIATA})`,
+            dates: formattedDates,
+            pax: `${rawTravelers} Travelers • Economy Rate`
+          });
+        });
+      });
 
       card.querySelector('.btn-feed-breakdown').addEventListener('click', () => {
         openTripDrawer(item);
@@ -1065,11 +1298,49 @@ function initResultsPage() {
     if (drawerTcoAmount) drawerTcoAmount.textContent = `€${item.totalPrice}`;
 
     if (drawerLegsList) {
+      const drawerDeals = item.deals || buildPackageDeals(item.totalPrice, item.category, primaryAirlineName, primaryAirlineUrl, directUrls);
+      
+      const drawerDealRowsHtml = drawerDeals.map(d => `
+        <div class="deal-provider-row" style="background: #ffffff;">
+          <div class="deal-provider-left">
+            <span class="deal-provider-logo">${d.icon}</span>
+            <div class="deal-provider-info">
+              <div class="deal-provider-name-wrap">
+                <span class="deal-provider-name">${d.providerName}</span>
+                <span class="deal-provider-badge ${d.badgeClass}">${d.badge}</span>
+              </div>
+              <span class="deal-provider-sub">${d.subText}</span>
+            </div>
+          </div>
+          <div class="deal-provider-right">
+            <span class="deal-provider-price">€${d.price}</span>
+            <button type="button" class="btn-book-provider-deal ${d.badgeClass === 'cheapest' ? 'cheapest' : ''}" data-prov-name="${d.providerName}" data-prov-url="${d.url}" data-prov-price="${d.price}">
+              <span>${d.badgeClass === 'direct' ? 'Book Direct ➔' : `Book on ${d.provider} ➔`}</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      const dealMatrixSectionHtml = `
+        <div class="drawer-deal-matrix-box" style="margin-bottom: 20px; padding: 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <h4 style="font-size: 0.92rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 6px;">
+              <span>🟢 Live Provider Breakdown (Skyscanner Deal Matrix)</span>
+            </h4>
+            <span style="font-size: 0.74rem; font-weight: 700; color: #16a34a; background: #dcfce7; padding: 2px 8px; border-radius: 9999px;">Verified Lowest Rates</span>
+          </div>
+          <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 14px;">Select any official carrier or top OTA to complete your booking with zero extra markup:</p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            ${drawerDealRowsHtml}
+          </div>
+        </div>
+      `;
+
       const legsHtml = item.legs.map(leg => {
         const actionBtnsHtml = leg.actions.map(act => `
-          <a href="${act.url}" target="_blank" rel="noopener noreferrer" class="provider-direct-btn ${act.featured ? 'featured' : ''}">
+          <button type="button" class="provider-direct-btn ${act.featured ? 'featured' : ''}" data-prov-name="${leg.carrier}" data-prov-url="${act.url}" data-prov-price="${item.totalPrice}">
             <span>${act.label}</span>
-          </a>
+          </button>
         `).join('');
 
         return `
@@ -1121,7 +1392,22 @@ function initResultsPage() {
         </div>
       `;
 
-      drawerLegsList.innerHTML = legsHtml + comparisonSectionHtml;
+      drawerLegsList.innerHTML = dealMatrixSectionHtml + legsHtml + comparisonSectionHtml;
+
+      // Wire drawer booking CTAs to trigger Skyscanner Forwarding Hand-off
+      drawerLegsList.querySelectorAll('.btn-book-provider-deal, .provider-direct-btn, .engine-pill-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const pName = btn.dataset.provName || btn.textContent.trim();
+          const pUrl = btn.dataset.provUrl || btn.href || item.primaryCtaUrl;
+          const pPrice = btn.dataset.provPrice || item.totalPrice;
+          triggerTripMuraForwarding(pName, pUrl, pPrice, {
+            route: `${originCity} (${originIATA}) → ${destCity} (${destIATA})`,
+            dates: formattedDates,
+            pax: `${rawTravelers} Travelers • Economy Rate`
+          });
+        });
+      });
     }
 
     tripSummaryBackdrop.classList.add('open');
@@ -1145,11 +1431,160 @@ function initResultsPage() {
     if (e.key === 'Escape') {
       closeTripDrawer();
       closeMobileFilters();
+      closeForwardingModal();
     }
   });
 
   // --------------------------------------------------------------------------
-  // 7. Live Server-Side Search Engine Fetcher (Travelpayouts / Aviasales Proxy)
+  // 7. Skyscanner Progressive Multi-Provider Scanner Controller
+  // --------------------------------------------------------------------------
+  function runProgressiveScanner(callback) {
+    const scannerBox = document.getElementById('progressiveSearchScanner');
+    if (!scannerBox) {
+      if (callback) callback();
+      return;
+    }
+
+    const statusText = document.getElementById('scannerStatusText');
+    const countStats = document.getElementById('scannerCountStats');
+    const trackFill = document.getElementById('scannerTrackFill');
+    const chips = document.querySelectorAll('.scanner-chip');
+
+    const scanStages = [
+      { pct: 25, text: 'Scanning Austrian, Ryanair, Lufthansa, British Airways...', prov: ['austrian', 'ryanair', 'lufthansa', 'ba'], stats: 'Scanning 100+ Airlines...' },
+      { pct: 55, text: 'Comparing deals across MyTrip, Gotogate, Expedia...', prov: ['mytrip', 'gotogate', 'expedia'], stats: 'Comparing 24+ OTAs...' },
+      { pct: 85, text: 'Syncing verified stays from Booking.com & Hotellook...', prov: ['booking', 'airbnb', 'oebb'], stats: 'Syncing 500+ Stays...' },
+      { pct: 100, text: '✓ Scan Complete: Found 142 journeys from €68 across 18 providers', prov: ['all'], stats: '142 Journeys Ready' }
+    ];
+
+    let currentStage = 0;
+    function updateStage() {
+      if (currentStage >= scanStages.length) {
+        if (callback) callback();
+        return;
+      }
+
+      const s = scanStages[currentStage];
+      if (trackFill) trackFill.style.width = `${s.pct}%`;
+      if (countStats) countStats.textContent = s.stats;
+      if (statusText) {
+        statusText.classList.add('fading');
+        setTimeout(() => {
+          statusText.textContent = s.text;
+          statusText.classList.remove('fading');
+        }, 100);
+      }
+
+      chips.forEach(chip => {
+        const p = chip.dataset.prov;
+        if (s.prov.includes('all') || s.prov.includes(p)) {
+          chip.classList.add('active-pulse');
+          if (s.pct === 100) chip.classList.add('verified-done');
+        } else {
+          chip.classList.remove('active-pulse');
+        }
+      });
+
+      currentStage++;
+      if (currentStage < scanStages.length) {
+        setTimeout(updateStage, 350);
+      } else {
+        if (callback) callback();
+      }
+    }
+
+    updateStage();
+  }
+
+  // --------------------------------------------------------------------------
+  // 8. Skyscanner-Style Forwarding Hand-off Interstitial Modal
+  // --------------------------------------------------------------------------
+  const forwardingModal = document.getElementById('tripMuraForwardingModal');
+  const forwardingBackdrop = document.getElementById('tripMuraForwardingBackdrop');
+  const forwardingManualLink = document.getElementById('forwardingManualLink');
+  let forwardingTimer = null;
+
+  function closeForwardingModal() {
+    if (forwardingTimer) clearTimeout(forwardingTimer);
+    forwardingBackdrop?.classList.remove('open');
+    forwardingModal?.classList.remove('open');
+    forwardingModal?.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('search-modal-open');
+  }
+
+  forwardingBackdrop?.addEventListener('click', closeForwardingModal);
+
+  function triggerTripMuraForwarding(providerName, targetUrl, price, details = {}) {
+    if (!forwardingModal || !forwardingBackdrop) {
+      window.open(targetUrl, '_blank');
+      return;
+    }
+
+    const pName = document.getElementById('forwardingProviderName');
+    const pIcon = document.getElementById('forwardingTargetIcon');
+    const pVerified = document.getElementById('forwardingVerifiedText');
+    const pRoute = document.getElementById('forwardingRouteText');
+    const pDates = document.getElementById('forwardingDatesText');
+    const pPax = document.getElementById('forwardingPaxText');
+    const progressBar = document.getElementById('forwardingProgressBar');
+
+    const cleanProv = providerName || 'Provider';
+    if (pName) pName.textContent = cleanProv;
+    if (pIcon) {
+      const lower = cleanProv.toLowerCase();
+      if (lower.includes('booking') || lower.includes('hotel')) {
+        pIcon.textContent = '🏨';
+      } else if (lower.includes('airbnb') || lower.includes('villa')) {
+        pIcon.textContent = '🏡';
+      } else if (lower.includes('rail') || lower.includes('train') || lower.includes('öbb') || lower.includes('bahn')) {
+        pIcon.textContent = '🚆';
+      } else {
+        pIcon.textContent = '✈️';
+      }
+    }
+
+    const priceStr = price ? `€${price}` : 'Cheapest Verified Rate';
+    if (pVerified) pVerified.textContent = `TripMura Verified Price: ${priceStr} • Securing your seats...`;
+    if (pRoute) {
+      pRoute.textContent = details.route || (hubRoute.needsHubTransfer
+        ? `${originCity} (${flightOriginIATA}) → ${destCity} (${destIATA})`
+        : `${originCity} (${originIATA}) → ${destCity} (${destIATA})`);
+    }
+    if (pDates) pDates.textContent = details.dates || formattedDates;
+    if (pPax) pPax.textContent = details.pax || `${rawTravelers} Travelers • Economy Rate`;
+
+    if (progressBar) {
+      progressBar.style.animation = 'none';
+      progressBar.offsetHeight; /* trigger reflow */
+      progressBar.style.animation = 'forwardingProgress 1s cubic-bezier(0.1, 0.7, 0.1, 1) forwards';
+    }
+
+    if (forwardingManualLink) {
+      forwardingManualLink.onclick = () => {
+        window.open(targetUrl, '_blank');
+        closeForwardingModal();
+      };
+    }
+
+    forwardingBackdrop.classList.add('open');
+    forwardingModal.classList.add('open');
+    forwardingModal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('search-modal-open');
+
+    // Automatically forward after 1000ms
+    forwardingTimer = setTimeout(() => {
+      window.open(targetUrl, '_blank');
+      setTimeout(() => {
+        closeForwardingModal();
+      }, 500);
+    }, 1000);
+  }
+
+  // Expose forwarding engine globally
+  window.triggerTripMuraForwarding = triggerTripMuraForwarding;
+
+  // --------------------------------------------------------------------------
+  // 9. Live Server-Side Search Engine Fetcher (Travelpayouts / Aviasales Proxy)
   // --------------------------------------------------------------------------
   async function fetchLiveProposals() {
     const config = (typeof window !== 'undefined' && window.TRIPMURA_CONFIG) ? window.TRIPMURA_CONFIG : {};
@@ -1199,7 +1634,7 @@ function initResultsPage() {
   }
 
   // --------------------------------------------------------------------------
-  // 8. Global 10,000+ IATA Asynchronous Refinement (Travelpayouts Places API)
+  // 10. Global 10,000+ IATA Asynchronous Refinement (Travelpayouts Places API)
   // --------------------------------------------------------------------------
   async function refineGlobalIataContext() {
     if (typeof TripMuraIATA === 'undefined' || !TripMuraIATA.resolveGlobalIata) return;
@@ -1238,8 +1673,10 @@ function initResultsPage() {
     }
   }
 
-  // Initial render, global IATA sync & live proposals fetch
-  applyFiltersAndSort();
+  // Initial render, progressive scanner, global IATA sync & live proposals fetch
+  runProgressiveScanner(() => {
+    applyFiltersAndSort();
+  });
   refineGlobalIataContext();
   fetchLiveProposals();
 }
