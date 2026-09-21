@@ -109,10 +109,11 @@
 
         <!-- Desktop Navigation Links -->
         <div class="nav-menu">
-          <a href="#explore" class="nav-link">Explore Trips</a>
-          <a href="#routes" class="nav-link">Multimodal Routes</a>
-          <a href="#group-sync" class="nav-link">Group Sync</a>
-          <a href="#guarantee" class="nav-link">Protection Guarantee</a>
+          <a href="#planner" class="nav-link" data-nav-mode="flights">Flights</a>
+          <a href="#planner" class="nav-link" data-nav-mode="stays">Accommodations</a>
+          <a href="#planner" class="nav-link" data-nav-mode="cars">Cars</a>
+          <a href="#planner" class="nav-link" data-nav-mode="packages">Packages</a>
+          <a href="#guarantee" class="nav-link">Price Guarantee</a>
         </div>
 
         <!-- Right Utility Actions -->
@@ -155,20 +156,24 @@
       </button>
     </div>
     <nav class="drawer-nav">
-      <a href="#explore" class="drawer-link">
-        <span>Explore Trips</span>
+      <a href="#planner" class="drawer-link" data-nav-mode="flights">
+        <span>✈️ Flights</span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
       </a>
-      <a href="#routes" class="drawer-link">
-        <span>Multimodal Routes</span>
+      <a href="#planner" class="drawer-link" data-nav-mode="stays">
+        <span>🏨 Accommodations</span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
       </a>
-      <a href="#group-sync" class="drawer-link">
-        <span>Group Sync</span>
+      <a href="#planner" class="drawer-link" data-nav-mode="cars">
+        <span>🚗 Cars</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+      </a>
+      <a href="#planner" class="drawer-link" data-nav-mode="packages">
+        <span>🌴 Packages</span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
       </a>
       <a href="#guarantee" class="drawer-link">
-        <span>Protection Guarantee</span>
+        <span>🛡️ Price Guarantee</span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
       </a>
     </nav>
@@ -195,41 +200,35 @@
           
           <!-- Headline -->
           <h1 class="hero-headline">
-            From Your Front Door to the Sun. <span class="text-gradient">One Click.</span>
+            Find the Best Flights, Stays &amp; Cars in <span class="text-gradient">One Click.</span>
           </h1>
 
           <!-- Subheadline -->
           <p class="hero-subheadline">
-            Compare flights, scenic trains, and boutique stays across 100+ platforms in one click. Book directly with trusted providers at zero extra cost.
+            Compare 100+ trusted travel providers with zero hidden fees.
           </p>
 
           <!-- Multimodal Planner Search Card -->
           <div class="multimodal-search-card">
             
-            <!-- TripMura Category Mode Tabs -->
+            <!-- TripMura 4 Core Search Mode Tabs -->
             <div class="search-mode-tabs" role="tablist" aria-label="Search Categories">
-              <button class="search-mode-tab active" role="tab" aria-selected="true" data-mode="holiday">
-                <span>🏖️ Whole Holiday</span>
-              </button>
               <button class="search-mode-tab" role="tab" aria-selected="false" data-mode="flights">
                 <span>✈️ Flights</span>
               </button>
-              <button class="search-mode-tab" role="tab" aria-selected="false" data-mode="stays">
-                <span>🏨 Stays</span>
-              </button>
-              <button class="search-mode-tab" role="tab" aria-selected="false" data-mode="rail">
-                <span>🚆 Rail & Ferry</span>
+              <button class="search-mode-tab active" role="tab" aria-selected="true" data-mode="stays">
+                <span>🏨 Accommodations</span>
               </button>
               <button class="search-mode-tab" role="tab" aria-selected="false" data-mode="cars">
                 <span>🚗 Cars</span>
               </button>
               <button class="search-mode-tab" role="tab" aria-selected="false" data-mode="packages">
-                <span>🎒 Packages</span>
+                <span>🌴 Packages</span>
               </button>
             </div>
 
-            <!-- Trip Type & Cabin Class Micro-Selectors -->
-            <div class="search-sub-options">
+            <!-- Trip Type & Cabin Class Micro-Selectors (Active in Flights & Packages) -->
+            <div class="search-sub-options" id="searchSubOptions" style="display: none;">
               <!-- Trip Type Selector -->
               <div class="micro-dropdown-wrap">
                 <button type="button" class="micro-option-btn" id="tripTypeBtn" aria-haspopup="listbox" aria-expanded="false">
@@ -265,17 +264,17 @@
               </label>
             </div>
 
-            <!-- Search Inputs -->
-            <form class="search-input-grid" onsubmit="event.preventDefault();">
+            <!-- Search Inputs Grid -->
+            <form class="search-input-grid single-dest" id="mainSearchForm" onsubmit="event.preventDefault();">
               
-              <!-- Origin Field & Popover -->
-              <div class="search-field-wrap">
+              <!-- Origin Field & Popover (Hidden in Single-Destination Accommodations Mode) -->
+              <div class="search-field-wrap hidden-mode" id="originFieldWrap">
                 <div class="search-field" id="originField">
-                  <label class="field-label" for="originInput">From (Your Door)</label>
-                  <input type="text" id="originInput" class="field-input" value="London, St Pancras" placeholder="City, Airport or Station" autocomplete="off">
+                  <label class="field-label" for="originInput" id="originFieldLabel">Departure Hub</label>
+                  <input type="text" id="originInput" class="field-input" value="London (LON)" placeholder="City or Airport (e.g. LHR, VIE)" autocomplete="off">
                 </div>
                 <!-- Origin Popover -->
-                <div class="search-popover search-popover-dropdown" id="originPopover" role="dialog" aria-label="Select Origin Hub">
+                <div class="search-popover search-popover-dropdown" id="originPopover" role="dialog" aria-label="Select Departure">
                   <!-- Mobile Top Bar -->
                   <div class="modal-top-bar">
                     <button type="button" class="modal-back-btn" aria-label="Back">
@@ -289,7 +288,7 @@
                   <div class="modal-search-box">
                     <div class="modal-input-wrap">
                       <svg class="search-lens-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                      <input type="text" class="modal-search-field" id="originModalSearch" placeholder="City, airport, or train station..." autocomplete="off">
+                      <input type="text" class="modal-search-field" id="originModalSearch" placeholder="City, airport, or station..." autocomplete="off">
                       <button type="button" class="modal-input-clear" id="originClearBtn">✕</button>
                     </div>
                   </div>
@@ -298,7 +297,7 @@
                   <div class="modal-scroll-body">
                     <div class="popover-header">
                       <span class="popover-title">Departure Hubs</span>
-                      <span class="popover-badge">Global & Multimodal</span>
+                      <span class="popover-badge">Airports &amp; Cities</span>
                     </div>
                     <div class="location-list"></div>
                   </div>
@@ -310,11 +309,11 @@
                 </div>
               </div>
 
-              <!-- Destination Field & Popover -->
-              <div class="search-field-wrap">
+              <!-- Destination Field & Popover (Primary for Accommodations) -->
+              <div class="search-field-wrap" id="destFieldWrap">
                 <div class="search-field" id="destField">
-                  <label class="field-label" for="destInput">To (Sun Destination)</label>
-                  <input type="text" id="destInput" class="field-input" value="Amalfi Coast, Italy" placeholder="Where to?" autocomplete="off">
+                  <label class="field-label" for="destInput" id="destFieldLabel">Destination</label>
+                  <input type="text" id="destInput" data-stay-destination="true" class="field-input" value="Mallorca, Spain" placeholder="City, landmark or specific property" autocomplete="off">
                 </div>
                 <!-- Destination Popover -->
                 <div class="search-popover search-popover-dropdown" id="destPopover" role="dialog" aria-label="Select Destination">
@@ -323,7 +322,7 @@
                     <button type="button" class="modal-back-btn" aria-label="Back">
                       <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
                     </button>
-                    <span class="modal-bar-title">Choose Destination</span>
+                    <span class="modal-bar-title" id="destModalBarTitle">Choose Destination</span>
                     <button type="button" class="modal-close-icon-btn" aria-label="Close">✕</button>
                   </div>
 
@@ -331,7 +330,7 @@
                   <div class="modal-search-box">
                     <div class="modal-input-wrap">
                       <svg class="search-lens-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                      <input type="text" class="modal-search-field" id="destModalSearch" placeholder="Where do you want to go?" autocomplete="off">
+                      <input type="text" class="modal-search-field" id="destModalSearch" placeholder="Where do you want to stay?" autocomplete="off">
                       <button type="button" class="modal-input-clear" id="destClearBtn">✕</button>
                     </div>
                   </div>
@@ -339,8 +338,8 @@
                   <!-- Scrollable Body -->
                   <div class="modal-scroll-body">
                     <div class="popover-header">
-                      <span class="popover-title">Popular Destinations</span>
-                      <span class="popover-badge">Boutique & Coastal</span>
+                      <span class="popover-title" id="destPopoverTitle">Popular Destinations</span>
+                      <span class="popover-badge">Top Stays</span>
                     </div>
                     <div class="location-list"></div>
                   </div>
@@ -352,35 +351,35 @@
                 </div>
               </div>
 
-              <!-- Dates Field -->
-              <div class="search-field-wrap">
+              <!-- Dates Field (Check-in — Check-out) -->
+              <div class="search-field-wrap" id="datesFieldWrap">
                 <div class="search-field" id="datesField">
-                  <label class="field-label" for="datesInput">Trip Dates</label>
-                  <input type="text" id="datesInput" class="field-input" placeholder="Select dates" readonly>
+                  <label class="field-label" for="datesInput" id="datesFieldLabel">Check-in — Check-out</label>
+                  <input type="text" id="datesInput" data-stay-dates="true" class="field-input" placeholder="Select dates" readonly>
                 </div>
               </div>
 
-              <!-- Travelers Field & Stepper Modal -->
-              <div class="search-field-wrap">
+              <!-- Guests & Rooms Field & Popover -->
+              <div class="search-field-wrap" id="guestsFieldWrap">
                 <div class="search-field" id="guestsField">
-                  <label class="field-label" for="guestsInput">Travelers</label>
-                  <input type="text" id="guestsInput" class="field-input" value="2 Adults, 1 Room" placeholder="Guests" readonly>
+                  <label class="field-label" for="guestsInput" id="guestsFieldLabel">Guests &amp; Rooms</label>
+                  <input type="text" id="guestsInput" data-stay-guests="true" class="field-input" value="2 Adults · 1 Room" placeholder="Guests &amp; Rooms" readonly>
                 </div>
                 <!-- Travelers Stepper Popover -->
-                <div class="search-popover travelers-popover" id="travelersModal" role="dialog" aria-label="Select Travelers and Rooms">
+                <div class="search-popover travelers-popover" id="travelersModal" role="dialog" aria-label="Select Guests and Rooms">
                   <!-- Mobile Top Bar -->
                   <div class="modal-top-bar">
                     <button type="button" class="modal-back-btn" aria-label="Back">
                       <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
                     </button>
-                    <span class="modal-bar-title">Travelers & Rooms</span>
+                    <span class="modal-bar-title">Guests &amp; Rooms</span>
                     <button type="button" class="modal-close-icon-btn" aria-label="Close">✕</button>
                   </div>
 
                   <div class="modal-scroll-body">
                     <div class="popover-header">
-                      <span class="popover-title">Travelers & Rooms</span>
-                      <span class="popover-badge">Group Sync</span>
+                      <span class="popover-title">Guests &amp; Rooms</span>
+                      <span class="popover-badge">Instant Booking</span>
                     </div>
                     <div class="stepper-rows">
                       <!-- Adults -->
@@ -402,7 +401,7 @@
                           <span class="stepper-desc">Age 0–17</span>
                         </div>
                         <div class="stepper-controls">
-                          <button type="button" class="stepper-btn" id="childrenMinus" aria-label="Decrease Children" disabled">−</button>
+                          <button type="button" class="stepper-btn" id="childrenMinus" aria-label="Decrease Children" disabled>−</button>
                           <span class="stepper-val" id="childrenVal">0</span>
                           <button type="button" class="stepper-btn" id="childrenPlus" aria-label="Increase Children">+</button>
                         </div>
@@ -411,7 +410,7 @@
                       <div class="stepper-row">
                         <div class="stepper-info">
                           <span class="stepper-label">Rooms</span>
-                          <span class="stepper-desc">Boutique & Hotel Stays</span>
+                          <span class="stepper-desc">Rooms or properties</span>
                         </div>
                         <div class="stepper-controls">
                           <button type="button" class="stepper-btn" id="roomsMinus" aria-label="Decrease Rooms">−</button>
@@ -420,27 +419,63 @@
                         </div>
                       </div>
                     </div>
+
+                    <!-- Entire Homes & Apartments Quick Toggle -->
+                    <div class="stepper-homes-toggle" style="padding-top: 12px; border-top: 1px solid var(--border-subtle); margin-top: 6px;">
+                      <label class="micro-checkbox-pill" style="width: 100%; justify-content: flex-start; cursor: pointer;">
+                        <input type="checkbox" id="entireHomesOnly" class="micro-checkbox-input">
+                        <span class="micro-checkbox-custom"></span>
+                        <span class="micro-checkbox-text" style="font-weight: 700; color: var(--text-primary); font-size: 0.82rem;">Entire homes &amp; apartments only</span>
+                      </label>
+                    </div>
+
+                    <!-- Desktop Action Footer -->
+                    <div class="popover-footer desktop-only-footer" style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-light); display: flex; justify-content: flex-end;">
+                      <button type="button" class="btn-apply-sm" id="applyTravelersDesktopBtn">Done</button>
+                    </div>
                   </div>
 
                   <div class="modal-sticky-footer">
-                    <button type="button" class="btn-modal-apply" id="applyTravelersBtn">Apply Travelers</button>
+                    <button type="button" class="btn-modal-apply" id="applyTravelersBtn">Apply</button>
                   </div>
                 </div>
               </div>
 
               <!-- Submit CTA Button -->
-              <button type="submit" class="search-cta-btn" aria-label="Find seamless holiday trips">
+              <button type="submit" class="search-cta-btn" id="searchSubmitBtn" aria-label="Search travel deals">
                 <div class="btn-text-default" style="display: inline-flex; align-items: center; gap: 8px;">
-                  <span>Find Trips</span>
+                  <span id="ctaBtnText">Search Deals</span>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
                 </div>
                 <div class="btn-text-loading">
                   <span class="btn-spinner"></span>
-                  <span>Finding 14,000+ routes...</span>
+                  <span id="ctaLoadingText">Finding best deals...</span>
                 </div>
               </button>
 
             </form>
+
+            <!-- Accommodations Quick Filter Pills (Below Search Bar) -->
+            <div class="search-quick-filters" id="stayQuickFilters">
+              <button type="button" class="quick-filter-chip active" data-filter="all">
+                <span>✓ All Stays</span>
+              </button>
+              <button type="button" class="quick-filter-chip" data-filter="hotels">
+                <span>🏨 Hotels</span>
+              </button>
+              <button type="button" class="quick-filter-chip" data-filter="apartments">
+                <span>🏡 Vacation Rentals &amp; Apartments</span>
+              </button>
+              <button type="button" class="quick-filter-chip" data-filter="cancellation">
+                <span>🛡️ Free Cancellation</span>
+              </button>
+              <button type="button" class="quick-filter-chip" data-filter="toprated">
+                <span>⭐ 8.5+ Top Rated</span>
+              </button>
+              <button type="button" class="quick-filter-chip" data-filter="pool">
+                <span>🏊 With Pool</span>
+              </button>
+            </div>
 
             <!-- Calendar Range Modal (June & July 2026) Centered on Search Card -->
             <div class="search-popover calendar-popover" id="datesPickerModal" role="dialog" aria-label="Select Dates">
@@ -572,17 +607,17 @@
             
             <div class="proof-item">
               <svg class="proof-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
-              <span>100% Self-Transfer Protection</span>
+              <span>Verified Direct Provider Rates</span>
             </div>
 
             <div class="proof-item">
               <svg class="proof-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-              <span>Over 14,000+ Multimodal Routes</span>
+              <span>Over 100+ Travel Platforms</span>
             </div>
 
             <div class="proof-item">
               <svg class="proof-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <span>100% Free to Use &bull; Direct Provider Booking &bull; No Hidden Fees</span>
+              <span>100% Free to Use &bull; Direct Booking &bull; No Hidden Fees</span>
             </div>
 
           </div>
@@ -636,7 +671,7 @@
           </a>
           <div class="footer-tagline">Holidays Made Simple.</div>
           <p class="footer-desc">
-            Synchronizing flights, scenic trains, and boutique stays into one seamless door-to-door trip.
+            Comparing flights, boutique stays, car hire, and packages across 100+ trusted providers in one click.
           </p>
         </div>
 

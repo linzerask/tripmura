@@ -97,33 +97,52 @@
       return `https://www.aviasales.com/search/${segment}?marker=${encodeURIComponent(MARKER)}`;
     },
 
-    // 6. Airbnb Direct Accommodation URL
-    buildAirbnbUrl(destCity, checkin, checkout, adults = 1, roomId = null) {
+    // 6. Airbnb Direct Accommodation URL (with Entire Homes support)
+    buildAirbnbUrl(destCity, checkin, checkout, adults = 2, children = 0, entireHomes = false, roomId = null) {
       if (roomId) {
         return `https://www.airbnb.com/rooms/${roomId}?adults=${adults}&check_in=${checkin}&check_out=${checkout}&search_mode=regular_search`;
       }
-      return `https://www.airbnb.com/s/${encodeURIComponent(destCity)}/homes?adults=${adults}&check_in=${checkin}&check_out=${checkout}&search_mode=regular_search`;
+      let url = `https://www.airbnb.com/s/${encodeURIComponent(destCity)}/homes?checkin=${checkin}&checkout=${checkout}&adults=${adults}&children=${children}`;
+      if (entireHomes) {
+        url += `&room_types%5B%5D=Entire%20home%2Fapt`;
+      }
+      return url;
     },
 
-    // 7. Booking.com Direct Specific Hotel URL
-    buildBookingComUrl(destCity, checkin, checkout, adults = 1, hotelSlug = null, countryCode = 'es') {
-      const base = hotelSlug 
-        ? `https://www.booking.com/hotel/${countryCode}/${hotelSlug}.html`
-        : `https://www.booking.com/searchresults.html`;
-      const params = new URLSearchParams({
-        ss: destCity,
-        checkin: checkin,
-        checkout: checkout,
-        group_adults: String(adults),
-        no_rooms: '1',
-        order: 'price',
-        aid: BOOKING_AID,
-        label: `tp${MARKER}`
-      });
-      return `${base}?${params.toString()}`;
+    // 7. Booking.com Direct Metasearch Route
+    buildBookingComUrl(destCity, checkin, checkout, adults = 2, rooms = 1, children = 0, aid = '2369322', hotelSlug = null, countryCode = 'es') {
+      if (hotelSlug) {
+        const base = `https://www.booking.com/hotel/${countryCode}/${hotelSlug}.html`;
+        const params = new URLSearchParams({
+          checkin: checkin,
+          checkout: checkout,
+          group_adults: String(adults),
+          no_rooms: String(rooms),
+          aid: aid || BOOKING_AID || '2369322',
+          label: `tp${MARKER}`
+        });
+        return `${base}?${params.toString()}`;
+      }
+      const effectiveAid = aid || BOOKING_AID || '2369322';
+      return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(destCity)}&checkin=${checkin}&checkout=${checkout}&group_adults=${adults}&no_rooms=${rooms}&group_children=${children}&aid=${effectiveAid}`;
     },
 
-    // 8. Trainline & ÖBB Direct Rail URLs
+    // 8. Travelpayouts / Hotellook Metasearch Route
+    buildHotellookUrl(destCity, checkin, checkout, adults = 2, children = 0, marker = '779382') {
+      const effMarker = marker || MARKER || '779382';
+      return `https://search.hotellook.com/?destination=${encodeURIComponent(destCity)}&checkIn=${checkin}&checkOut=${checkout}&adults=${adults}&children=${children}&marker=${effMarker}`;
+    },
+
+    // 9. DiscoverCars Car Rental Metasearch Route
+    buildDiscoverCarsUrl(location, pickupDate, dropoffDate, marker = '779382') {
+      const effMarker = marker || MARKER || '779382';
+      let url = `https://www.discovercars.com/?search=${encodeURIComponent(location)}&a_aid=${effMarker}`;
+      if (pickupDate) url += `&pick_date=${pickupDate}`;
+      if (dropoffDate) url += `&drop_date=${dropoffDate}`;
+      return url;
+    },
+
+    // 10. Trainline & ÖBB Direct Rail URLs
     buildTrainlineUrl(originCity, destCity, departDate, returnDate, adults = 1) {
       return `https://www.thetrainline.com/book/results?origin=${encodeURIComponent(originCity)}&destination=${encodeURIComponent(destCity)}&outwardDate=${departDate}&returnDate=${returnDate || ''}&passengers=${adults}`;
     },

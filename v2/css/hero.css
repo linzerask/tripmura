@@ -291,6 +291,15 @@
   align-items: center;
   position: relative;
   z-index: 10;
+  transition: all var(--transition-normal);
+}
+
+.search-input-grid.single-dest {
+  grid-template-columns: 1.5fr 1.15fr 1.15fr auto;
+}
+
+.search-field-wrap.hidden-mode {
+  display: none !important;
 }
 
 .search-field {
@@ -298,7 +307,7 @@
   border: 1px solid var(--border-light);
   border-radius: var(--radius-inner-md);
   padding: 10px 14px;
-  min-height: 54px;
+  min-height: 56px;
   text-align: left;
   transition: all var(--transition-fast);
   display: flex;
@@ -334,7 +343,7 @@
 
 .search-cta-btn {
   height: 100%;
-  min-height: 54px;
+  min-height: 56px;
   padding: 0 28px;
   display: flex;
   align-items: center;
@@ -348,6 +357,7 @@
   box-shadow: 0 4px 16px rgba(2, 132, 199, 0.35);
   transition: all var(--transition-normal);
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .search-cta-btn:hover {
@@ -363,6 +373,55 @@
 
 .search-cta-btn:active {
   transform: scale(0.98);
+}
+
+/* Quick Filter Pills (Below Accommodations Search Bar) */
+.search-quick-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 2px 4px 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.search-quick-filters::-webkit-scrollbar {
+  display: none;
+}
+
+.quick-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid var(--border-light);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-xs);
+  user-select: none;
+}
+
+.quick-filter-chip:hover {
+  background: #ffffff;
+  color: var(--primary-azure);
+  border-color: rgba(2, 132, 199, 0.35);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.quick-filter-chip.active {
+  background: var(--primary-azure);
+  color: #ffffff;
+  border-color: var(--primary-azure);
+  box-shadow: 0 2px 10px rgba(2, 132, 199, 0.3);
 }
 
 /* ==========================================================================

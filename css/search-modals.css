@@ -977,9 +977,9 @@ body.search-modal-open .multimodal-search-card,
 
   .btn-modal-apply {
     width: 100% !important;
-    height: 48px !important;
+    height: 52px !important;
     border-radius: 12px !important;
-    background: var(--gradient-azure, linear-gradient(135deg, #0284c7 0%, #0369a1 100%)) !important;
+    background: var(--primary-azure, #0284c7) !important;
     color: #ffffff !important;
     font-size: 1rem !important;
     font-weight: 700 !important;

@@ -1,7 +1,9 @@
 /**
  * TripMura Design System — Search Engine Master Interactive Controller
- * Dynamic Category Switcher, Real Global Geocoding Autocomplete,
- * Dual-Month Range & One-Way Calendar, Travelers Stepper & Micro-Dropdowns.
+ * 4 Core Search Modes: Accommodations (Default), Flights, Cars, Packages.
+ * Skyscanner / Booking.com-grade Accommodations Engine, Geocoding Autocomplete,
+ * Dual-Month Range & One-Way Calendar, Travelers & Rooms Stepper with Homes Toggle,
+ * Quick Filter Chips, and Direct Outbound Affiliate Deep-Linking.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -9,15 +11,34 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initSearchEngine() {
-  // Master Input Elements
+  // Master Elements
   const originInput = document.getElementById('originInput');
   const destInput = document.getElementById('destInput');
   const datesInput = document.getElementById('datesInput');
   const guestsInput = document.getElementById('guestsInput');
-  const searchForm = document.querySelector('.search-input-grid');
-  const searchCta = document.querySelector('.search-cta-btn');
+  const entireHomesCheckbox = document.getElementById('entireHomesOnly');
+  const searchForm = document.getElementById('mainSearchForm') || document.querySelector('.search-input-grid');
+  const searchCta = document.getElementById('searchSubmitBtn') || document.querySelector('.search-cta-btn');
+  const ctaBtnText = document.getElementById('ctaBtnText');
+  const ctaLoadingText = document.getElementById('ctaLoadingText');
 
-  // Popover references
+  // Field Wrappers
+  const originFieldWrap = document.getElementById('originFieldWrap');
+  const destFieldWrap = document.getElementById('destFieldWrap');
+  const datesFieldWrap = document.getElementById('datesFieldWrap');
+  const guestsFieldWrap = document.getElementById('guestsFieldWrap');
+  const subOptionsBar = document.getElementById('searchSubOptions');
+  const quickFiltersBar = document.getElementById('stayQuickFilters');
+
+  // Field Labels
+  const originFieldLabel = document.getElementById('originFieldLabel');
+  const destFieldLabel = document.getElementById('destFieldLabel');
+  const datesFieldLabel = document.getElementById('datesFieldLabel');
+  const guestsFieldLabel = document.getElementById('guestsFieldLabel');
+  const destPopoverTitle = document.getElementById('destPopoverTitle');
+  const destModalBarTitle = document.getElementById('destModalBarTitle');
+
+  // Popover References
   const originPopover = document.getElementById('originPopover');
   const destPopover = document.getElementById('destPopover');
   const datesModal = document.getElementById('datesPickerModal');
@@ -27,27 +48,37 @@ function initSearchEngine() {
   const allPopovers = [originPopover, destPopover, datesModal, travelersModal].filter(Boolean);
   const allFields = document.querySelectorAll('.search-field');
 
-  // Global state
+  // Active State
+  let activeMode = 'stays'; // 'stays' (Accommodations - default), 'flights', 'cars', 'packages'
   let currentTripType = 'roundtrip'; // 'roundtrip', 'oneway', 'multicity'
   let currentCabinClass = 'economy';
   let isFlexibleDates = false;
+  let activeStayFilter = 'all'; // 'all', 'hotels', 'apartments', 'cancellation', 'toprated', 'pool'
+
+  // Travelers State
+  let adults = 2;
+  let children = 0;
+  let rooms = 1;
+  let entireHomesOnly = false;
 
   // --------------------------------------------------------------------------
-  // 1. Curated Multimodal Preset Hubs (Shown when input is empty or focused)
+  // 1. Curated Popular Presets (Accommodations & Travel Hubs)
   // --------------------------------------------------------------------------
-  const presetHubs = [
-    { name: 'London St Pancras', sub: 'Eurostar Main Terminal, UK', icon: '🚆', tag: 'High-Speed Rail' },
-    { name: 'London Heathrow (LHR)', sub: 'Terminals 2, 3, 5 Connections, UK', icon: '✈️', tag: 'Direct Flight' },
+  const presetDestinations = [
+    { name: 'Mallorca, Balearic Islands, Spain', sub: 'Palma, Alcúdia & Coastal Resorts', icon: '🏖️', tag: 'Top Island Stay' },
+    { name: 'Barcelona, Catalonia, Spain', sub: 'Gothic Quarter, Eixample & Beachfront', icon: '🏨', tag: 'City & Beach' },
+    { name: 'London, Greater London, UK', sub: 'Central London, Soho & Westminster', icon: '📍', tag: 'Global Capital' },
+    { name: 'Rome, Lazio, Italy', sub: 'Historic Center, Trastevere & Colosseum', icon: '📍', tag: 'Historic Stay' },
+    { name: 'Vienna, Austria', sub: 'Innere Stadt, MuseumsQuartier & Schönbrunn', icon: '📍', tag: 'Cultural Stay' },
+    { name: 'Paris, Île-de-France, France', sub: 'Le Marais, Saint-Germain & Eiffel', icon: '🏨', tag: 'City of Light' },
+    { name: 'Dubai, United Arab Emirates', sub: 'Downtown, Palm Jumeirah & Marina', icon: '🏨', tag: '5★ Luxury' },
+    { name: 'Bali, Indonesia', sub: 'Seminyak, Ubud Villas & Canggu', icon: '🌴', tag: 'Tropical Resort' },
+    { name: 'Amalfi Coast, Campania, Italy', sub: 'Positano, Amalfi & Cliffside Villas', icon: '🏖️', tag: 'Boutique Stay' },
+    { name: 'Santorini, Cyclades, Greece', sub: 'Oia, Fira & Caldera View Suites', icon: '🏖️', tag: 'Island Luxury' },
+    { name: 'Nice, Côte d’Azur, France', sub: 'Promenade des Anglais & Old Town', icon: '⛵', tag: 'French Riviera' },
+    { name: 'London Heathrow (LHR)', sub: 'Terminals 2, 3, 5 Connections, UK', icon: '✈️', tag: 'Major Airport' },
     { name: 'Vienna Schwechat (VIE)', sub: 'Vienna International Airport, Austria', icon: '✈️', tag: 'Direct Flight' },
-    { name: 'Vienna Central Station', sub: 'Wien Hauptbahnhof (ÖBB Railjet)', icon: '🚆', tag: 'Fast Rail' },
-    { name: 'Amalfi Coast, Italy', sub: 'Positano & Amalfi Coastal Pier', icon: '📍', tag: 'Scenic Destination' },
-    { name: 'Naples Central Station', sub: 'Frecciarossa & Italo High-Speed', icon: '🚆', tag: 'Fast Rail' },
-    { name: 'Naples Airport (NAP)', sub: 'Capodichino International, Italy', icon: '✈️', tag: 'Airport' },
-    { name: 'Capri Island Marina', sub: 'Marina Grande Hydrofoil Port, Italy', icon: '⛵', tag: 'Ferry Link' },
-    { name: 'Lake Como, Bellagio Villa', sub: 'Lake Como Ferry & Luxury Villas, Italy', icon: '📍', tag: 'Boutique Stay' },
-    { name: 'Zurich Hauptbahnhof', sub: 'SBB Swiss Federal Railways Hub', icon: '🚆', tag: 'Scenic Rail' },
-    { name: 'Paris Charles de Gaulle (CDG)', sub: 'Roissy Airport, France', icon: '✈️', tag: 'Airport' },
-    { name: 'Tokyo Haneda (HND)', sub: 'Ota City, Tokyo, Japan', icon: '✈️', tag: 'Airport' }
+    { name: 'Palma de Mallorca (PMI)', sub: 'Son Sant Joan Airport, Spain', icon: '✈️', tag: 'Direct Flight' }
   ];
 
   // --------------------------------------------------------------------------
@@ -129,7 +160,7 @@ function initSearchEngine() {
 
         // Categorize icon and badge
         let icon = '📍';
-        let tag = 'City / Destination';
+        let tag = 'City / Region';
 
         const osmVal = (p.osm_value || '').toLowerCase();
         const osmKey = (p.osm_key || '').toLowerCase();
@@ -138,25 +169,21 @@ function initSearchEngine() {
         if (osmVal === 'aerodrome' || osmVal === 'airport' || lowerName.includes('airport') || lowerName.includes('flughafen')) {
           icon = '✈️';
           tag = 'Airport';
-        } else if (osmVal === 'station' || osmVal === 'train_station' || osmKey === 'railway' || lowerName.includes('station') || lowerName.includes('bahnhof') || lowerName.includes('gare')) {
-          icon = '🚆';
-          tag = 'Rail Station';
-        } else if (osmVal === 'hotel' || osmVal === 'resort' || osmKey === 'tourism' || lowerName.includes('resort') || lowerName.includes('hotel')) {
+        } else if (osmVal === 'hotel' || osmVal === 'resort' || osmKey === 'tourism' || lowerName.includes('resort') || lowerName.includes('hotel') || lowerName.includes('villa') || lowerName.includes('suites')) {
           icon = '🏨';
-          tag = 'Stay / Resort';
-        } else if (osmVal === 'ferry_terminal' || lowerName.includes('port') || lowerName.includes('marina')) {
-          icon = '⛵';
-          tag = 'Ferry Port';
+          tag = 'Hotel / Stay';
+        } else if (osmVal === 'station' || osmVal === 'train_station' || osmKey === 'railway' || lowerName.includes('station')) {
+          icon = '🚆';
+          tag = 'Station';
         }
 
         return { name, sub, icon, tag };
       });
     } catch (err) {
-      if (err.name === 'AbortError') return null; // Cancelled
+      if (err.name === 'AbortError') return null;
       console.warn('Geocoding API network fallback to curated presets:', err);
-      // Fallback: local filter
       const q = query.toLowerCase();
-      return presetHubs.filter(h => 
+      return presetDestinations.filter(h => 
         h.name.toLowerCase().includes(q) || 
         h.sub.toLowerCase().includes(q) || 
         h.tag.toLowerCase().includes(q)
@@ -182,7 +209,7 @@ function initSearchEngine() {
         listEl.innerHTML = `
           <div style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 20px; color: var(--text-secondary); font-size: 0.85rem;">
             <span class="btn-spinner" style="border-color: rgba(2, 132, 199, 0.2); border-top-color: var(--primary-azure); width: 18px; height: 18px;"></span>
-            <span>Searching global airports, rail & hubs...</span>
+            <span>Searching destinations &amp; properties...</span>
           </div>
         `;
         return;
@@ -191,7 +218,7 @@ function initSearchEngine() {
       if (!items || items.length === 0) {
         listEl.innerHTML = `
           <div style="padding: 18px 12px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
-            <span>No destinations found for "${searchQuery}". Try a major city or airport.</span>
+            <span>No results for "${searchQuery}". Try searching a city, island, or hotel name.</span>
           </div>
         `;
         return;
@@ -229,8 +256,7 @@ function initSearchEngine() {
       );
     }
 
-    // Initial render with curated popular hubs
-    renderItems(presetHubs);
+    renderItems(presetDestinations);
 
     function handleQueryInput(q) {
       clearTimeout(debounceTimer);
@@ -240,19 +266,18 @@ function initSearchEngine() {
       }
 
       if (!q) {
-        renderItems(presetHubs);
+        renderItems(presetDestinations);
         return;
       }
 
-      // Instant local matches first
-      const instantLocal = presetHubs.filter(h => 
+      const instantLocal = presetDestinations.filter(h => 
         h.name.toLowerCase().includes(q.toLowerCase()) || 
         h.sub.toLowerCase().includes(q.toLowerCase())
       );
       if (instantLocal.length > 0) {
         renderItems(instantLocal);
       } else {
-        renderItems([], true); // Show loading
+        renderItems([], true);
       }
 
       debounceTimer = setTimeout(async () => {
@@ -266,7 +291,6 @@ function initSearchEngine() {
       }, 220);
     }
 
-    // Live typing handler on main input
     inputEl.addEventListener('input', (e) => {
       const q = e.target.value.trim();
       if (modalSearchInput) modalSearchInput.value = e.target.value;
@@ -274,7 +298,6 @@ function initSearchEngine() {
       handleQueryInput(q);
     });
 
-    // Mobile search input handler
     if (modalSearchInput) {
       modalSearchInput.addEventListener('input', (e) => {
         const q = e.target.value.trim();
@@ -283,335 +306,192 @@ function initSearchEngine() {
       });
     }
 
-    // Clear button handler
     if (modalClearBtn) {
       modalClearBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (modalSearchInput) modalSearchInput.value = '';
         inputEl.value = '';
-        renderItems(presetHubs);
+        renderItems(presetDestinations);
         if (modalSearchInput) modalSearchInput.focus();
       });
     }
 
-    // Input focus / click handler
     inputEl.addEventListener('click', (e) => {
       e.stopPropagation();
       openPopover(container, inputEl.closest('.search-field'));
       if (!inputEl.value.trim()) {
-        renderItems(presetHubs);
+        renderItems(presetDestinations);
       }
     });
   }
 
-  // Initialize Origin & Destination Dropdowns
-  renderLocationList(originPopover, originInput, () => {
-    destInput.focus();
-    openPopover(destPopover, destInput.closest('.search-field'));
-  });
-
-  renderLocationList(destPopover, destInput, () => {
-    openPopover(datesModal, datesInput.closest('.search-field'));
-  });
-
-  // --------------------------------------------------------------------------
-  // 4. Category Mode Tabs & Dynamic Context-Aware Controls
-  // --------------------------------------------------------------------------
-  const tripTypeBtn = document.getElementById('tripTypeBtn');
-  const tripTypeMenu = document.getElementById('tripTypeMenu');
-  const tripTypeLabel = document.getElementById('tripTypeLabel');
-
-  const cabinClassBtn = document.getElementById('cabinClassBtn');
-  const cabinClassMenu = document.getElementById('cabinClassMenu');
-  const cabinClassLabel = document.getElementById('cabinClassLabel');
-
-  const subOptionsConfig = {
-    holiday: {
-      opt1: {
-        label: 'Roundtrip',
-        defaultVal: 'roundtrip',
-        items: [
-          { val: 'roundtrip', label: 'Roundtrip' },
-          { val: 'oneway', label: 'One-way' },
-          { val: 'multicity', label: 'Multi-city' }
-        ],
-        isTripType: true
-      },
-      opt2: {
-        label: 'Economy',
-        defaultVal: 'economy',
-        items: [
-          { val: 'economy', label: 'Economy' },
-          { val: 'premium', label: 'Premium Economy' },
-          { val: 'business', label: 'Business Class' },
-          { val: 'first', label: 'First Class' }
-        ]
-      }
-    },
-    flights: {
-      opt1: {
-        label: 'Roundtrip',
-        defaultVal: 'roundtrip',
-        items: [
-          { val: 'roundtrip', label: 'Roundtrip' },
-          { val: 'oneway', label: 'One-way' },
-          { val: 'multicity', label: 'Multi-city' }
-        ],
-        isTripType: true
-      },
-      opt2: {
-        label: 'Economy',
-        defaultVal: 'economy',
-        items: [
-          { val: 'economy', label: 'Economy' },
-          { val: 'premium', label: 'Premium Economy' },
-          { val: 'business', label: 'Business Class' },
-          { val: 'first', label: 'First Class' }
-        ]
-      }
-    },
-    stays: {
-      opt1: {
-        label: 'All Stays',
-        defaultVal: 'all_stays',
-        items: [
-          { val: 'all_stays', label: 'All Stays' },
-          { val: 'boutique', label: 'Boutique Hotels' },
-          { val: 'villas', label: 'Luxury Villas' },
-          { val: 'apartments', label: 'Apartments & Chalets' }
-        ],
-        isTripType: false
-      },
-      opt2: {
-        label: 'Top Rated (8.5+)',
-        defaultVal: '8.5',
-        items: [
-          { val: 'any', label: 'Any Rating' },
-          { val: '8.5', label: 'Top Rated (8.5+)' },
-          { val: '9.0', label: 'Exceptional (9.0+)' },
-          { val: '5star', label: '5-Star Luxury' }
-        ]
-      }
-    },
-    rail: {
-      opt1: {
-        label: 'Roundtrip',
-        defaultVal: 'roundtrip',
-        items: [
-          { val: 'roundtrip', label: 'Roundtrip' },
-          { val: 'oneway', label: 'One-way' }
-        ],
-        isTripType: true
-      },
-      opt2: {
-        label: 'Standard Class',
-        defaultVal: 'standard',
-        items: [
-          { val: 'standard', label: 'Standard Class' },
-          { val: 'executive', label: '1st Class / Executive' },
-          { val: 'sleeper', label: 'Couchette / Sleeper' }
-        ]
-      }
-    },
-    cars: {
-      opt1: {
-        label: 'Return to same location',
-        defaultVal: 'same',
-        items: [
-          { val: 'same', label: 'Return to same location' },
-          { val: 'diff', label: 'Different Drop-off' }
-        ],
-        isTripType: false
-      },
-      opt2: {
-        label: 'Any Car Type',
-        defaultVal: 'any',
-        items: [
-          { val: 'any', label: 'Any Car Type' },
-          { val: 'compact', label: 'Compact' },
-          { val: 'suv', label: 'SUV / 4x4' },
-          { val: 'luxury', label: 'Luxury' },
-          { val: 'electric', label: 'Electric' }
-        ]
-      }
-    },
-    packages: {
-      opt1: {
-        label: 'Roundtrip',
-        defaultVal: 'roundtrip',
-        items: [
-          { val: 'roundtrip', label: 'Roundtrip' },
-          { val: 'oneway', label: 'One-way' },
-          { val: 'multicity', label: 'Multi-city' }
-        ],
-        isTripType: true
-      },
-      opt2: {
-        label: 'Economy',
-        defaultVal: 'economy',
-        items: [
-          { val: 'economy', label: 'Economy' },
-          { val: 'premium', label: 'Premium Economy' },
-          { val: 'business', label: 'Business Class' },
-          { val: 'first', label: 'First Class' }
-        ]
-      }
-    }
-  };
-
-  let activeMode = 'holiday';
-
-  function renderSubOptions(mode) {
-    const cfg = subOptionsConfig[mode] || subOptionsConfig.holiday;
-    
-    // Update Option 1
-    if (tripTypeLabel) tripTypeLabel.textContent = cfg.opt1.label;
-    if (tripTypeMenu) {
-      tripTypeMenu.innerHTML = cfg.opt1.items.map((item, idx) => `
-        <div class="micro-option-item ${item.val === cfg.opt1.defaultVal ? 'active' : ''}" data-val="${item.val}" role="option">
-          ${item.label}
-        </div>
-      `).join('');
-      
-      tripTypeMenu.querySelectorAll('.micro-option-item').forEach(item => {
-        item.addEventListener('click', (e) => {
-          e.stopPropagation();
-          tripTypeMenu.querySelectorAll('.micro-option-item').forEach(i => i.classList.remove('active'));
-          item.classList.add('active');
-          const val = item.dataset.val;
-          const text = item.textContent.trim();
-          if (tripTypeLabel) tripTypeLabel.textContent = text;
-          tripTypeMenu.classList.remove('open');
-          if (tripTypeBtn) tripTypeBtn.classList.remove('active');
-
-          if (cfg.opt1.isTripType) {
-            currentTripType = val;
-            syncTripTypeToCalendar(val);
-          }
-        });
-      });
-    }
-
-    // Update Option 2
-    if (cabinClassLabel) cabinClassLabel.textContent = cfg.opt2.label;
-    if (cabinClassMenu) {
-      cabinClassMenu.innerHTML = cfg.opt2.items.map((item, idx) => `
-        <div class="micro-option-item ${item.val === cfg.opt2.defaultVal ? 'active' : ''}" data-val="${item.val}" role="option">
-          ${item.label}
-        </div>
-      `).join('');
-
-      cabinClassMenu.querySelectorAll('.micro-option-item').forEach(item => {
-        item.addEventListener('click', (e) => {
-          e.stopPropagation();
-          cabinClassMenu.querySelectorAll('.micro-option-item').forEach(i => i.classList.remove('active'));
-          item.classList.add('active');
-          const val = item.dataset.val;
-          const text = item.textContent.trim();
-          if (cabinClassLabel) cabinClassLabel.textContent = text;
-          currentCabinClass = val;
-          cabinClassMenu.classList.remove('open');
-          if (cabinClassBtn) cabinClassBtn.classList.remove('active');
-        });
-      });
-    }
-  }
-
-  function setupMicroDropdownToggle(btn, menu) {
-    if (!btn || !menu) return;
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = menu.classList.contains('open');
-      closeAllPopovers();
-      if (!isOpen) {
-        menu.classList.add('open');
-        btn.classList.add('active');
+  // Initialize Autocomplete on Origin & Destination
+  if (originPopover && originInput) {
+    renderLocationList(originPopover, originInput, () => {
+      if (destInput) {
+        destInput.focus();
+        openPopover(destPopover, destInput.closest('.search-field'));
       }
     });
   }
 
-  setupMicroDropdownToggle(tripTypeBtn, tripTypeMenu);
-  setupMicroDropdownToggle(cabinClassBtn, cabinClassMenu);
-  renderSubOptions('holiday');
+  if (destPopover && destInput) {
+    renderLocationList(destPopover, destInput, () => {
+      if (datesInput) {
+        openPopover(datesModal, datesInput.closest('.search-field'));
+      }
+    });
+  }
 
+  // --------------------------------------------------------------------------
+  // 4. Dynamic 4 Core Category Switcher (Accommodations, Flights, Cars, Packages)
+  // --------------------------------------------------------------------------
   const categoryTabs = document.querySelectorAll('.search-mode-tab');
+
+  function setMode(mode) {
+    activeMode = mode;
+
+    categoryTabs.forEach(tab => {
+      const isCurrent = tab.dataset.mode === mode;
+      tab.classList.toggle('active', isCurrent);
+      tab.setAttribute('aria-selected', isCurrent ? 'true' : 'false');
+    });
+
+    if (mode === 'stays') {
+      // 🏨 Accommodations (Default Single-Destination Mode)
+      if (searchForm) searchForm.classList.add('single-dest');
+      if (originFieldWrap) originFieldWrap.classList.add('hidden-mode');
+      if (subOptionsBar) subOptionsBar.style.display = 'none';
+      if (quickFiltersBar) quickFiltersBar.style.display = 'flex';
+
+      if (destFieldLabel) destFieldLabel.textContent = 'Destination';
+      if (destInput) {
+        destInput.placeholder = 'City, landmark or specific property';
+        if (!destInput.value || destInput.value.includes('Amalfi')) {
+          destInput.value = 'Mallorca, Spain';
+        }
+      }
+      if (destPopoverTitle) destPopoverTitle.textContent = 'Popular Stay Destinations';
+      if (destModalBarTitle) destModalBarTitle.textContent = 'Choose Destination';
+
+      if (datesFieldLabel) datesFieldLabel.textContent = 'Check-in — Check-out';
+      if (guestsFieldLabel) guestsFieldLabel.textContent = 'Guests & Rooms';
+      if (ctaBtnText) ctaBtnText.textContent = 'Search Deals';
+      if (ctaLoadingText) ctaLoadingText.textContent = 'Finding best deals...';
+
+      updateTravelersSummary();
+      updateDatesInputText();
+    } else if (mode === 'flights') {
+      // ✈️ Flights
+      if (searchForm) searchForm.classList.remove('single-dest');
+      if (originFieldWrap) originFieldWrap.classList.remove('hidden-mode');
+      if (subOptionsBar) subOptionsBar.style.display = 'flex';
+      if (quickFiltersBar) quickFiltersBar.style.display = 'none';
+
+      if (originFieldLabel) originFieldLabel.textContent = 'From';
+      if (originInput) {
+        originInput.placeholder = 'City or Airport (e.g. LHR, VIE)';
+        if (!originInput.value) originInput.value = 'London (LON)';
+      }
+
+      if (destFieldLabel) destFieldLabel.textContent = 'To';
+      if (destInput) {
+        destInput.placeholder = 'City or Airport (e.g. PMI, BCN)';
+        if (!destInput.value || destInput.value.includes('Mallorca')) {
+          destInput.value = 'Palma de Mallorca (PMI)';
+        }
+      }
+      if (destPopoverTitle) destPopoverTitle.textContent = 'Popular Flight Destinations';
+      if (destModalBarTitle) destModalBarTitle.textContent = 'Choose Arrival Airport';
+
+      if (datesFieldLabel) datesFieldLabel.textContent = 'Trip Dates';
+      if (guestsFieldLabel) guestsFieldLabel.textContent = 'Travelers & Cabin';
+      if (ctaBtnText) ctaBtnText.textContent = 'Find Flights';
+      if (ctaLoadingText) ctaLoadingText.textContent = 'Scanning 100+ airlines...';
+
+      updateTravelersSummary();
+      updateDatesInputText();
+    } else if (mode === 'cars') {
+      // 🚗 Cars
+      if (searchForm) searchForm.classList.remove('single-dest');
+      if (originFieldWrap) originFieldWrap.classList.remove('hidden-mode');
+      if (subOptionsBar) subOptionsBar.style.display = 'flex';
+      if (quickFiltersBar) quickFiltersBar.style.display = 'none';
+
+      if (originFieldLabel) originFieldLabel.textContent = 'Pick-up Location';
+      if (originInput) originInput.placeholder = 'Airport, City or Rental Hub';
+
+      if (destFieldLabel) destFieldLabel.textContent = 'Drop-off Location';
+      if (destInput) destInput.placeholder = 'Same as pick-up or different city';
+
+      if (datesFieldLabel) datesFieldLabel.textContent = 'Rental Dates';
+      if (guestsFieldLabel) guestsFieldLabel.textContent = 'Driver Age';
+      if (ctaBtnText) ctaBtnText.textContent = 'Find Cars';
+      if (ctaLoadingText) ctaLoadingText.textContent = 'Comparing top car fleets...';
+
+      if (guestsInput) guestsInput.value = 'Driver age 25–70';
+      updateDatesInputText();
+    } else if (mode === 'packages') {
+      // 🌴 Packages (Flight + Hotel)
+      if (searchForm) searchForm.classList.remove('single-dest');
+      if (originFieldWrap) originFieldWrap.classList.remove('hidden-mode');
+      if (subOptionsBar) subOptionsBar.style.display = 'flex';
+      if (quickFiltersBar) quickFiltersBar.style.display = 'none';
+
+      if (originFieldLabel) originFieldLabel.textContent = 'Departure Hub';
+      if (destFieldLabel) destFieldLabel.textContent = 'Destination Stay';
+      if (datesFieldLabel) datesFieldLabel.textContent = 'Travel Dates';
+      if (guestsFieldLabel) guestsFieldLabel.textContent = 'Guests & Rooms';
+      if (ctaBtnText) ctaBtnText.textContent = 'Find Packages';
+      if (ctaLoadingText) ctaLoadingText.textContent = 'Bundling flight + stay deals...';
+
+      updateTravelersSummary();
+      updateDatesInputText();
+    }
+  }
+
   categoryTabs.forEach(tab => {
     tab.addEventListener('click', (e) => {
       e.preventDefault();
-      categoryTabs.forEach(t => {
-        t.classList.remove('active');
-        t.setAttribute('aria-selected', 'false');
-      });
-      tab.classList.add('active');
-      tab.setAttribute('aria-selected', 'true');
+      setMode(tab.dataset.mode);
+    });
+  });
 
-      const mode = tab.dataset.mode;
-      activeMode = mode;
-      renderSubOptions(mode);
-
-      const originLabel = document.querySelector('#originField .field-label');
-      const destLabel = document.querySelector('#destField .field-label');
-
-      if (mode === 'flights') {
-        if (originLabel) originLabel.textContent = 'Departure Airport';
-        if (destLabel) destLabel.textContent = 'Arrival Airport';
-        originInput.placeholder = 'City or Airport (e.g. LHR, VIE)';
-        destInput.placeholder = 'City or Airport (e.g. NAP, JFK)';
-      } else if (mode === 'stays') {
-        if (originLabel) originLabel.textContent = 'Stay Destination';
-        if (destLabel) destLabel.textContent = 'Resort or Property';
-        originInput.placeholder = 'City, Region or Island';
-        destInput.placeholder = 'Villa, Resort, or Hotel Name';
-      } else if (mode === 'rail') {
-        if (originLabel) originLabel.textContent = 'Departure Station';
-        if (destLabel) destLabel.textContent = 'Arrival Station';
-        originInput.placeholder = 'Eurostar / Rail Station';
-        destInput.placeholder = 'Connecting Station';
-      } else if (mode === 'cars') {
-        if (originLabel) originLabel.textContent = 'Pick-up Location';
-        if (destLabel) destLabel.textContent = 'Drop-off Location';
-        originInput.placeholder = 'Airport, City or Rental Hub';
-        destInput.placeholder = 'Drop-off Airport or City';
-      } else {
-        if (originLabel) originLabel.textContent = 'From (Your Door)';
-        if (destLabel) destLabel.textContent = 'To (Sun Destination)';
-        originInput.placeholder = 'City, Airport or Station';
-        destInput.placeholder = 'Where to?';
+  // Also bind navigation links with data-nav-mode
+  document.querySelectorAll('[data-nav-mode]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const targetMode = link.dataset.navMode;
+      if (targetMode) {
+        setMode(targetMode);
       }
     });
   });
 
-  function syncTripTypeToCalendar(type) {
-    const roundBtn = document.getElementById('calRoundtripBtn');
-    const oneBtn = document.getElementById('calOnewayBtn');
-    const datesModal = document.getElementById('datesPickerModal');
-    const presetsBar = document.querySelector('.calendar-presets-bar');
-    
-    if (type === 'oneway') {
-      if (roundBtn) roundBtn.classList.remove('active');
-      if (oneBtn) oneBtn.classList.add('active');
-      if (datesModal) datesModal.classList.add('oneway-mode');
-      if (presetsBar) presetsBar.classList.add('hidden');
-      selectedEnd = null;
-      selectingState = 'idle';
-      updateDatesInputText();
-      renderAllCalendars();
-    } else {
-      if (roundBtn) roundBtn.classList.add('active');
-      if (oneBtn) oneBtn.classList.remove('active');
-      if (datesModal) datesModal.classList.remove('oneway-mode');
-      if (presetsBar) presetsBar.classList.remove('hidden');
-      if (!selectedEnd && selectedStart) {
-        selectedEnd = new Date(selectedStart.getTime() + 7 * 24 * 60 * 60 * 1000);
+  // --------------------------------------------------------------------------
+  // 5. Accommodations Quick Filter Chips
+  // --------------------------------------------------------------------------
+  const filterChips = document.querySelectorAll('.quick-filter-chip');
+  filterChips.forEach(chip => {
+    chip.addEventListener('click', (e) => {
+      e.preventDefault();
+      filterChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeStayFilter = chip.dataset.filter || 'all';
+
+      // Auto-sync entire homes checkbox if apartments is clicked
+      if (activeStayFilter === 'apartments') {
+        entireHomesOnly = true;
+        if (entireHomesCheckbox) entireHomesCheckbox.checked = true;
+      } else if (activeStayFilter === 'hotels') {
+        entireHomesOnly = false;
+        if (entireHomesCheckbox) entireHomesCheckbox.checked = false;
       }
-      selectingState = 'idle';
-      updateDatesInputText();
-      renderAllCalendars();
-    }
-  }
+      updateTravelersSummary();
+    });
+  });
 
   // --------------------------------------------------------------------------
-  // 6. Interactive Dynamic Real Live-Date Dual-Month Range Calendar
+  // 6. Interactive Dual-Month Range & Weekend Calendar
   // --------------------------------------------------------------------------
   const today = new Date();
   const todayNormalized = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -619,9 +499,10 @@ function initSearchEngine() {
   let currentCalYear = today.getFullYear();
   let currentCalMonth = today.getMonth();
 
-  let selectedStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  let selectedEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
-  let selectingState = 'idle'; // 'idle', 'picking-end'
+  // Dynamic initialization: 7 days in advance
+  let selectedStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
+  let selectedEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 14);
+  let selectingState = 'idle';
 
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -635,7 +516,9 @@ function initSearchEngine() {
   }
 
   function updateDatesInputText() {
-    if (currentTripType === 'oneway') {
+    if (!datesInput) return;
+
+    if (currentTripType === 'oneway' && activeMode !== 'stays') {
       if (selectedStart) {
         datesInput.value = `${formatDisplayDate(selectedStart)} ${selectedStart.getFullYear()} (One-way)`;
       } else {
@@ -645,9 +528,16 @@ function initSearchEngine() {
     }
 
     if (selectedStart && selectedEnd) {
-      datesInput.value = `${formatDisplayDate(selectedStart)} – ${formatDisplayDate(selectedEnd)}`;
+      const diffMs = selectedEnd.getTime() - selectedStart.getTime();
+      const nights = Math.max(Math.round(diffMs / (1000 * 60 * 60 * 24)), 1);
+
+      if (activeMode === 'stays') {
+        datesInput.value = `${formatDisplayDate(selectedStart)} – ${formatDisplayDate(selectedEnd)} (${nights} night${nights > 1 ? 's' : ''})`;
+      } else {
+        datesInput.value = `${formatDisplayDate(selectedStart)} – ${formatDisplayDate(selectedEnd)}`;
+      }
     } else if (selectedStart) {
-      datesInput.value = `${formatDisplayDate(selectedStart)} – Select Return`;
+      datesInput.value = `${formatDisplayDate(selectedStart)} – Select Check-out`;
     } else {
       datesInput.value = 'Select dates';
     }
@@ -657,11 +547,10 @@ function initSearchEngine() {
     if (!gridEl) return;
     gridEl.innerHTML = '';
     
-    const firstDay = new Date(year, month, 1).getDay(); // 0 is Sunday
-    const startOffset = (firstDay + 6) % 7; // Monday 0
+    const firstDay = new Date(year, month, 1).getDay();
+    const startOffset = (firstDay + 6) % 7;
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    // Empty lead cells
     for (let i = 0; i < startOffset; i++) {
       const empty = document.createElement('div');
       empty.className = 'day-cell disabled';
@@ -681,7 +570,7 @@ function initSearchEngine() {
 
       const isStart = selectedStart && cellDate.toDateString() === selectedStart.toDateString();
       const isEnd = selectedEnd && cellDate.toDateString() === selectedEnd.toDateString();
-      const inRange = currentTripType !== 'oneway' && selectedStart && selectedEnd && cellDate > selectedStart && cellDate < selectedEnd;
+      const inRange = selectedStart && selectedEnd && cellDate > selectedStart && cellDate < selectedEnd;
 
       if (isStart) cell.classList.add('range-start');
       if (isEnd) cell.classList.add('range-end');
@@ -691,7 +580,7 @@ function initSearchEngine() {
         cell.addEventListener('click', (e) => {
           e.stopPropagation();
 
-          if (currentTripType === 'oneway') {
+          if (currentTripType === 'oneway' && activeMode !== 'stays') {
             selectedStart = cellDate;
             selectedEnd = null;
             selectingState = 'idle';
@@ -700,7 +589,6 @@ function initSearchEngine() {
             return;
           }
 
-          // Roundtrip logic
           if (selectingState === 'idle' || (selectedStart && selectedEnd)) {
             selectedStart = cellDate;
             selectedEnd = null;
@@ -717,24 +605,10 @@ function initSearchEngine() {
           updateDatesInputText();
           renderAllCalendars();
         });
-
-        cell.addEventListener('mouseenter', () => {
-          if (currentTripType !== 'oneway' && selectingState === 'picking-end' && selectedStart && !selectedEnd) {
-            highlightHoverRange(cellDate);
-          }
-        });
       }
 
       gridEl.appendChild(cell);
     }
-  }
-
-  function highlightHoverRange(hoverDate) {
-    document.querySelectorAll('.days-grid .day-cell').forEach(c => {
-      if (!c.classList.contains('disabled') && !c.classList.contains('range-start')) {
-        c.classList.remove('in-range');
-      }
-    });
   }
 
   function renderAllCalendars() {
@@ -763,7 +637,6 @@ function initSearchEngine() {
   updateDatesInputText();
   renderAllCalendars();
 
-  // Dynamic Navigation Arrow Buttons (< and >) placed at bottom of calendar
   const calPrevMonth = document.getElementById('calPrevMonth');
   const calNextMonth = document.getElementById('calNextMonth');
 
@@ -791,114 +664,46 @@ function initSearchEngine() {
     });
   }
 
-  // Calendar Header Trip Type Buttons
-  const calRoundtripBtn = document.getElementById('calRoundtripBtn');
-  const calOnewayBtn = document.getElementById('calOnewayBtn');
-
-  if (calRoundtripBtn) {
-    calRoundtripBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      currentTripType = 'roundtrip';
-      if (tripTypeLabel) tripTypeLabel.textContent = 'Roundtrip';
-      syncTripTypeToCalendar('roundtrip');
-    });
-  }
-
-  if (calOnewayBtn) {
-    calOnewayBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      currentTripType = 'oneway';
-      if (tripTypeLabel) tripTypeLabel.textContent = 'One-way';
-      syncTripTypeToCalendar('oneway');
-    });
-  }
-
-  // Presets Bar Handlers
-  const presetBtns = document.querySelectorAll('.preset-pill-btn');
-  presetBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      presetBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      if (currentTripType === 'oneway') {
-        currentTripType = 'roundtrip';
-        syncTripTypeToCalendar('roundtrip');
-      }
-
-      const preset = btn.dataset.preset;
-      currentCalYear = today.getFullYear();
-      currentCalMonth = today.getMonth();
-
-      if (preset === '1week') {
-        selectedStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        selectedEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
-      } else if (preset === 'weekend') {
-        selectedStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        selectedEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 3);
-      } else if (preset === '2weeks') {
-        selectedStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        selectedEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 14);
-      }
-      selectingState = 'idle';
-      updateDatesInputText();
-      renderAllCalendars();
-    });
-  });
-
-  // Flexible Dates Checkbox
-  const flexCheck = document.getElementById('flexibleDatesCheck');
-  if (flexCheck) {
-    flexCheck.addEventListener('change', (e) => {
-      isFlexibleDates = e.target.checked;
-    });
-  }
-
-  // Calendar Footer Buttons
-  const clearDatesBtn = document.getElementById('clearDatesBtn');
   const applyDatesBtn = document.getElementById('applyDatesBtn');
-
-  if (clearDatesBtn) {
-    clearDatesBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      selectedStart = null;
-      selectedEnd = null;
-      datesInput.value = '';
-      selectingState = 'idle';
-      renderAllCalendars();
-    });
-  }
-
   if (applyDatesBtn) {
     applyDatesBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       updateDatesInputText();
       closeAllPopovers();
-      openPopover(travelersModal, guestsInput.closest('.search-field'));
+      if (guestsInput) openPopover(travelersModal, guestsInput.closest('.search-field'));
     });
   }
 
-  datesInput.addEventListener('click', (e) => {
-    e.stopPropagation();
-    openPopover(datesModal, datesInput.closest('.search-field'));
-  });
+  if (datesInput) {
+    datesInput.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openPopover(datesModal, datesInput.closest('.search-field'));
+    });
+  }
 
   // --------------------------------------------------------------------------
-  // 7. Travelers & Rooms Counter Steppers
+  // 7. Guests & Rooms Stepper Popover with Entire Homes Toggle
   // --------------------------------------------------------------------------
-  let adults = 2;
-  let children = 0;
-  let rooms = 1;
-
   function updateTravelersSummary() {
-    let summary = `${adults} Adult${adults > 1 ? 's' : ''}`;
-    if (children > 0) {
-      summary += `, ${children} Child${children > 1 ? 'ren' : ''}`;
-    }
-    summary += `, ${rooms} Room${rooms > 1 ? 's' : ''}`;
-    guestsInput.value = summary;
+    if (!guestsInput) return;
 
-    // Update Counter Displays
+    if (activeMode === 'stays' || activeMode === 'packages') {
+      let summary = `${adults} Adult${adults > 1 ? 's' : ''} · ${rooms} Room${rooms > 1 ? 's' : ''}`;
+      if (children > 0) {
+        summary = `${adults} Adults, ${children} Child${children > 1 ? 'ren' : ''} · ${rooms} Room${rooms > 1 ? 's' : ''}`;
+      }
+      if (entireHomesOnly) {
+        summary += ' (Homes)';
+      }
+      guestsInput.value = summary;
+    } else if (activeMode === 'flights') {
+      const pax = adults + children;
+      const cabinLabel = currentCabinClass.charAt(0).toUpperCase() + currentCabinClass.slice(1);
+      guestsInput.value = `${pax} Traveler${pax > 1 ? 's' : ''} · ${cabinLabel}`;
+    } else if (activeMode === 'cars') {
+      guestsInput.value = 'Driver age 25–70';
+    }
+
     const adultsEl = document.getElementById('adultsVal');
     const childrenEl = document.getElementById('childrenVal');
     const roomsEl = document.getElementById('roomsVal');
@@ -907,7 +712,6 @@ function initSearchEngine() {
     if (childrenEl) childrenEl.textContent = children;
     if (roomsEl) roomsEl.textContent = rooms;
 
-    // Update Minus Button Disabled States
     const adultsMinus = document.getElementById('adultsMinus');
     const childrenMinus = document.getElementById('childrenMinus');
     const roomsMinus = document.getElementById('roomsMinus');
@@ -944,23 +748,48 @@ function initSearchEngine() {
 
   setupStepper('adultsPlus', 'adultsMinus', () => adults, (v) => { adults = v; }, 1, 10);
   setupStepper('childrenPlus', 'childrenMinus', () => children, (v) => { children = v; }, 0, 8);
-  setupStepper('roomsPlus', 'roomsMinus', () => rooms, (v) => { rooms = v; }, 1, 5);
+  setupStepper('roomsPlus', 'roomsMinus', () => rooms, (v) => { rooms = v; }, 1, 8);
+
+  if (entireHomesCheckbox) {
+    entireHomesCheckbox.addEventListener('change', (e) => {
+      entireHomesOnly = e.target.checked;
+      if (entireHomesOnly && activeStayFilter !== 'apartments') {
+        filterChips.forEach(c => c.classList.remove('active'));
+        const aptChip = document.querySelector('[data-filter="apartments"]');
+        if (aptChip) aptChip.classList.add('active');
+        activeStayFilter = 'apartments';
+      }
+      updateTravelersSummary();
+    });
+  }
 
   const applyTravelersBtn = document.getElementById('applyTravelersBtn');
   if (applyTravelersBtn) {
     applyTravelersBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      updateTravelersSummary();
       closeAllPopovers();
     });
   }
 
-  guestsInput.addEventListener('click', (e) => {
-    e.stopPropagation();
-    openPopover(travelersModal, guestsInput.closest('.search-field'));
-  });
+  const applyTravelersDesktopBtn = document.getElementById('applyTravelersDesktopBtn');
+  if (applyTravelersDesktopBtn) {
+    applyTravelersDesktopBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      updateTravelersSummary();
+      closeAllPopovers();
+    });
+  }
+
+  if (guestsInput) {
+    guestsInput.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openPopover(travelersModal, guestsInput.closest('.search-field'));
+    });
+  }
 
   // --------------------------------------------------------------------------
-  // 8. Mobile Modal Close, Back & Apply Handlers
+  // 8. Mobile Navigation & Dismissal Handlers
   // --------------------------------------------------------------------------
   document.querySelectorAll('.modal-back-btn, .modal-close-icon-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -989,13 +818,11 @@ function initSearchEngine() {
   if (applyDatesModalBtn) {
     applyDatesModalBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      updateDatesInputText();
       closeAllPopovers();
     });
   }
 
-  // --------------------------------------------------------------------------
-  // 9. Global Outside-Click & Escape Key Dismissal
-  // --------------------------------------------------------------------------
   document.addEventListener('click', (e) => {
     if (
       !e.target.closest('.search-field-wrap') && 
@@ -1019,160 +846,100 @@ function initSearchEngine() {
   });
 
   // --------------------------------------------------------------------------
-  // 10. Search CTA Submit & Luxury Loading Transition Controller
+  // 9. Search CTA Submit & Real Outbound Affiliate Forwarding
   // --------------------------------------------------------------------------
-  function triggerSearchTransition() {
+  function formatDateISO(d) {
+    if (!d) return '';
+    const yr = d.getFullYear();
+    const mo = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${yr}-${mo}-${day}`;
+  }
+
+  function triggerSearchAction() {
     closeAllPopovers();
 
-    const origin = originInput ? originInput.value.trim() : 'Linz (LNZ)';
-    const dest = destInput ? destInput.value.trim() : 'Thessaloniki (SKG)';
-    
-    // Format dates ISO
-    const departISO = selectedStart ? TripMuraIATA.formatDateISO(selectedStart) : TripMuraIATA.formatDateISO(new Date(), 0);
-    const returnISO = selectedEnd ? TripMuraIATA.formatDateISO(selectedEnd) : (currentTripType === 'oneway' ? '' : TripMuraIATA.formatDateISO(new Date(), 7));
+    const destination = (destInput ? destInput.value.trim() : '') || 'Mallorca, Spain';
+    const origin = (originInput ? originInput.value.trim() : '') || 'London (LON)';
+    const checkInISO = formatDateISO(selectedStart);
+    const checkOutISO = formatDateISO(selectedEnd);
 
-    const adultsVal = document.getElementById('adultsVal');
-    const childrenVal = document.getElementById('childrenVal');
-    const roomsVal = document.getElementById('roomsVal');
-    const directCheck = document.getElementById('directRoutesOnly');
+    if (activeMode === 'stays') {
+      // Accommodations Outbound Metasearch Route Generation
+      let targetUrl = '';
+      let providerName = 'Booking.com';
 
-    const adults = adultsVal ? parseInt(adultsVal.textContent, 10) || 2 : 2;
-    const children = childrenVal ? parseInt(childrenVal.textContent, 10) || 0 : 0;
-    const rooms = roomsVal ? parseInt(roomsVal.textContent, 10) || 1 : 1;
-    const direct = directCheck && directCheck.checked ? 1 : 0;
+      if (entireHomesOnly || activeStayFilter === 'apartments') {
+        targetUrl = window.FORWARDING_ENGINE 
+          ? window.FORWARDING_ENGINE.buildAirbnbUrl(destination, checkInISO, checkOutISO, adults, children, true)
+          : `https://www.airbnb.com/s/${encodeURIComponent(destination)}/homes?checkin=${checkInISO}&checkout=${checkOutISO}&adults=${adults}&children=${children}&room_types%5B%5D=Entire%20home%2Fapt`;
+        providerName = 'Airbnb & Vacation Rentals';
+      } else {
+        targetUrl = window.FORWARDING_ENGINE
+          ? window.FORWARDING_ENGINE.buildBookingComUrl(destination, checkInISO, checkOutISO, adults, rooms, children, '2369322')
+          : `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(destination)}&checkin=${checkInISO}&checkout=${checkOutISO}&group_adults=${adults}&no_rooms=${rooms}&group_children=${children}&aid=2369322`;
+        providerName = 'Booking.com Official Portal';
+      }
 
-    const overlay = document.getElementById('searchTransitionOverlay');
-
-    function navigateToResults() {
-      const params = new URLSearchParams({
-        from: origin,
-        to: dest,
-        depart: departISO,
-        return: returnISO,
-        travelers: adults,
-        children: children,
-        rooms: rooms,
-        cabin: currentCabinClass || 'economy',
-        direct: direct
-      });
-      window.location.href = `results.html?${params.toString()}`;
-    }
-
-    if (!overlay) {
-      navigateToResults();
+      if (window.FORWARDING_ENGINE && window.FORWARDING_ENGINE.triggerForwarding) {
+        window.FORWARDING_ENGINE.triggerForwarding(providerName, targetUrl, 'Best Direct Rate', {
+          route: destination,
+          dates: `${formatDisplayDate(selectedStart)} – ${formatDisplayDate(selectedEnd)}`,
+          pax: `${adults} Guests · ${rooms} Room`
+        });
+      } else {
+        window.open(targetUrl, '_blank');
+      }
       return;
     }
 
-    const counterVal = document.getElementById('searchCounterVal');
-    const progressFill = document.getElementById('searchProgressFill');
-    const statusMsg = document.getElementById('searchStatusMsg');
-    const arcActive = overlay.querySelector('.search-arc-active');
-    const jetGroup = overlay.querySelector('.search-jet-group');
-    const providerPills = overlay.querySelectorAll('.search-provider-pill');
+    if (activeMode === 'cars') {
+      const loc = destination || origin || 'Mallorca';
+      const targetUrl = window.FORWARDING_ENGINE
+        ? window.FORWARDING_ENGINE.buildDiscoverCarsUrl(loc, checkInISO, checkOutISO, '779382')
+        : `https://www.discovercars.com/?search=${encodeURIComponent(loc)}&a_aid=779382`;
 
-    overlay.classList.add('active');
-    document.body.classList.add('search-modal-open');
-
-    // Dynamic rotating status messages every ~400ms
-    const messages = [
-      { text: "Scanning direct routes on Austrian Airlines & Lufthansa...", provider: "austrian" },
-      { text: "Finding lowest direct room rates on Booking.com & Airbnb...", provider: "booking" },
-      { text: "Checking real-time tickets on ÖBB Ticket Shop & Deutsche Bahn...", provider: "oebb" },
-      { text: "Comparing low-cost direct flights on Ryanair & easyJet...", provider: "ryanair" },
-      { text: "Synthesizing door-to-door direct carrier itineraries...", provider: "lufthansa" }
-    ];
-
-    let totalArcLength = 280;
-    if (arcActive && arcActive.getTotalLength) {
-      try {
-        totalArcLength = arcActive.getTotalLength();
-        arcActive.style.strokeDasharray = `${totalArcLength} ${totalArcLength}`;
-        arcActive.style.strokeDashoffset = `${totalArcLength}`;
-      } catch (e) {
-        totalArcLength = 280;
-      }
-    }
-
-    const SEARCH_DURATION = 2000; // 2.0s calibrated authentic live search feel
-    let startTimestamp = null;
-    let lastMsgIndex = -1;
-
-    function easeInOut(t) {
-      return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-    }
-
-    function step(timestamp) {
-      if (!startTimestamp) startTimestamp = timestamp;
-      const elapsed = timestamp - startTimestamp;
-      const linearProgress = Math.min(elapsed / SEARCH_DURATION, 1);
-      const eased = easeInOut(linearProgress);
-
-      const pct = Math.min(Math.round(eased * 100), 100);
-      if (counterVal) counterVal.textContent = `${pct}%`;
-      if (progressFill) progressFill.style.width = `${pct}%`;
-
-      if (arcActive) {
-        arcActive.style.strokeDashoffset = totalArcLength * (1 - eased);
-      }
-
-      if (jetGroup && arcActive && arcActive.getPointAtLength) {
-        try {
-          const currentDistance = totalArcLength * eased;
-          const point = arcActive.getPointAtLength(currentDistance);
-          const p1 = arcActive.getPointAtLength(Math.max(currentDistance - 2, 0));
-          const p2 = arcActive.getPointAtLength(Math.min(currentDistance + 2, totalArcLength));
-          const angleDeg = (Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180) / Math.PI;
-          jetGroup.style.transform = `translate(${point.x - 12}px, ${point.y - 12}px) rotate(${angleDeg}deg)`;
-        } catch (e) {}
-      }
-
-      // Rotate status message every ~400ms
-      const currentMsgIndex = Math.min(Math.floor((elapsed / SEARCH_DURATION) * messages.length), messages.length - 1);
-      if (currentMsgIndex !== lastMsgIndex) {
-        lastMsgIndex = currentMsgIndex;
-        if (statusMsg) {
-          statusMsg.classList.add('fading');
-          setTimeout(() => {
-            statusMsg.textContent = messages[currentMsgIndex].text;
-            statusMsg.classList.remove('fading');
-          }, 120);
-        }
-
-        // Highlight corresponding provider pill
-        const activeProv = messages[currentMsgIndex].provider;
-        providerPills.forEach(p => {
-          if (p.dataset.provider === activeProv || (activeProv === 'booking' && p.dataset.provider === 'airbnb')) {
-            p.classList.add('active-pulse');
-          } else {
-            p.classList.remove('active-pulse');
-          }
+      if (window.FORWARDING_ENGINE && window.FORWARDING_ENGINE.triggerForwarding) {
+        window.FORWARDING_ENGINE.triggerForwarding('DiscoverCars Portal', targetUrl, 'Best Rental Deal', {
+          route: loc,
+          dates: `${formatDisplayDate(selectedStart)} – ${formatDisplayDate(selectedEnd)}`,
+          pax: 'Driver age 25–70'
         });
-      }
-
-      if (linearProgress < 1) {
-        requestAnimationFrame(step);
       } else {
-        setTimeout(navigateToResults, 200);
+        window.open(targetUrl, '_blank');
       }
+      return;
     }
 
-    requestAnimationFrame(step);
+    // Flights or Packages -> Navigate to results engine
+    const params = new URLSearchParams({
+      from: origin,
+      to: destination,
+      depart: checkInISO,
+      return: checkOutISO,
+      travelers: adults,
+      children: children,
+      rooms: rooms,
+      cabin: currentCabinClass || 'economy',
+      mode: activeMode
+    });
+    window.location.href = `results.html?${params.toString()}`;
   }
 
   if (searchForm) {
     searchForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      triggerSearchTransition();
+      triggerSearchAction();
     });
   }
 
   if (searchCta) {
     searchCta.addEventListener('click', (e) => {
       e.preventDefault();
-      triggerSearchTransition();
+      triggerSearchAction();
     });
   }
 
-  // Expose search trigger globally
-  window.tripmuraTriggerSearch = triggerSearchTransition;
+  // Initialize Default Mode: Accommodations
+  setMode('stays');
 }
